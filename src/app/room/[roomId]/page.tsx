@@ -11,7 +11,6 @@ import { Spinner } from '@/components/ui/Spinner'
 import { useRoom } from '@/hooks/useRoom'
 import { usePlayers } from '@/hooks/usePlayers'
 import { useVotes } from '@/hooks/useVotes'
-import { useSession } from '@/hooks/useSession'
 import { useGameStore } from '@/store/gameStore'
 import { createClient } from '@/lib/supabase/client'
 
@@ -21,7 +20,6 @@ export default function RoomPage() {
   const roomId = params.roomId as string
   const { toast, showToast, clearToast } = useToast()
 
-  const { userId } = useSession()
   const { myPlayerId, myRole, selectedVote } = useGameStore()
 
   const { room, loading: roomLoading } = useRoom(roomId)
