@@ -18,6 +18,10 @@ export interface PlayerStats {
   lowest: number | null
   /** Their highest numeric vote (most pessimistic). */
   highest: number | null
+  /** Average response time (in seconds) — last vote change minus the round's
+   *  start (heuristically: the earliest vote in that round). Null if not
+   *  computable (no rounds finalised with a numeric vote). */
+  averageResponseSec: number | null
 }
 
 export interface Award {
@@ -98,6 +102,17 @@ export function computeSessionStats(
     roundMean.set(r, nums.reduce((a, b) => a + b, 0) / nums.length)
   }
 
+  // Round start time heuristic: the earliest vote.created_at for that round.
+  // Underestimates the true voting_started_at (the SM clicked "Lancer le vote"
+  // a bit before), but it's the same baseline for everyone so the comparison
+  // remains fair.
+  const roundStartedAt = new Map<number, number>()
+  for (const v of votes) {
+    const t = new Date(v.created_at).getTime()
+    const prev = roundStartedAt.get(v.round)
+    if (prev === undefined || t < prev) roundStartedAt.set(v.round, t)
+  }
+
   const perPlayer: PlayerStats[] = devs.map(player => {
     const pv = votesByPlayer.get(player.id) ?? []
     let numericVotes = 0
@@ -107,6 +122,8 @@ export function computeSessionStats(
     let highest: number | null = null
     let alignSum = 0
     let alignCount = 0
+    let respSum = 0
+    let respCount = 0
     const seenRounds = new Set<number>()
 
     for (const v of pv) {
@@ -125,6 +142,18 @@ export function computeSessionStats(
         alignSum += Math.abs(playerIdx - meanIdx)
         alignCount++
       }
+      // Response time = last-change timestamp (updated_at) minus the round
+      // start. Falls back to created_at if the updated_at column isn't there
+      // yet (migration 20260521020000 not applied).
+      const start = roundStartedAt.get(v.round)
+      const lastChange = (v.updated_at ?? v.created_at) as string
+      if (start !== undefined) {
+        const elapsed = (new Date(lastChange).getTime() - start) / 1000
+        if (elapsed >= 0 && isFinite(elapsed)) {
+          respSum += elapsed
+          respCount++
+        }
+      }
     }
 
     const missing = Math.max(0, roundMean.size - seenRounds.size)
@@ -137,6 +166,7 @@ export function computeSessionStats(
       alignmentScore: alignCount > 0 ? alignSum / alignCount : null,
       lowest,
       highest,
+      averageResponseSec: respCount > 0 ? respSum / respCount : null,
     }
   })
 
@@ -257,17 +287,18 @@ export function computeSessionStats(
     })
   }
 
-  // La Machine (most numeric votes — measure of participation)
+  // La Machine (fastest average response time — last vote change makes faith)
   const machine = [...perPlayer]
-    .sort((a, b) => b.numericVotes - a.numericVotes)[0]
-  if (machine && machine.numericVotes > 0 && perPlayer.length > 1) {
+    .filter(p => p.averageResponseSec !== null && p.numericVotes > 0)
+    .sort((a, b) => (a.averageResponseSec as number) - (b.averageResponseSec as number))[0]
+  if (machine) {
     awards.push({
       id: 'machine',
       icon: '🚀',
       title: 'La Machine',
-      subtitle: 'Présent à tous les rounds',
+      subtitle: 'A chiffré le plus vite en moyenne',
       player: machine.player,
-      value: `${machine.numericVotes} vote${machine.numericVotes > 1 ? 's' : ''}`,
+      value: formatDuration(machine.averageResponseSec as number),
     })
   }
 
@@ -283,6 +314,17 @@ export function computeSessionStats(
     mostUnanimous,
     awards,
   }
+}
+
+/** Human-readable duration: 8.4s / 1m 23s / 2m 05s. */
+export function formatDuration(seconds: number): string {
+  if (!isFinite(seconds) || seconds < 0) return '—'
+  if (seconds < 60) {
+    return seconds < 10 ? `${seconds.toFixed(1)}s` : `${Math.round(seconds)}s`
+  }
+  const m = Math.floor(seconds / 60)
+  const s = Math.round(seconds - m * 60)
+  return s === 0 ? `${m}min` : `${m}min ${s.toString().padStart(2, '0')}`
 }
 
 export function consensusEmoji(c: ConsensusLevel | string | null): string {

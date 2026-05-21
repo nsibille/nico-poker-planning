@@ -116,27 +116,36 @@ export function SessionRecap({ roomId, players, stories, endedAt }: SessionRecap
       <section className="session-recap__big-stats">
         <BigStat
           delay={0.6}
+          label="Stories"
+          value={String(storiesCount)}
+          accent="indigo"
+          hint={storiesCount > 1 ? 'rounds joués' : 'round joué'}
+        />
+        <BigStat
+          delay={0.8}
           label="Story points"
           value={totalStoryPoints.toFixed(0)}
           accent="brand"
           hint="Total estimé"
         />
         <BigStat
-          delay={0.8}
+          delay={1.0}
           label="Complexité moy."
           value={globalMean !== null ? formatMean(globalMean) : '—'}
           accent="indigo"
           hint="par story"
         />
         <BigStat
-          delay={1.0}
+          delay={1.2}
           label="🎯 Consensus parfait"
-          value={`${perfectConsensusCount}/${storiesCount}`}
+          value={String(perfectConsensusCount)}
           accent="success"
-          hint={perfectConsensusCount === storiesCount && storiesCount > 0 ? 'Sans-faute !' : 'rounds'}
+          hint={perfectConsensusCount === storiesCount && storiesCount > 0
+            ? 'sans-faute !'
+            : perfectConsensusCount > 1 ? 'rounds' : 'round'}
         />
         <BigStat
-          delay={1.2}
+          delay={1.4}
           label="⚠️ Divergents"
           value={String(divergentCount)}
           accent={divergentCount > 0 ? 'danger' : 'muted'}
@@ -163,7 +172,7 @@ export function SessionRecap({ roomId, players, stories, endedAt }: SessionRecap
                   <div className="award-card__subtitle">{a.subtitle}</div>
                   <div className="award-card__player">
                     <Avatar name={a.player.name} role={a.player.role} emoji={a.player.emoji} size="sm" />
-                    <span className="award-card__player-name">{a.player.name}</span>
+                    <span className="award-card__player-name" title={a.player.name}>{a.player.name}</span>
                     {a.value && <span className="award-card__value">{a.value}</span>}
                   </div>
                 </div>
