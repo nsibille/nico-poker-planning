@@ -704,12 +704,12 @@ html, body {
   padding: var(--space-4) var(--space-6);
 }
 .layout-room-grid--with-timeline {
-  grid-template-columns: 240px minmax(0, 1fr) 300px;
-  max-width: 1320px;
+  grid-template-columns: 280px minmax(0, 1fr) 300px;
+  max-width: 1360px;
 }
 @media (max-width: 1080px) {
   .layout-room-grid--with-timeline {
-    grid-template-columns: 240px minmax(0, 1fr);
+    grid-template-columns: 280px minmax(0, 1fr);
   }
   .layout-room-grid--with-timeline > .story-timeline {
     grid-column: 1 / -1;
