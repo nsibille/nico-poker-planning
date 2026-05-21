@@ -898,6 +898,11 @@ Variantes  : sm, md, lg | success, warning, danger, info, neutral
 | `emoji-picker` | Lobby | Sélecteur d'emoji avatar — preview + dé re-roll + grille |
 | `role-card-group` | Lobby | Grille 2 col du sélecteur de rôle |
 | `role-card` | Lobby | Carte rôle (icône + titre + subtitle + check badge) — variants developer (amber) / scrum-master (brand) |
+| `reveal-bar__reopen` | Reveal | Bouton "↺ Re-voter" sous chaque barre — SM only |
+| `reveal-reopen-chip` | Reveal | Pill CTA dans le banner de divergence — "Rouvrir le vote de X" |
+| `reveal-reopen-hint` | Reveal | Astuce discrète SM quand pas de divergence |
+| `vote-grid--reopened` | Vote | Variant card-surface quand le SM a rouvert le vote du dev |
+| `vote-grid__reopen-banner` | Vote | Banner d'info dans le VoteGrid en mode rouvert |
 | `avatar-lg` | Avatar | Variante grande (56 px) pour le scoreboard |
 | `avatar-emoji` | Avatar | Span emoji intérieur quand l'avatar a un emoji |
 | `reveal-discussion-banner` | Reveal | Banner appelant à discuter quand divergence — souligne les outliers |

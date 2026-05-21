@@ -79,6 +79,10 @@ export default function RoomPage() {
   const isScrumMaster = myRole === 'scrum-master'
   const myVote = votes.find(v => v.player_id === myPlayerId)
   const currentVote = myVote?.value ?? selectedVote
+  // A developer whose vote was deleted by the SM in revealed phase ("re-voter")
+  // should see the VoteGrid again, even though the global phase is still 'revealed'.
+  const reopenedForMe = myRole === 'developer' && phase === 'revealed' && !myVote
+  const showVoteGrid = myRole === 'developer' && (phase !== 'revealed' || reopenedForMe)
 
   return (
     <div className="layout-room">
@@ -104,11 +108,12 @@ export default function RoomPage() {
             isScrumMaster={isScrumMaster}
           />
 
-          {myRole === 'developer' && phase !== 'revealed' && (
+          {showVoteGrid && (
             <VoteGrid
               roomId={roomId}
               round={room.round}
               phase={phase}
+              reopened={reopenedForMe}
               myPlayerId={myPlayerId}
               myRole={myRole}
               currentVote={currentVote ?? null}
@@ -116,7 +121,13 @@ export default function RoomPage() {
           )}
 
           {phase === 'revealed' && (
-            <RevealDashboard players={players} votes={votes} round={room.round} />
+            <RevealDashboard
+              players={players}
+              votes={votes}
+              round={room.round}
+              roomId={roomId}
+              isScrumMaster={isScrumMaster}
+            />
           )}
 
           <StatusBar

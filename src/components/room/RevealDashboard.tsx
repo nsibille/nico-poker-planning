@@ -1,5 +1,7 @@
 'use client'
+import { useState, useTransition } from 'react'
 import { Avatar } from '@/components/ui/Avatar'
+import { createClient } from '@/lib/supabase/client'
 import {
   computeRevealStats,
   consensusHint,
@@ -16,6 +18,8 @@ interface RevealDashboardProps {
   players: Player[]
   votes: Vote[]
   round: number
+  roomId: string
+  isScrumMaster: boolean
 }
 
 function barFillForValue(value: number): string {
@@ -35,13 +39,15 @@ function tierLabel(value: number): string {
 interface BarProps {
   entry: VoteEntry
   index: number
+  isScrumMaster: boolean
+  reopening: boolean
+  onReopen: (playerId: string) => void
 }
 
-function Bar({ entry, index }: BarProps) {
+function Bar({ entry, index, isScrumMaster, reopening, onReopen }: BarProps) {
   const isMissing = entry.value === null
   const isUnknown = entry.value === '?'
   const numeric = entry.numeric ?? 0
-  // Use Fibonacci index for height so 1 vs 2 vs 3 reads as different rungs.
   const heightPercent = isMissing || isUnknown
     ? 18
     : Math.max(12, ((entry.fibIndex ?? 0) + 1) / FIB_NUMERIC.length * 100)
@@ -56,6 +62,10 @@ function Bar({ entry, index }: BarProps) {
     : entry.isOutlier
     ? 'reveal-bar--outlier'
     : ''
+
+  // SM can re-open only players who already cast a value — re-opening a missing
+  // player is a no-op since they have nothing to clear.
+  const canReopen = isScrumMaster && !isMissing
 
   return (
     <div className={`reveal-bar ${variant}`}>
@@ -91,13 +101,41 @@ function Bar({ entry, index }: BarProps) {
       <div className="reveal-bar__name" title={entry.player.name}>
         {entry.player.name}
       </div>
+
+      {canReopen && (
+        <button
+          type="button"
+          className="reveal-bar__reopen"
+          onClick={() => onReopen(entry.player.id)}
+          disabled={reopening}
+          title={`Réouvrir le vote de ${entry.player.name}`}
+        >
+          {reopening ? '…' : '↺'} Re-voter
+        </button>
+      )}
     </div>
   )
 }
 
-export function RevealDashboard({ players, votes, round }: RevealDashboardProps) {
+export function RevealDashboard({ players, votes, round, roomId, isScrumMaster }: RevealDashboardProps) {
+  const [pendingId, setPendingId] = useState<string | null>(null)
+  const [, startTransition] = useTransition()
+
   const stats = computeRevealStats(players, votes)
   const { entries, numericCount, mean, min, max, consensus, outliers, questionCount, missingCount } = stats
+
+  async function reopenVote(playerId: string) {
+    if (!isScrumMaster || pendingId) return
+    setPendingId(playerId)
+    const supabase = createClient()
+    await supabase
+      .from('votes')
+      .delete()
+      .eq('room_id', roomId)
+      .eq('player_id', playerId)
+      .eq('round', round)
+    startTransition(() => setPendingId(null))
+  }
 
   if (entries.length === 0) {
     return (
@@ -124,6 +162,8 @@ export function RevealDashboard({ players, votes, round }: RevealDashboardProps)
     const idx = lo + t
     return ((idx + 1) / FIB_NUMERIC.length) * 100
   })()
+
+  const needsDiscussion = (consensus === 'discuss' || consensus === 'divergent') && outliers.length > 0
 
   return (
     <div key={`round-${round}`} className="reveal-dashboard">
@@ -175,12 +215,19 @@ export function RevealDashboard({ players, votes, round }: RevealDashboardProps)
             </div>
           )}
           {entries.map((e, i) => (
-            <Bar key={e.player.id} entry={e} index={i} />
+            <Bar
+              key={e.player.id}
+              entry={e}
+              index={i}
+              isScrumMaster={isScrumMaster}
+              reopening={pendingId === e.player.id}
+              onReopen={reopenVote}
+            />
           ))}
         </div>
       </div>
 
-      {(consensus === 'discuss' || consensus === 'divergent') && outliers.length > 0 && (
+      {needsDiscussion && (
         <div className="reveal-discussion-banner" data-level={consensus}>
           <div className="reveal-discussion-banner__icon">💬</div>
           <div className="reveal-discussion-banner__body">
@@ -198,6 +245,30 @@ export function RevealDashboard({ players, votes, round }: RevealDashboardProps)
                   </>}
               {' '}Prenez un instant pour comprendre les hypothèses avant de re-voter.
             </p>
+
+            {isScrumMaster && (
+              <div className="reveal-discussion-banner__actions">
+                <span className="reveal-discussion-banner__cta">
+                  Après échange, tu peux rouvrir le vote d&apos;un participant pour qu&apos;il ré-estime :
+                </span>
+                <div className="reveal-discussion-banner__chips">
+                  {outliers.map(o => (
+                    <button
+                      key={o.player.id}
+                      type="button"
+                      className="reveal-reopen-chip"
+                      data-level={consensus}
+                      onClick={() => reopenVote(o.player.id)}
+                      disabled={pendingId === o.player.id}
+                    >
+                      <span aria-hidden>{o.player.emoji ?? '↺'}</span>
+                      <span>Rouvrir le vote de <strong>{o.player.name}</strong></span>
+                      {pendingId === o.player.id && <span aria-hidden>…</span>}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -210,6 +281,12 @@ export function RevealDashboard({ players, votes, round }: RevealDashboardProps)
             <p>Tout le monde est aligné. Direction le prochain ticket.</p>
           </div>
         </div>
+      )}
+
+      {isScrumMaster && !needsDiscussion && entries.some(e => e.value !== null) && (
+        <p className="reveal-reopen-hint">
+          ↺ Besoin d&apos;ajuster ? Clique « Re-voter » sous un participant pour lui rouvrir son vote.
+        </p>
       )}
     </div>
   )

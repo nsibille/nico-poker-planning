@@ -11,17 +11,21 @@ interface VoteGridProps {
   roomId: string
   round: number
   phase: Phase
+  reopened?: boolean
   myPlayerId: string | null
   myRole: 'developer' | 'scrum-master' | null
   currentVote: string | null
 }
 
-export function VoteGrid({ roomId, round, phase, myPlayerId, myRole, currentVote }: VoteGridProps) {
+export function VoteGrid({ roomId, round, phase, reopened = false, myPlayerId, myRole, currentVote }: VoteGridProps) {
   const { setSelectedVote } = useGameStore()
   const { toast, showToast, clearToast } = useToast()
   const [confirmedVote, setConfirmedVote] = useState<string | null>(null)
 
-  const disabled = myRole !== 'developer' || phase !== 'voting'
+  // Vote is open if: classic 'voting' phase, OR the SM re-opened this player
+  // individually while the room is still in 'revealed' phase.
+  const canVote = myRole === 'developer' && (phase === 'voting' || reopened)
+  const disabled = !canVote
 
   async function handleCardClick(value: string) {
     if (disabled || !myPlayerId) return
@@ -58,14 +62,26 @@ export function VoteGrid({ roomId, round, phase, myPlayerId, myRole, currentVote
   }
 
   if (myRole !== 'developer') return null
-  if (phase === 'revealed') return null
+  if (phase === 'revealed' && !reopened) return null
 
-  const displayConfirmed = confirmedVote ?? (currentVote && phase === 'voting' ? currentVote : null)
+  const displayConfirmed = confirmedVote ?? (currentVote && canVote ? currentVote : null)
+
+  const title = reopened
+    ? 'Re-vote demandé par le Scrum Master'
+    : phase === 'voting'
+      ? 'Votre estimation'
+      : 'En attente…'
 
   return (
-    <div className="card-surface flex flex-col gap-4">
+    <div className={`card-surface flex flex-col gap-4 ${reopened ? 'vote-grid--reopened' : ''}`}>
+      {reopened && (
+        <div className="vote-grid__reopen-banner">
+          <span aria-hidden>↺</span>
+          <span>Le Scrum Master t&apos;a rouvert le vote — choisis ta nouvelle estimation, elle est prise en compte immédiatement.</span>
+        </div>
+      )}
       <h3 style={{ fontSize: 'var(--text-md)', fontWeight: 'var(--fw-bold)', color: 'var(--color-text-primary)', fontFamily: 'var(--font-primary)' }}>
-        {phase === 'voting' ? 'Votre estimation' : 'En attente…'}
+        {title}
       </h3>
       <div className="flex flex-wrap gap-3 justify-center">
         {FIBONACCI.map(val => (
@@ -78,7 +94,7 @@ export function VoteGrid({ roomId, round, phase, myPlayerId, myRole, currentVote
           />
         ))}
       </div>
-      {phase === 'voting' && displayConfirmed && (
+      {canVote && displayConfirmed && (
         <p style={{ textAlign: 'center', fontSize: 'var(--text-sm)', color: 'var(--color-success)', fontFamily: 'var(--font-primary)', fontWeight: 'var(--fw-medium)' }}>
           ✓ Vote enregistré : {displayConfirmed} <span style={{ color: 'var(--color-text-muted)' }}>— reclique la carte pour annuler</span>
         </p>
