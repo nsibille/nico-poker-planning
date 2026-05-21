@@ -1,7 +1,6 @@
 'use client'
 import { useState } from 'react'
 import { Button } from '@/components/ui/Button'
-import { MeanDisplay } from './MeanDisplay'
 import { createClient } from '@/lib/supabase/client'
 import { useGameStore } from '@/store/gameStore'
 import type { Player, Vote, Phase } from '@/types'
@@ -47,7 +46,6 @@ export function StatusBar({ roomId, phase, round, players, votes, isScrumMaster 
   return (
     <div className="card-surface flex flex-col gap-3">
       <div className="flex flex-wrap items-center gap-4">
-        {phase === 'revealed' && <MeanDisplay votes={votes} />}
         <div className="flex-1" />
 
         {isScrumMaster && (

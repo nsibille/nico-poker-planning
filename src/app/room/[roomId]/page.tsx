@@ -7,6 +7,7 @@ import { StoryPanel } from '@/components/room/StoryPanel'
 import { VoteGrid } from '@/components/room/VoteGrid'
 import { StatusBar } from '@/components/room/StatusBar'
 import { RevealOverlay } from '@/components/room/RevealOverlay'
+import { RevealDashboard } from '@/components/room/RevealDashboard'
 import { Toast, useToast } from '@/components/ui/Toast'
 import { Spinner } from '@/components/ui/Spinner'
 import { useRoom } from '@/hooks/useRoom'
@@ -101,7 +102,7 @@ export default function RoomPage() {
             isScrumMaster={isScrumMaster}
           />
 
-          {myRole === 'developer' && (
+          {myRole === 'developer' && phase !== 'revealed' && (
             <VoteGrid
               roomId={roomId}
               round={room.round}
@@ -110,6 +111,10 @@ export default function RoomPage() {
               myRole={myRole}
               currentVote={currentVote ?? null}
             />
+          )}
+
+          {phase === 'revealed' && (
+            <RevealDashboard players={players} votes={votes} round={room.round} />
           )}
 
           <StatusBar

@@ -886,3 +886,9 @@ Variantes  : sm, md, lg | success, warning, danger, info, neutral
 | `toast-success` | Toast | Notification succès — teal |
 | `toast-error` | Toast | Notification erreur — coral |
 | `fx-reveal-burst` | FX | Animation festive plein écran au reveal — 6 presets random |
+| `reveal-dashboard` | Reveal | Conteneur du tableau de bord post-reveal |
+| `reveal-mean-hero` | Reveal | Tuile moyenne XL — gradient teinté par niveau de consensus |
+| `reveal-consensus-badge` | Reveal | Badge niveau consensus (perfect / aligned / discuss / divergent) |
+| `reveal-vote-tile` | Reveal | Tuile vote d'un participant — variants aligned/close/off/far/unknown/missing |
+| `reveal-discussion-banner` | Reveal | Banner appelant à discuter quand divergence — souligne les outliers |
+| `reveal-stat` | Reveal | Mini statistique (Min/Max/Votants...) du dashboard |
