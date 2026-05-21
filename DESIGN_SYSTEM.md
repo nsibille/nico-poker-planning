@@ -842,6 +842,9 @@ Variantes  : sm, md, lg | success, warning, danger, info, neutral
 }
 ```
 
+### `fx-reveal-burst`
+**Animation festive plein écran au passage en phase `revealed`.** Canvas plein écran fixé en surimpression (`pointer-events: none`, `z-index: 9999`), généré via `canvas-confetti`. À chaque révélation, un des 6 presets random est joué : `fireworks`, `bigBang`, `sideCannons`, `starShower`, `schoolPride`, `goldenRain`. Palette principale alignée sur les couleurs de marque (`#4970ff`, `#ffb24d`, etc.) sauf `starShower` (palette dorée) et `goldenRain` (palette dorée). Composant : `RevealOverlay` (`src/components/room/RevealOverlay.tsx`).
+
 ---
 
 ## Index des slugs
@@ -882,3 +885,4 @@ Variantes  : sm, md, lg | success, warning, danger, info, neutral
 | `spinner-sm` | Feedback | Spinner chargement |
 | `toast-success` | Toast | Notification succès — teal |
 | `toast-error` | Toast | Notification erreur — coral |
+| `fx-reveal-burst` | FX | Animation festive plein écran au reveal — 6 presets random |

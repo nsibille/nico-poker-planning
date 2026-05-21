@@ -6,6 +6,7 @@ import { PlayersList } from '@/components/room/PlayersList'
 import { StoryPanel } from '@/components/room/StoryPanel'
 import { VoteGrid } from '@/components/room/VoteGrid'
 import { StatusBar } from '@/components/room/StatusBar'
+import { RevealOverlay } from '@/components/room/RevealOverlay'
 import { Toast, useToast } from '@/components/ui/Toast'
 import { Spinner } from '@/components/ui/Spinner'
 import { useRoom } from '@/hooks/useRoom'
@@ -123,6 +124,7 @@ export default function RoomPage() {
       </div>
 
       {toast && <Toast message={toast.message} type={toast.type} onClose={clearToast} />}
+      <RevealOverlay phase={phase} />
     </div>
   )
 }
