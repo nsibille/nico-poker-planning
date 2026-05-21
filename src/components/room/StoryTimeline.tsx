@@ -42,14 +42,14 @@ export function StoryTimeline({ roomId, stories, liveRound, livePhase, liveStory
   const items = [
     ...stories.map(s => ({
       round: s.round,
-      title: s.title || '(sans titre)',
+      title: s.title || '(titre perdu)',
       final_mean: s.final_mean,
       consensus: s.consensus as ConsensusLevel | null,
       isLive: s.round === liveRound,
       isPending: false,
     })),
     ...(currentVirtual ? [currentVirtual] : []),
-  ].sort((a, b) => a.round - b.round)
+  ].sort((a, b) => b.round - a.round) // plus récent en haut
 
   async function openStory(round: number) {
     if (pendingRound !== null) return

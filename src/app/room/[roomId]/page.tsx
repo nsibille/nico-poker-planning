@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { RoomHeader } from '@/components/room/RoomHeader'
 import { PlayersList } from '@/components/room/PlayersList'
@@ -16,6 +16,7 @@ import { usePlayers } from '@/hooks/usePlayers'
 import { useVotes } from '@/hooks/useVotes'
 import { useStories } from '@/hooks/useStories'
 import { createClient } from '@/lib/supabase/client'
+import { computeRevealStats } from '@/lib/game/reveal-stats'
 import { useGameStore } from '@/store/gameStore'
 
 export default function RoomPage() {
@@ -69,6 +70,46 @@ export default function RoomPage() {
     }
   }, [hydrated, myPlayerId, players, reset, router])
 
+  // Backfill: SM-side, on mount, detect rounds with votes but no stories row
+  // (e.g. rounds revealed before the timeline migration was applied) and create
+  // the snapshot from existing votes. Title is lost (rooms.story was reset on
+  // next round) — we leave it empty so the timeline shows '(titre perdu)'.
+  const backfilledRef = useRef(false)
+  const isScrumMaster = myRole === 'scrum-master'
+  useEffect(() => {
+    if (backfilledRef.current) return
+    if (!isScrumMaster || !room || !players.length) return
+    backfilledRef.current = true
+    const supabase = createClient()
+    ;(async () => {
+      const { data: allVotes } = await supabase
+        .from('votes')
+        .select('id,room_id,player_id,round,value,created_at')
+        .eq('room_id', roomId)
+      if (!allVotes) return
+      const liveRoundLocal = room.round
+      const byRound = new Map<number, typeof allVotes>()
+      for (const v of allVotes) {
+        if (v.round >= liveRoundLocal) continue // skip current live round
+        const list = byRound.get(v.round) ?? []
+        list.push(v)
+        byRound.set(v.round, list)
+      }
+      const existing = new Set(stories.map(s => s.round))
+      for (const [r, vs] of byRound) {
+        if (existing.has(r)) continue
+        const stats = computeRevealStats(players, vs)
+        await supabase.from('stories').upsert({
+          room_id: roomId,
+          round: r,
+          title: '',
+          final_mean: stats.mean,
+          consensus: stats.consensus,
+        }, { onConflict: 'room_id,round' })
+      }
+    })()
+  }, [isScrumMaster, room, players, stories, roomId])
+
   // When a developer's vote gets re-opened (by the SM, in displayPhase==='revealed'),
   // clear the local optimistic selectedVote so the re-shown grid starts unselected.
   const reopenedTrigger = myRole === 'developer'
@@ -95,7 +136,6 @@ export default function RoomPage() {
     )
   }
 
-  const isScrumMaster = myRole === 'scrum-master'
   const myVoteRow = votes.find(v => v.player_id === myPlayerId)
   const myActiveVote = myVoteRow && myVoteRow.value !== '' ? myVoteRow : undefined
   const reopenedForMe = myRole === 'developer' && displayPhase === 'revealed' && !myActiveVote
