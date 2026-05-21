@@ -29,7 +29,7 @@ export function useVotes(roomId: string, round: number) {
         (payload) => {
           if (payload.eventType === 'INSERT') {
             const v = payload.new as Vote
-            if (v.round === round) setVotes(prev => [...prev, v])
+            if (v.round === round) setVotes(prev => prev.some(x => x.id === v.id) ? prev : [...prev, v])
           } else if (payload.eventType === 'UPDATE') {
             const v = payload.new as Vote
             if (v.round === round) setVotes(prev => prev.map(x => x.id === v.id ? v : x))
