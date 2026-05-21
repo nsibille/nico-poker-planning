@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { VoteCard } from './VoteCard'
 import { createClient } from '@/lib/supabase/client'
 import { FIBONACCI } from '@/lib/game/constants'
@@ -21,6 +21,9 @@ export function VoteGrid({ roomId, round, phase, reopened = false, myPlayerId, m
   const { setSelectedVote } = useGameStore()
   const { toast, showToast, clearToast } = useToast()
   const [confirmedVote, setConfirmedVote] = useState<string | null>(null)
+  // The "Vote enregistré : X" hint is per-round — reset when we move to a
+  // different round so the dev doesn't see a stale confirmation.
+  useEffect(() => { setConfirmedVote(null) }, [round])
 
   // Vote is open if: classic 'voting' phase, OR the SM re-opened this player
   // individually while the room is still in 'revealed' phase.

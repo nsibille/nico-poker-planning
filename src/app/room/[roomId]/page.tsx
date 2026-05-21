@@ -120,6 +120,13 @@ export default function RoomPage() {
     if (reopenedTrigger && selectedVote) setSelectedVote(null)
   }, [reopenedTrigger, selectedVote, setSelectedVote])
 
+  // Reset the local optimistic vote whenever we switch rounds (next round
+  // launched by SM, or SM navigates the timeline). Otherwise the dev sees the
+  // previous round's card still highlighted on a fresh voting grid.
+  useEffect(() => {
+    setSelectedVote(null)
+  }, [displayRound, setSelectedVote])
+
   if (roomLoading) {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg-page)' }}>
