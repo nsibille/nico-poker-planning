@@ -34,14 +34,18 @@ export function VoteGrid({ roomId, round, phase, reopened = false, myPlayerId, m
     if (currentVote === value) {
       setSelectedVote(null)
       setConfirmedVote(null)
-      const { error } = await supabase
+      const { error, count } = await supabase
         .from('votes')
-        .delete()
+        .delete({ count: 'exact' })
         .eq('room_id', roomId)
         .eq('player_id', myPlayerId)
         .eq('round', round)
       if (error) {
         showToast(`Annulation échouée : ${error.message}`)
+        setSelectedVote(value)
+      } else if (count === 0) {
+        // Aucune ligne supprimée → presque toujours une policy RLS DELETE manquante.
+        showToast('Annulation refusée par la base (policy DELETE manquante sur votes).')
         setSelectedVote(value)
       }
       return
