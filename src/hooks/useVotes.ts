@@ -10,16 +10,18 @@ export function useVotes(roomId: string, round: number) {
   useEffect(() => {
     if (!roomId) return
     const supabase = createClient()
+    let cancelled = false
 
-    supabase
-      .from('votes')
-      .select('*')
-      .eq('room_id', roomId)
-      .eq('round', round)
-      .then(({ data }) => {
-        setVotes((data ?? []) as Vote[])
-        setLoading(false)
-      })
+    async function refetch() {
+      const { data } = await supabase
+        .from('votes')
+        .select('*')
+        .eq('room_id', roomId)
+        .eq('round', round)
+      if (cancelled) return
+      setVotes((data ?? []) as Vote[])
+      setLoading(false)
+    }
 
     const channel = supabase
       .channel(`votes-${roomId}-${round}`)
@@ -38,9 +40,14 @@ export function useVotes(roomId: string, round: number) {
           }
         }
       )
-      .subscribe()
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') void refetch()
+      })
 
-    return () => { supabase.removeChannel(channel) }
+    return () => {
+      cancelled = true
+      supabase.removeChannel(channel)
+    }
   }, [roomId, round])
 
   return { votes, loading }

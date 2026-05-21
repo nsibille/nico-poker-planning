@@ -1,8 +1,10 @@
 'use client'
+import { useState } from 'react'
 import { VoteCard } from './VoteCard'
 import { createClient } from '@/lib/supabase/client'
 import { FIBONACCI } from '@/lib/game/constants'
 import { useGameStore } from '@/store/gameStore'
+import { Toast, useToast } from '@/components/ui/Toast'
 import type { Phase } from '@/types'
 
 interface VoteGridProps {
@@ -16,20 +18,31 @@ interface VoteGridProps {
 
 export function VoteGrid({ roomId, round, phase, myPlayerId, myRole, currentVote }: VoteGridProps) {
   const { setSelectedVote } = useGameStore()
+  const { toast, showToast, clearToast } = useToast()
+  const [confirmedVote, setConfirmedVote] = useState<string | null>(null)
 
   const disabled = myRole !== 'developer' || phase !== 'voting'
 
-  function handleVote(value: string) {
+  async function handleVote(value: string) {
     if (disabled || !myPlayerId) return
     setSelectedVote(value)
+    setConfirmedVote(null)
     const supabase = createClient()
-    void supabase.from('votes').upsert(
+    const { error } = await supabase.from('votes').upsert(
       { room_id: roomId, player_id: myPlayerId, round, value },
       { onConflict: 'room_id,player_id,round' }
     )
+    if (error) {
+      showToast(`Vote non enregistré : ${error.message}`)
+      setSelectedVote(null)
+      return
+    }
+    setConfirmedVote(value)
   }
 
   if (myRole !== 'developer') return null
+
+  const displayConfirmed = confirmedVote ?? (currentVote && phase === 'voting' ? currentVote : null)
 
   return (
     <div className="card-surface flex flex-col gap-4">
@@ -47,11 +60,12 @@ export function VoteGrid({ roomId, round, phase, myPlayerId, myRole, currentVote
           />
         ))}
       </div>
-      {phase === 'voting' && currentVote && (
+      {phase === 'voting' && displayConfirmed && (
         <p style={{ textAlign: 'center', fontSize: 'var(--text-sm)', color: 'var(--color-success)', fontFamily: 'var(--font-primary)', fontWeight: 'var(--fw-medium)' }}>
-          ✓ Vote enregistré : {currentVote}
+          ✓ Vote enregistré : {displayConfirmed}
         </p>
       )}
+      {toast && <Toast message={toast.message} type={toast.type} onClose={clearToast} />}
     </div>
   )
 }

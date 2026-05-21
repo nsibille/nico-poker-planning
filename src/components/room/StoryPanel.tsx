@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Textarea } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { createClient } from '@/lib/supabase/client'
@@ -16,7 +16,10 @@ export function StoryPanel({ roomId, story, phase, isScrumMaster }: StoryPanelPr
   const [draft, setDraft] = useState(story)
   const [saving, setSaving] = useState(false)
 
-  const canEdit = isScrumMaster && phase !== 'revealed'
+  useEffect(() => { setDraft(story) }, [story])
+
+  const isVoting = phase === 'voting'
+  const canEdit = isScrumMaster && phase === 'waiting'
 
   async function handleSave() {
     setSaving(true)
@@ -25,7 +28,7 @@ export function StoryPanel({ roomId, story, phase, isScrumMaster }: StoryPanelPr
     setSaving(false)
   }
 
-  if (!canEdit) {
+  if (!isScrumMaster || phase === 'revealed') {
     return (
       <div className="card-surface flex flex-col gap-3">
         <h3 style={{ fontSize: 'var(--text-md)', fontWeight: 'var(--fw-bold)', color: 'var(--color-text-primary)', fontFamily: 'var(--font-primary)' }}>
@@ -48,14 +51,16 @@ export function StoryPanel({ roomId, story, phase, isScrumMaster }: StoryPanelPr
         onChange={e => setDraft(e.target.value)}
         placeholder="Décris la story à estimer…"
         rows={3}
+        disabled={!canEdit}
       />
       <Button
         variant="secondary"
         onClick={handleSave}
         loading={saving}
+        disabled={isVoting || !draft.trim()}
         className="self-end"
       >
-        Lancer le vote
+        {isVoting ? 'Vote en cours' : 'Lancer le vote'}
       </Button>
     </div>
   )

@@ -20,11 +20,13 @@ export function StatusBar({ roomId, phase, round, players, votes, isScrumMaster 
   const [loading, setLoading] = useState(false)
 
   const devs = players.filter(p => p.role === 'developer')
-  const devVotes = votes.filter(v => devs.some(d => d.id === v.player_id))
-  const allVoted = devs.length > 0 && devVotes.length >= devs.length
+  const voted = devs.filter(d => votes.some(v => v.player_id === d.id))
+  const pending = devs.filter(d => !votes.some(v => v.player_id === d.id))
+  const hasDevs = devs.length > 0
+  const allVoted = hasDevs && pending.length === 0
 
   async function handleReveal() {
-    if (!allVoted || loading) return
+    if (!hasDevs || loading) return
     setLoading(true)
     const supabase = createClient()
     await supabase.from('rooms').update({ phase: 'revealed' }).eq('id', roomId)
@@ -43,45 +45,62 @@ export function StatusBar({ roomId, phase, round, players, votes, isScrumMaster 
   }
 
   return (
-    <div className="card-surface flex flex-wrap items-center gap-4">
-      {phase === 'revealed' && (
-        <MeanDisplay votes={votes} />
-      )}
+    <div className="card-surface flex flex-col gap-3">
+      <div className="flex flex-wrap items-center gap-4">
+        {phase === 'revealed' && <MeanDisplay votes={votes} />}
+        <div className="flex-1" />
 
-      <div className="flex-1" />
-
-      {isScrumMaster && (
-        <>
-          {phase === 'voting' && (
-            <div className="flex items-center gap-3">
-              <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)', fontFamily: 'var(--font-primary)' }}>
-                {devVotes.length}/{devs.length} vote{devs.length !== 1 ? 's' : ''}
-              </span>
-              <Button
-                variant="reveal"
-                onClick={handleReveal}
-                disabled={!allVoted}
-                loading={loading}
-              >
-                Révéler les votes
+        {isScrumMaster && (
+          <>
+            {phase === 'voting' && (
+              <div className="flex items-center gap-3">
+                <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)', fontFamily: 'var(--font-primary)' }}>
+                  {voted.length}/{devs.length} vote{devs.length !== 1 ? 's' : ''}
+                </span>
+                <Button
+                  variant="reveal"
+                  onClick={handleReveal}
+                  disabled={!hasDevs}
+                  loading={loading}
+                  title={allVoted ? undefined : 'Tous les devs n\'ont pas voté — révéler quand même ?'}
+                >
+                  Révéler les votes
+                </Button>
+              </div>
+            )}
+            {phase === 'revealed' && (
+              <Button variant="primary" onClick={handleNextRound} loading={loading}>
+                Prochain round →
               </Button>
+            )}
+            {phase === 'waiting' && (
+              <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)', fontFamily: 'var(--font-primary)' }}>
+                Définissez une story pour lancer le vote
+              </span>
+            )}
+          </>
+        )}
+      </div>
+
+      {isScrumMaster && phase === 'voting' && hasDevs && (
+        <div className="flex flex-col gap-1" style={{ fontFamily: 'var(--font-primary)', fontSize: 'var(--text-sm)' }}>
+          {voted.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2">
+              <span style={{ color: 'var(--color-success, #1aa37a)', fontWeight: 'var(--fw-medium)' }}>✓ A voté :</span>
+              <span style={{ color: 'var(--color-text-primary)' }}>
+                {voted.map(d => d.name).join(', ')}
+              </span>
             </div>
           )}
-          {phase === 'revealed' && (
-            <Button
-              variant="primary"
-              onClick={handleNextRound}
-              loading={loading}
-            >
-              Prochain round →
-            </Button>
+          {pending.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2">
+              <span style={{ color: 'var(--color-text-muted)', fontWeight: 'var(--fw-medium)' }}>… En attente :</span>
+              <span style={{ color: 'var(--color-text-primary)' }}>
+                {pending.map(d => d.name).join(', ')}
+              </span>
+            </div>
           )}
-          {phase === 'waiting' && (
-            <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)', fontFamily: 'var(--font-primary)' }}>
-              Définissez une story pour lancer le vote
-            </span>
-          )}
-        </>
+        </div>
       )}
     </div>
   )
