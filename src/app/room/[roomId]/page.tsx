@@ -8,6 +8,7 @@ import { VoteGrid } from '@/components/room/VoteGrid'
 import { StatusBar } from '@/components/room/StatusBar'
 import { RevealOverlay } from '@/components/room/RevealOverlay'
 import { RevealDashboard } from '@/components/room/RevealDashboard'
+import { SessionRecap } from '@/components/room/SessionRecap'
 import { StoryTimeline } from '@/components/room/StoryTimeline'
 import { Toast, useToast } from '@/components/ui/Toast'
 import { Spinner } from '@/components/ui/Spinner'
@@ -141,6 +142,28 @@ export default function RoomPage() {
   const reopenedForMe = myRole === 'developer' && displayPhase === 'revealed' && !myActiveVote
   const showVoteGrid = myRole === 'developer' && (displayPhase !== 'revealed' || reopenedForMe)
   const currentVote = reopenedForMe ? null : (myActiveVote?.value ?? selectedVote)
+
+  // Session ended → switch the whole room into "recap mode" for everyone.
+  if (room.ended_at) {
+    return (
+      <div className="layout-room">
+        <RoomHeader
+          room={room}
+          connected={true}
+          displayRound={displayRound}
+          displayPhase="revealed"
+          isHistoryMode={false}
+        />
+        <SessionRecap
+          roomId={roomId}
+          players={players}
+          stories={stories}
+          endedAt={room.ended_at}
+        />
+        {toast && <Toast message={toast.message} type={toast.type} onClose={clearToast} />}
+      </div>
+    )
+  }
 
   return (
     <div className="layout-room">

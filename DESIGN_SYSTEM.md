@@ -957,3 +957,10 @@ Variantes  : sm, md, lg | success, warning, danger, info, neutral
 | `story-timeline__item` | Timeline | Item cliquable d'un round (rang + dot consensus + moyenne) |
 | `history-banner` | Banner | Bandeau "Vue historique — Round X" + CTA Retour |
 | `layout-room-grid--with-timeline` | Layout | Variante 3 col du grid (240 / 1fr / 300) — SM only |
+| `session-recap` | Recap | Conteneur de l'écran final "session terminée" — anims orchestrées |
+| `session-recap__hero` | Recap | Header géant avec titre 2 mots animés + emoji + subtitle |
+| `big-stat` | Recap | Tuile stat XL (story points, consensus...) — variants brand/indigo/success/danger/muted |
+| `award-card` | Recap | Carte d'award (flip-in 3D) avec icône bouncy + shine sweep — variants par id |
+| `player-row` | Recap | Ligne joueur du leaderboard alignement — top 3 teintés or/argent/bronze |
+| `highlight-card` | Recap | Story remarquable (consensuelle vs chaude) |
+| `recap-story` | Recap | Item compact d'une story dans la liste finale — bordure gauche colorée |

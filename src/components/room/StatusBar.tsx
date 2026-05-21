@@ -24,7 +24,22 @@ interface StatusBarProps {
 export function StatusBar({ roomId, phase, round, liveRound, isHistoryMode, story, players, votes, isScrumMaster }: StatusBarProps) {
   const { setSelectedVote } = useGameStore()
   const [loading, setLoading] = useState(false)
+  const [endConfirm, setEndConfirm] = useState(false)
   const { toast, showToast, clearToast } = useToast()
+
+  async function handleEndSession() {
+    setLoading(true)
+    const supabase = createClient()
+    const { error } = await supabase
+      .from('rooms')
+      .update({ ended_at: new Date().toISOString() })
+      .eq('id', roomId)
+    if (error) {
+      showToast(`Fin de session échouée : ${error.message}`)
+    }
+    setLoading(false)
+    setEndConfirm(false)
+  }
 
   const devs = players.filter(p => p.role === 'developer')
   const hasActiveVote = (devId: string) => votes.some(v => v.player_id === devId && v.value !== '')
@@ -124,10 +139,39 @@ export function StatusBar({ roomId, phase, round, liveRound, isHistoryMode, stor
                 </Button>
               </div>
             )}
-            {phase === 'revealed' && (
-              <Button variant="primary" onClick={handleNextRound} loading={loading}>
-                Prochain round →
-              </Button>
+            {phase === 'revealed' && !endConfirm && (
+              <div className="flex items-center gap-2 flex-wrap">
+                <button
+                  type="button"
+                  className="btn-ghost-sm status-bar__end-session"
+                  onClick={() => setEndConfirm(true)}
+                  disabled={loading}
+                  title="Affiche l'écran final à tous les participants"
+                >
+                  🏁 Terminer la session
+                </button>
+                <Button variant="primary" onClick={handleNextRound} loading={loading}>
+                  Prochain round →
+                </Button>
+              </div>
+            )}
+            {phase === 'revealed' && endConfirm && (
+              <div className="flex items-center gap-2 flex-wrap">
+                <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)', fontFamily: 'var(--font-primary)' }}>
+                  Tout le monde verra le récap final.
+                </span>
+                <button
+                  type="button"
+                  className="btn-ghost-sm"
+                  onClick={() => setEndConfirm(false)}
+                  disabled={loading}
+                >
+                  Annuler
+                </button>
+                <Button variant="danger" onClick={handleEndSession} loading={loading}>
+                  Oui, terminer
+                </Button>
+              </div>
             )}
             {phase === 'waiting' && (
               <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)', fontFamily: 'var(--font-primary)' }}>

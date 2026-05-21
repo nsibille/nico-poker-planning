@@ -7,6 +7,7 @@ export interface Room {
   story: string
   round: number
   viewing_round: number | null
+  ended_at: string | null
   created_at: string
   updated_at: string
 }
