@@ -890,15 +890,15 @@ html, body {
 .reveal-chart {
   position: relative;
   display: grid;
-  grid-template-columns: 36px 1fr;
+  grid-template-columns: 44px 1fr;
   gap: var(--space-3);
   align-items: stretch;
-  padding: var(--space-4) var(--space-2) var(--space-2);
+  padding: 64px var(--space-3) var(--space-3);
   background: linear-gradient(180deg, var(--color-bg-page) 0%, var(--color-bg-surface) 100%);
   border-radius: var(--radius-xl);
   border: 1px solid var(--color-border);
-  min-height: 320px;
-  overflow: hidden;
+  min-height: 380px;
+  overflow: visible;
 }
 
 .reveal-chart__axis {
@@ -922,26 +922,26 @@ html, body {
   display: flex;
   gap: var(--space-3);
   align-items: flex-end;
-  padding-bottom: var(--space-1);
   height: 280px;
+  margin-bottom: 32px;
   overflow-x: auto;
+  overflow-y: visible;
 }
 
 .reveal-chart__mean-line {
   position: absolute;
-  left: calc(36px + var(--space-3));
-  right: var(--space-2);
+  left: 0;
+  right: 0;
   height: 0;
   border-top: 2px dashed var(--color-brand-primary);
   pointer-events: none;
   opacity: 0;
   animation: revealFadeUp 0.5s ease-out 0.9s forwards;
-  z-index: 2;
-  margin-bottom: 36px;
+  z-index: 1;
 }
 .reveal-chart__mean-label {
   position: absolute;
-  right: 8px;
+  left: 0;
   top: -12px;
   background: var(--color-brand-primary);
   color: white;
@@ -956,6 +956,7 @@ html, body {
 
 .reveal-bar {
   flex: 1 0 96px;
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -966,7 +967,7 @@ html, body {
 .reveal-bar__column {
   position: relative;
   width: 100%;
-  height: calc(100% - 36px);
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: flex-end;
@@ -1026,8 +1027,10 @@ html, body {
   align-items: center;
   gap: 2px;
   animation: revealTokenIn 0.5s cubic-bezier(.34,1.56,.64,1) both;
-  z-index: 3;
+  z-index: 4;
+  pointer-events: none;
 }
+.reveal-bar__token > * { pointer-events: auto; }
 @keyframes revealTokenIn {
   0%   { opacity: 0; transform: translateX(-50%) translateY(30px) scale(0.6); }
   60%  { opacity: 1; transform: translateX(-50%) translateY(-6px) scale(1.05); }
@@ -1095,30 +1098,19 @@ html, body {
 }
 
 .reveal-bar__name {
-  margin-top: 8px;
+  position: absolute;
+  bottom: -28px;
+  left: 0;
+  right: 0;
   font-size: var(--text-sm);
   font-weight: var(--fw-medium);
   color: var(--color-text-primary);
   font-family: var(--font-primary);
   text-align: center;
-  max-width: 100px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.reveal-bar__mean-marker {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  width: calc(60% + 18px);
-  max-width: 90px;
-  height: 0;
-  border-top: 2px dashed rgba(73,112,255,0.45);
-  pointer-events: none;
-  opacity: 0;
-  animation: revealFadeUp 0.5s ease-out 1s forwards;
-  z-index: 2;
+  padding: 0 4px;
 }
 
 .reveal-discussion-banner {

@@ -35,10 +35,9 @@ function tierLabel(value: number): string {
 interface BarProps {
   entry: VoteEntry
   index: number
-  meanPercent: number | null
 }
 
-function Bar({ entry, index, meanPercent }: BarProps) {
+function Bar({ entry, index }: BarProps) {
   const isMissing = entry.value === null
   const isUnknown = entry.value === '?'
   const numeric = entry.numeric ?? 0
@@ -87,10 +86,6 @@ function Bar({ entry, index, meanPercent }: BarProps) {
         >
           <div className="reveal-bar__shine" />
         </div>
-
-        {meanPercent !== null && (
-          <div className="reveal-bar__mean-marker" style={{ bottom: `${meanPercent}%` }} aria-hidden />
-        )}
       </div>
 
       <div className="reveal-bar__name" title={entry.player.name}>
@@ -102,7 +97,7 @@ function Bar({ entry, index, meanPercent }: BarProps) {
 
 export function RevealDashboard({ players, votes, round }: RevealDashboardProps) {
   const stats = computeRevealStats(players, votes)
-  const { entries, numericCount, mean, min, max, consensus, outliers, questionCount, missingCount, meanFibIndex } = stats
+  const { entries, numericCount, mean, min, max, consensus, outliers, questionCount, missingCount } = stats
 
   if (entries.length === 0) {
     return (
@@ -114,10 +109,21 @@ export function RevealDashboard({ players, votes, round }: RevealDashboardProps)
     )
   }
 
-  // Mean line position in % of bar area height (using Fib index axis to match bars).
-  const meanPercent = meanFibIndex !== null
-    ? ((meanFibIndex + 1) / FIB_NUMERIC.length) * 100
-    : null
+  // Mean line position: interpolate between the two surrounding Fib rungs so a mean of 6.5
+  // sits halfway between the "5" and "8" axis ticks instead of snapping to one of them.
+  const meanPercent = (() => {
+    if (mean === null) return null
+    let lo = 0
+    let hi = FIB_NUMERIC.length - 1
+    for (let i = 0; i < FIB_NUMERIC.length - 1; i++) {
+      if (FIB_NUMERIC[i] <= mean && mean <= FIB_NUMERIC[i + 1]) { lo = i; hi = i + 1; break }
+    }
+    if (mean <= FIB_NUMERIC[0]) return ((0 + 1) / FIB_NUMERIC.length) * 100
+    if (mean >= FIB_NUMERIC[FIB_NUMERIC.length - 1]) return 100
+    const t = (mean - FIB_NUMERIC[lo]) / (FIB_NUMERIC[hi] - FIB_NUMERIC[lo])
+    const idx = lo + t
+    return ((idx + 1) / FIB_NUMERIC.length) * 100
+  })()
 
   return (
     <div key={`round-${round}`} className="reveal-dashboard">
@@ -163,16 +169,15 @@ export function RevealDashboard({ players, votes, round }: RevealDashboardProps)
         </div>
 
         <div className="reveal-chart__bars">
+          {meanPercent !== null && (
+            <div className="reveal-chart__mean-line" style={{ bottom: `${meanPercent}%` }}>
+              <span className="reveal-chart__mean-label">Moy. {formatMean(mean as number)}</span>
+            </div>
+          )}
           {entries.map((e, i) => (
-            <Bar key={e.player.id} entry={e} index={i} meanPercent={meanPercent} />
+            <Bar key={e.player.id} entry={e} index={i} />
           ))}
         </div>
-
-        {meanPercent !== null && (
-          <div className="reveal-chart__mean-line" style={{ bottom: `${meanPercent}%` }}>
-            <span className="reveal-chart__mean-label">Moy. {formatMean(mean as number)}</span>
-          </div>
-        )}
       </div>
 
       {(consensus === 'discuss' || consensus === 'divergent') && outliers.length > 0 && (
