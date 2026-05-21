@@ -896,6 +896,8 @@ Variantes  : sm, md, lg | success, warning, danger, info, neutral
 | `reveal-bar__tier` | Reveal | Mini badge EASY/MEDIUM/HARD/EPIC façon free-to-play |
 | `reveal-chart__mean-line` | Reveal | Ligne pointillée de la moyenne tracée sur le chart |
 | `emoji-picker` | Lobby | Sélecteur d'emoji avatar — preview + dé re-roll + grille |
+| `role-card-group` | Lobby | Grille 2 col du sélecteur de rôle |
+| `role-card` | Lobby | Carte rôle (icône + titre + subtitle + check badge) — variants developer (amber) / scrum-master (brand) |
 | `avatar-lg` | Avatar | Variante grande (56 px) pour le scoreboard |
 | `avatar-emoji` | Avatar | Span emoji intérieur quand l'avatar a un emoji |
 | `reveal-discussion-banner` | Reveal | Banner appelant à discuter quand divergence — souligne les outliers |
