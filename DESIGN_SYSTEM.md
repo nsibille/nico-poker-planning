@@ -889,6 +889,14 @@ Variantes  : sm, md, lg | success, warning, danger, info, neutral
 | `reveal-dashboard` | Reveal | Conteneur du tableau de bord post-reveal |
 | `reveal-mean-hero` | Reveal | Tuile moyenne XL — gradient teinté par niveau de consensus |
 | `reveal-consensus-badge` | Reveal | Badge niveau consensus (perfect / aligned / discuss / divergent) |
-| `reveal-vote-tile` | Reveal | Tuile vote d'un participant — variants aligned/close/off/far/unknown/missing |
+| `reveal-chart` | Reveal | Conteneur bar chart gamifié (axe Fibonacci à gauche + barres) |
+| `reveal-bar` | Reveal | Barre verticale d'un participant — variants outlier/unknown/missing |
+| `reveal-bar__fill` | Reveal | Remplissage de la barre — dégradés cool/mid/warm/hot selon valeur |
+| `reveal-bar__token` | Reveal | Token au-dessus de la barre (avatar + pill valeur + tier badge) |
+| `reveal-bar__tier` | Reveal | Mini badge EASY/MEDIUM/HARD/EPIC façon free-to-play |
+| `reveal-chart__mean-line` | Reveal | Ligne pointillée de la moyenne tracée sur le chart |
+| `emoji-picker` | Lobby | Sélecteur d'emoji avatar — preview + dé re-roll + grille |
+| `avatar-lg` | Avatar | Variante grande (56 px) pour le scoreboard |
+| `avatar-emoji` | Avatar | Span emoji intérieur quand l'avatar a un emoji |
 | `reveal-discussion-banner` | Reveal | Banner appelant à discuter quand divergence — souligne les outliers |
 | `reveal-stat` | Reveal | Mini statistique (Min/Max/Votants...) du dashboard |

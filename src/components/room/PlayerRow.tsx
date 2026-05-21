@@ -12,7 +12,7 @@ interface PlayerRowProps {
 export function PlayerRow({ player, vote, phase, isMe }: PlayerRowProps) {
   return (
     <div className="card-player-row">
-      <Avatar name={player.name} role={player.role as 'developer' | 'scrum-master'} />
+      <Avatar name={player.name} role={player.role as 'developer' | 'scrum-master'} emoji={player.emoji} />
       <div className="player-name">
         {player.name}
         {isMe && <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', marginLeft: '6px' }}>(moi)</span>}

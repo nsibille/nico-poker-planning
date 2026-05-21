@@ -5,10 +5,12 @@ import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { Toast, useToast } from '@/components/ui/Toast'
 import { RoleSelector } from './RoleSelector'
+import { EmojiPicker } from './EmojiPicker'
 import { useSession } from '@/hooks/useSession'
 import { useGameStore } from '@/store/gameStore'
 import { createClient } from '@/lib/supabase/client'
 import { generateRoomId } from '@/lib/game/utils'
+import { randomPlayerEmoji } from '@/lib/game/emojis'
 import { MAX_DEV, MAX_SM } from '@/lib/game/constants'
 import type { Role } from '@/types'
 
@@ -21,6 +23,7 @@ export function LobbyForm() {
   const [name, setName] = useState('')
   const [role, setRole] = useState<Role | null>(null)
   const [roomId, setRoomId] = useState('')
+  const [emoji, setEmoji] = useState<string>(() => randomPlayerEmoji())
   const [loading, setLoading] = useState(false)
 
   const handleGenerate = useCallback(() => {
@@ -81,7 +84,7 @@ export function LobbyForm() {
       // Insert player
       const { data: player, error: playerError } = await supabase
         .from('players')
-        .insert({ room_id: roomId, name: name.trim(), role, user_id: userId })
+        .insert({ room_id: roomId, name: name.trim(), role, user_id: userId, emoji })
         .select()
         .single()
       if (playerError) {
@@ -115,6 +118,8 @@ export function LobbyForm() {
           maxLength={32}
           autoFocus
         />
+
+        <EmojiPicker value={emoji} onChange={setEmoji} />
 
         <RoleSelector value={role} onChange={setRole} />
 

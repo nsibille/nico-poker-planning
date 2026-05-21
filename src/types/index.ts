@@ -16,6 +16,7 @@ export interface Player {
   name: string
   role: Role
   user_id: string | null
+  emoji: string | null
   joined_at: string
 }
 

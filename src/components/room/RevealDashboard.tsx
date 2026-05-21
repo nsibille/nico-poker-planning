@@ -6,6 +6,7 @@ import {
   consensusIcon,
   consensusLabel,
   formatMean,
+  FIB_NUMERIC,
   type ConsensusLevel,
   type VoteEntry,
 } from '@/lib/game/reveal-stats'
@@ -17,19 +18,91 @@ interface RevealDashboardProps {
   round: number
 }
 
-function tileVariant(e: VoteEntry): string {
-  if (e.value === null) return 'reveal-vote-tile reveal-vote-tile--missing'
-  if (e.value === '?') return 'reveal-vote-tile reveal-vote-tile--unknown'
-  if (e.isOutlier) return 'reveal-vote-tile reveal-vote-tile--far'
-  const d = e.fibDistance ?? 0
-  if (d === 0) return 'reveal-vote-tile reveal-vote-tile--aligned'
-  if (d === 1) return 'reveal-vote-tile reveal-vote-tile--close'
-  return 'reveal-vote-tile reveal-vote-tile--off'
+function barFillForValue(value: number): string {
+  if (value <= 2)  return 'reveal-bar__fill--cool'    // 1, 2 — green
+  if (value <= 5)  return 'reveal-bar__fill--mid'     // 3, 5 — teal/blue
+  if (value <= 8)  return 'reveal-bar__fill--warm'    // 8 — amber
+  return 'reveal-bar__fill--hot'                       // 13, 21 — coral
+}
+
+function tierLabel(value: number): string {
+  if (value <= 2)  return 'EASY'
+  if (value <= 5)  return 'MEDIUM'
+  if (value <= 8)  return 'HARD'
+  return 'EPIC'
+}
+
+interface BarProps {
+  entry: VoteEntry
+  index: number
+  meanPercent: number | null
+}
+
+function Bar({ entry, index, meanPercent }: BarProps) {
+  const isMissing = entry.value === null
+  const isUnknown = entry.value === '?'
+  const numeric = entry.numeric ?? 0
+  // Use Fibonacci index for height so 1 vs 2 vs 3 reads as different rungs.
+  const heightPercent = isMissing || isUnknown
+    ? 18
+    : Math.max(12, ((entry.fibIndex ?? 0) + 1) / FIB_NUMERIC.length * 100)
+  const fillClass = isMissing || isUnknown ? '' : barFillForValue(numeric)
+  const tier = !isMissing && !isUnknown ? tierLabel(numeric) : null
+  const delay = 0.25 + index * 0.12
+
+  const variant = isMissing
+    ? 'reveal-bar--missing'
+    : isUnknown
+    ? 'reveal-bar--unknown'
+    : entry.isOutlier
+    ? 'reveal-bar--outlier'
+    : ''
+
+  return (
+    <div className={`reveal-bar ${variant}`}>
+      <div className="reveal-bar__column">
+        <div
+          className="reveal-bar__token"
+          style={{
+            bottom: `calc(${heightPercent}% - 4px)`,
+            animationDelay: `${delay + 0.45}s`,
+          }}
+        >
+          <div className="reveal-bar__token-avatar">
+            <Avatar name={entry.player.name} role="developer" emoji={entry.player.emoji} size="lg" />
+          </div>
+          <div className="reveal-bar__value">
+            {isMissing ? '—' : entry.value}
+          </div>
+          {tier && <div className="reveal-bar__tier" data-tier={tier.toLowerCase()}>{tier}</div>}
+          {entry.isOutlier && <div className="reveal-bar__outlier-flag">⚠️</div>}
+        </div>
+
+        <div
+          className={`reveal-bar__fill ${fillClass}`}
+          style={{
+            height: `${heightPercent}%`,
+            animationDelay: `${delay}s`,
+          }}
+        >
+          <div className="reveal-bar__shine" />
+        </div>
+
+        {meanPercent !== null && (
+          <div className="reveal-bar__mean-marker" style={{ bottom: `${meanPercent}%` }} aria-hidden />
+        )}
+      </div>
+
+      <div className="reveal-bar__name" title={entry.player.name}>
+        {entry.player.name}
+      </div>
+    </div>
+  )
 }
 
 export function RevealDashboard({ players, votes, round }: RevealDashboardProps) {
   const stats = computeRevealStats(players, votes)
-  const { entries, numericCount, mean, min, max, consensus, outliers, questionCount, missingCount } = stats
+  const { entries, numericCount, mean, min, max, consensus, outliers, questionCount, missingCount, meanFibIndex } = stats
 
   if (entries.length === 0) {
     return (
@@ -41,14 +114,16 @@ export function RevealDashboard({ players, votes, round }: RevealDashboardProps)
     )
   }
 
-  // Re-key on round so animations replay each reveal.
-  const animKey = `round-${round}`
+  // Mean line position in % of bar area height (using Fib index axis to match bars).
+  const meanPercent = meanFibIndex !== null
+    ? ((meanFibIndex + 1) / FIB_NUMERIC.length) * 100
+    : null
 
   return (
-    <div key={animKey} className="reveal-dashboard">
+    <div key={`round-${round}`} className="reveal-dashboard">
       <header className="reveal-dashboard__header">
         <span className="reveal-dashboard__eyebrow">Résultats — Round {round}</span>
-        <h2 className="reveal-dashboard__title">Votes révélés</h2>
+        <h2 className="reveal-dashboard__title">Scoreboard</h2>
       </header>
 
       <div className="reveal-hero">
@@ -74,30 +149,30 @@ export function RevealDashboard({ players, votes, round }: RevealDashboardProps)
         </div>
       </div>
 
-      <div className="reveal-vote-grid">
-        {entries.map((e, i) => (
-          <article
-            key={e.player.id}
-            className={tileVariant(e)}
-            style={{ animationDelay: `${0.18 + i * 0.08}s` }}
-          >
-            <div className="reveal-vote-tile__avatar">
-              <Avatar name={e.player.name} role="developer" />
-            </div>
-            <div className="reveal-vote-tile__name">{e.player.name}</div>
-            <div className="reveal-vote-tile__value">
-              {e.value === null ? '—' : e.value}
-            </div>
-            <div className="reveal-vote-tile__hint">
-              {e.value === null ? 'pas voté'
-                : e.value === '?' ? 'indécis'
-                : e.isOutlier ? '⚠️ écart fort'
-                : (e.fibDistance ?? 0) === 0 ? '✓ aligné'
-                : (e.fibDistance ?? 0) === 1 ? 'proche'
-                : 'éloigné'}
-            </div>
-          </article>
-        ))}
+      <div className="reveal-chart">
+        <div className="reveal-chart__axis" aria-hidden>
+          {[...FIB_NUMERIC].reverse().map((n, i) => (
+            <span
+              key={n}
+              className="reveal-chart__axis-tick"
+              style={{ bottom: `${((FIB_NUMERIC.length - i) / FIB_NUMERIC.length) * 100}%` }}
+            >
+              {n}
+            </span>
+          ))}
+        </div>
+
+        <div className="reveal-chart__bars">
+          {entries.map((e, i) => (
+            <Bar key={e.player.id} entry={e} index={i} meanPercent={meanPercent} />
+          ))}
+        </div>
+
+        {meanPercent !== null && (
+          <div className="reveal-chart__mean-line" style={{ bottom: `${meanPercent}%` }}>
+            <span className="reveal-chart__mean-label">Moy. {formatMean(mean as number)}</span>
+          </div>
+        )}
       </div>
 
       {(consensus === 'discuss' || consensus === 'divergent') && outliers.length > 0 && (
@@ -107,15 +182,16 @@ export function RevealDashboard({ players, votes, round }: RevealDashboardProps)
             <strong>{consensus === 'divergent' ? 'Discussion nécessaire' : 'Échange recommandé'}</strong>
             <p>
               {outliers.length === 1
-                ? <><span className="reveal-discussion-banner__name">{outliers[0].player.name}</span> a estimé <strong>{outliers[0].value}</strong> alors que la moyenne est <strong>{mean !== null ? formatMean(mean) : '—'}</strong>.</>
+                ? <><span aria-hidden>{outliers[0].player.emoji ?? ''} </span><span className="reveal-discussion-banner__name">{outliers[0].player.name}</span> a estimé <strong>{outliers[0].value}</strong> alors que la moyenne est <strong>{mean !== null ? formatMean(mean) : '—'}</strong>.</>
                 : <>
                     {outliers.map((o, i) => (
                       <span key={o.player.id}>
+                        <span aria-hidden>{o.player.emoji ?? ''} </span>
                         <span className="reveal-discussion-banner__name">{o.player.name}</span> ({o.value}){i < outliers.length - 1 ? ', ' : ''}
                       </span>
                     ))} sortent du lot par rapport à la moyenne <strong>{mean !== null ? formatMean(mean) : '—'}</strong>.
                   </>}
-              {' '}Prenez un instant pour comprendre les hypothèses différentes avant de re-voter.
+              {' '}Prenez un instant pour comprendre les hypothèses avant de re-voter.
             </p>
           </div>
         </div>
@@ -126,7 +202,7 @@ export function RevealDashboard({ players, votes, round }: RevealDashboardProps)
           <div className="reveal-discussion-banner__icon">🎯</div>
           <div className="reveal-discussion-banner__body">
             <strong>Consensus parfait !</strong>
-            <p>Tout le monde est sur la même longueur d&apos;onde. Direction le prochain ticket.</p>
+            <p>Tout le monde est aligné. Direction le prochain ticket.</p>
           </div>
         </div>
       )}
