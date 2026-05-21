@@ -1,5 +1,5 @@
 'use client'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { RoomHeader } from '@/components/room/RoomHeader'
 import { PlayersList } from '@/components/room/PlayersList'
@@ -14,7 +14,6 @@ import { useRoom } from '@/hooks/useRoom'
 import { usePlayers } from '@/hooks/usePlayers'
 import { useVotes } from '@/hooks/useVotes'
 import { useGameStore } from '@/store/gameStore'
-import { createClient } from '@/lib/supabase/client'
 
 export default function RoomPage() {
   const params = useParams()
@@ -22,7 +21,11 @@ export default function RoomPage() {
   const roomId = params.roomId as string
   const { toast, showToast, clearToast } = useToast()
 
-  const { myPlayerId, myRole, selectedVote } = useGameStore()
+  const { myPlayerId, myRoomId, myRole, selectedVote, reset } = useGameStore()
+  // Wait for zustand's persisted state to hydrate before deciding to redirect.
+  // Otherwise an immediate "no session" bounce fires on first render after refresh.
+  const [hydrated, setHydrated] = useState(false)
+  useEffect(() => { setHydrated(true) }, [])
 
   const { room, loading: roomLoading } = useRoom(roomId)
   const { players } = usePlayers(roomId)
@@ -36,25 +39,24 @@ export default function RoomPage() {
     }
   }, [room, roomLoading, router, showToast])
 
-  // Redirect if no player session for this room
+  // Redirect if no player session, OR session belongs to a different room.
   useEffect(() => {
-    if (!myPlayerId) {
+    if (!hydrated) return
+    if (!myPlayerId || (myRoomId && myRoomId !== roomId)) {
       router.push('/')
     }
-  }, [myPlayerId, router])
+  }, [hydrated, myPlayerId, myRoomId, roomId, router])
 
-  // Cleanup: remove player on unmount
+  // If the persisted player no longer exists in DB (e.g. removed elsewhere), clear
+  // the session and bounce back to the lobby so the user can re-join cleanly.
   useEffect(() => {
-    if (!myPlayerId) return
-    const handleUnload = async () => {
-      const supabase = createClient()
-      await supabase.from('players').delete().eq('id', myPlayerId)
+    if (!hydrated || !myPlayerId || !players.length) return
+    const stillExists = players.some(p => p.id === myPlayerId)
+    if (!stillExists) {
+      reset()
+      router.push('/')
     }
-    window.addEventListener('beforeunload', handleUnload)
-    return () => {
-      window.removeEventListener('beforeunload', handleUnload)
-    }
-  }, [myPlayerId])
+  }, [hydrated, myPlayerId, players, reset, router])
 
   if (roomLoading) {
     return (
