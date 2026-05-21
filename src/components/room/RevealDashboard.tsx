@@ -1,6 +1,7 @@
 'use client'
 import { useState, useTransition } from 'react'
 import { Avatar } from '@/components/ui/Avatar'
+import { Toast, useToast } from '@/components/ui/Toast'
 import { createClient } from '@/lib/supabase/client'
 import {
   computeRevealStats,
@@ -120,20 +121,28 @@ function Bar({ entry, index, isScrumMaster, reopening, onReopen }: BarProps) {
 export function RevealDashboard({ players, votes, round, roomId, isScrumMaster }: RevealDashboardProps) {
   const [pendingId, setPendingId] = useState<string | null>(null)
   const [, startTransition] = useTransition()
+  const { toast, showToast, clearToast } = useToast()
 
   const stats = computeRevealStats(players, votes)
   const { entries, numericCount, mean, min, max, consensus, outliers, questionCount, missingCount } = stats
+  const allOutliersTwoVoters = numericCount === 2 && outliers.length === 2
 
   async function reopenVote(playerId: string) {
     if (!isScrumMaster || pendingId) return
     setPendingId(playerId)
     const supabase = createClient()
-    await supabase
+    const { error, count } = await supabase
       .from('votes')
-      .delete()
+      .delete({ count: 'exact' })
       .eq('room_id', roomId)
       .eq('player_id', playerId)
       .eq('round', round)
+    if (error) {
+      showToast(`Réouverture échouée : ${error.message}`)
+    } else if (count === 0) {
+      // No row deleted — almost always means RLS denied the DELETE silently.
+      showToast('Suppression refusée par la base (vérifie la policy DELETE sur votes).')
+    }
     startTransition(() => setPendingId(null))
   }
 
@@ -233,23 +242,41 @@ export function RevealDashboard({ players, votes, round, roomId, isScrumMaster }
           <div className="reveal-discussion-banner__body">
             <strong>{consensus === 'divergent' ? 'Discussion nécessaire' : 'Échange recommandé'}</strong>
             <p>
-              {outliers.length === 1
-                ? <><span aria-hidden>{outliers[0].player.emoji ?? ''} </span><span className="reveal-discussion-banner__name">{outliers[0].player.name}</span> a estimé <strong>{outliers[0].value}</strong> alors que la moyenne est <strong>{mean !== null ? formatMean(mean) : '—'}</strong>.</>
-                : <>
-                    {outliers.map((o, i) => (
-                      <span key={o.player.id}>
-                        <span aria-hidden>{o.player.emoji ?? ''} </span>
-                        <span className="reveal-discussion-banner__name">{o.player.name}</span> ({o.value}){i < outliers.length - 1 ? ', ' : ''}
-                      </span>
-                    ))} sortent du lot par rapport à la moyenne <strong>{mean !== null ? formatMean(mean) : '—'}</strong>.
-                  </>}
-              {' '}Prenez un instant pour comprendre les hypothèses avant de re-voter.
+              {allOutliersTwoVoters ? (
+                <>
+                  Les deux estimations divergent :{' '}
+                  {outliers.map((o, i) => (
+                    <span key={o.player.id}>
+                      <span aria-hidden>{o.player.emoji ?? ''} </span>
+                      <span className="reveal-discussion-banner__name">{o.player.name}</span> (<strong>{o.value}</strong>)
+                      {i < outliers.length - 1 ? ' et ' : ''}
+                    </span>
+                  ))}
+                  . Échangez pour aligner vos estimations.
+                </>
+              ) : outliers.length === 1 ? (
+                <>
+                  <span aria-hidden>{outliers[0].player.emoji ?? ''} </span>
+                  <span className="reveal-discussion-banner__name">{outliers[0].player.name}</span> a estimé <strong>{outliers[0].value}</strong> alors que la moyenne est <strong>{mean !== null ? formatMean(mean) : '—'}</strong>. Prenez un instant pour comprendre les hypothèses avant de re-voter.
+                </>
+              ) : (
+                <>
+                  {outliers.map((o, i) => (
+                    <span key={o.player.id}>
+                      <span aria-hidden>{o.player.emoji ?? ''} </span>
+                      <span className="reveal-discussion-banner__name">{o.player.name}</span> ({o.value}){i < outliers.length - 1 ? ', ' : ''}
+                    </span>
+                  ))} sortent du lot par rapport à la moyenne <strong>{mean !== null ? formatMean(mean) : '—'}</strong>. Prenez un instant pour comprendre les hypothèses avant de re-voter.
+                </>
+              )}
             </p>
 
             {isScrumMaster && (
               <div className="reveal-discussion-banner__actions">
                 <span className="reveal-discussion-banner__cta">
-                  Après échange, tu peux rouvrir le vote d&apos;un participant pour qu&apos;il ré-estime :
+                  {allOutliersTwoVoters
+                    ? 'Après échange, tu peux rouvrir le vote de l\'un ou des deux participants pour qu\'ils ré-estiment :'
+                    : 'Après échange, tu peux rouvrir le vote d\'un participant pour qu\'il ré-estime :'}
                 </span>
                 <div className="reveal-discussion-banner__chips">
                   {outliers.map(o => (
@@ -288,6 +315,8 @@ export function RevealDashboard({ players, votes, round, roomId, isScrumMaster }
           ↺ Besoin d&apos;ajuster ? Clique « Re-voter » sous un participant pour lui rouvrir son vote.
         </p>
       )}
+
+      {toast && <Toast message={toast.message} type={toast.type} onClose={clearToast} />}
     </div>
   )
 }

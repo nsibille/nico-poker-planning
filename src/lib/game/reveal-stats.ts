@@ -125,10 +125,18 @@ export function computeRevealStats(players: Player[], votes: Vote[]): RevealStat
 
   let outliers: VoteEntry[] = []
   if (consensus === 'discuss' || consensus === 'divergent') {
-    const maxDist = Math.max(...numericEntries.map(e => e.fibDistance ?? 0))
-    if (maxDist > 0) {
-      outliers = numericEntries.filter(e => (e.fibDistance ?? 0) === maxDist)
+    if (numericEntries.length === 2) {
+      // Avec seulement 2 votants en désaccord il n'y a pas de "majorité" à
+      // laquelle se référer — les deux points de vue doivent être discutés
+      // et tous deux peuvent être rouverts par le SM.
+      outliers = numericEntries
       outliers.forEach(o => { o.isOutlier = true })
+    } else {
+      const maxDist = Math.max(...numericEntries.map(e => e.fibDistance ?? 0))
+      if (maxDist > 0) {
+        outliers = numericEntries.filter(e => (e.fibDistance ?? 0) === maxDist)
+        outliers.forEach(o => { o.isOutlier = true })
+      }
     }
   }
 
