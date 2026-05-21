@@ -1,5 +1,4 @@
 'use client'
-import { useState } from 'react'
 import { VoteCard } from './VoteCard'
 import { createClient } from '@/lib/supabase/client'
 import { FIBONACCI } from '@/lib/game/constants'
@@ -17,20 +16,17 @@ interface VoteGridProps {
 
 export function VoteGrid({ roomId, round, phase, myPlayerId, myRole, currentVote }: VoteGridProps) {
   const { setSelectedVote } = useGameStore()
-  const [loading, setLoading] = useState(false)
 
   const disabled = myRole !== 'developer' || phase !== 'voting'
 
-  async function handleVote(value: string) {
-    if (disabled || !myPlayerId || loading) return
-    setLoading(true)
+  function handleVote(value: string) {
+    if (disabled || !myPlayerId) return
+    setSelectedVote(value)
     const supabase = createClient()
-    await supabase.from('votes').upsert(
+    void supabase.from('votes').upsert(
       { room_id: roomId, player_id: myPlayerId, round, value },
       { onConflict: 'room_id,player_id,round' }
     )
-    setSelectedVote(value)
-    setLoading(false)
   }
 
   if (myRole !== 'developer') return null
