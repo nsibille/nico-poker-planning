@@ -1086,8 +1086,11 @@ html, body {
   align-items: flex-end;
   height: 280px;
   margin-bottom: 32px;
-  overflow-x: auto;
-  overflow-y: visible;
+  /* CSS forces overflow-y to auto when overflow-x is auto, which clips the
+     player names and the SM "Re-voter" button positioned below each bar.
+     With typical planning-poker headcounts (~2-8 devs) we don't need an
+     internal scroll, so use overflow: visible. */
+  overflow: visible;
 }
 
 .reveal-chart__mean-line {
