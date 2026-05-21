@@ -58,10 +58,12 @@ export default function RoomPage() {
     }
   }, [hydrated, myPlayerId, players, reset, router])
 
-  // When the SM re-opens a developer's vote (deletes the vote row), clear the
-  // local optimistic selectedVote so the re-shown grid starts unselected rather
-  // than showing the previous pick highlighted.
-  const reopenedTrigger = myRole === 'developer' && room?.phase === 'revealed' && !votes.some(v => v.player_id === myPlayerId)
+  // When the SM re-opens a developer's vote (sets vote.value to '' — our "no
+  // vote" sentinel), clear the local optimistic selectedVote so the re-shown
+  // grid starts unselected rather than showing the previous pick highlighted.
+  const reopenedTrigger = myRole === 'developer'
+    && room?.phase === 'revealed'
+    && !votes.some(v => v.player_id === myPlayerId && v.value !== '')
   useEffect(() => {
     if (reopenedTrigger && selectedVote) setSelectedVote(null)
   }, [reopenedTrigger, selectedVote, setSelectedVote])
@@ -85,15 +87,18 @@ export default function RoomPage() {
 
   const phase = room.phase as 'waiting' | 'voting' | 'revealed'
   const isScrumMaster = myRole === 'scrum-master'
-  const myVote = votes.find(v => v.player_id === myPlayerId)
-  // A developer whose vote was deleted by the SM in revealed phase ("re-voter")
+  const myVoteRow = votes.find(v => v.player_id === myPlayerId)
+  // A vote row with empty value is the SM's "reopened" sentinel — treat it as
+  // if we hadn't voted yet.
+  const myActiveVote = myVoteRow && myVoteRow.value !== '' ? myVoteRow : undefined
+  // A developer whose vote was cleared by the SM in revealed phase ("re-voter")
   // should see the VoteGrid again, even though the global phase is still 'revealed'.
-  const reopenedForMe = myRole === 'developer' && phase === 'revealed' && !myVote
+  const reopenedForMe = myRole === 'developer' && phase === 'revealed' && !myActiveVote
   const showVoteGrid = myRole === 'developer' && (phase !== 'revealed' || reopenedForMe)
   // Don't fall back to the locally-cached selectedVote when we're re-opened — the
   // user is supposed to start from a clean slate, not see their previous pick still
   // highlighted.
-  const currentVote = reopenedForMe ? null : (myVote?.value ?? selectedVote)
+  const currentVote = reopenedForMe ? null : (myActiveVote?.value ?? selectedVote)
 
   return (
     <div className="layout-room">

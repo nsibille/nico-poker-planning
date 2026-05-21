@@ -18,15 +18,17 @@ export function PlayerRow({ player, vote, phase, isMe }: PlayerRowProps) {
         {isMe && <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', marginLeft: '6px' }}>(moi)</span>}
       </div>
       <BadgeRole role={player.role as 'developer' | 'scrum-master'} />
-      {player.role === 'developer' && (
-        phase === 'revealed' && vote ? (
-          <div className="vote-card-revealed">{vote.value}</div>
-        ) : vote ? (
-          <div className="status-voted">✓</div>
-        ) : (
-          <div className="status-waiting">…</div>
-        )
-      )}
+      {player.role === 'developer' && (() => {
+        // value === '' = sentinel "vote rouvert" → considéré comme pas voté.
+        const activeVote = vote && vote.value !== '' ? vote : undefined
+        if (phase === 'revealed' && activeVote) {
+          return <div className="vote-card-revealed">{activeVote.value}</div>
+        }
+        if (activeVote) {
+          return <div className="status-voted">✓</div>
+        }
+        return <div className="status-waiting">…</div>
+      })()}
     </div>
   )
 }

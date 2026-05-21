@@ -19,8 +19,10 @@ export function StatusBar({ roomId, phase, round, players, votes, isScrumMaster 
   const [loading, setLoading] = useState(false)
 
   const devs = players.filter(p => p.role === 'developer')
-  const voted = devs.filter(d => votes.some(v => v.player_id === d.id))
-  const pending = devs.filter(d => !votes.some(v => v.player_id === d.id))
+  // value === '' = sentinel "vote rouvert / annulé" → traité comme pas voté.
+  const hasActiveVote = (devId: string) => votes.some(v => v.player_id === devId && v.value !== '')
+  const voted = devs.filter(d => hasActiveVote(d.id))
+  const pending = devs.filter(d => !hasActiveVote(d.id))
   const hasDevs = devs.length > 0
   const allVoted = hasDevs && pending.length === 0
 

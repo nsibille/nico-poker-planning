@@ -131,17 +131,18 @@ export function RevealDashboard({ players, votes, round, roomId, isScrumMaster }
     if (!isScrumMaster || pendingId) return
     setPendingId(playerId)
     const supabase = createClient()
-    const { error, count } = await supabase
+    // On ne supprime PAS la ligne (éviterait d'ajouter une policy RLS DELETE) —
+    // on remet la value à '' qui est notre sentinel "pas de vote effectif".
+    // Le hook useVotes propage l'UPDATE en temps réel à tous les clients ; côté
+    // dev, reopenedForMe passe à true et la grille réapparaît.
+    const { error } = await supabase
       .from('votes')
-      .delete({ count: 'exact' })
+      .update({ value: '' })
       .eq('room_id', roomId)
       .eq('player_id', playerId)
       .eq('round', round)
     if (error) {
       showToast(`Réouverture échouée : ${error.message}`)
-    } else if (count === 0) {
-      // No row deleted — almost always means RLS denied the DELETE silently.
-      showToast('Suppression refusée par la base (vérifie la policy DELETE sur votes).')
     }
     startTransition(() => setPendingId(null))
   }

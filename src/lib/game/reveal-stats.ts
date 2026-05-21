@@ -71,7 +71,9 @@ export function computeRevealStats(players: Player[], votes: Vote[]): RevealStat
   const devs = players.filter(p => p.role === 'developer')
   const entries: VoteEntry[] = devs.map(player => {
     const v = votes.find(x => x.player_id === player.id)
-    const raw = v?.value ?? null
+    // A vote row with an empty value is the "reopened" sentinel — treat it like
+    // an absent vote (no DELETE policy needed in the DB).
+    const raw = v && v.value !== '' ? v.value : null
     let numeric: number | null = null
     let fibIndex: number | null = null
     if (raw && raw !== '?') {
