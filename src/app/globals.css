@@ -1376,15 +1376,16 @@ html, body {
 .reveal-chart__bars {
   position: relative;
   display: flex;
-  gap: var(--space-3);
+  gap: var(--space-2);
   align-items: flex-end;
   height: 280px;
   margin-bottom: 32px;
-  /* CSS forces overflow-y to auto when overflow-x is auto, which clips the
-     player names and the SM "Re-voter" button positioned below each bar.
-     With typical planning-poker headcounts (~2-8 devs) we don't need an
-     internal scroll, so use overflow: visible. */
+  /* Avec ≤8 devs ça tient en largeur. Au-delà, on autorise le scroll-x
+     plutôt que d'écraser le contenu. overflow: visible permet aux tokens
+     (avatar + valeur) au-dessus des barres et au "Re-voter" en dessous de
+     ne pas être clippés. */
   overflow: visible;
+  min-width: 0;
 }
 
 .reveal-chart__mean-line {
@@ -1414,13 +1415,18 @@ html, body {
 }
 
 .reveal-bar {
-  flex: 1 0 96px;
+  /* Scale-down friendly : la barre prend une part équitable, mais peut
+     descendre jusqu'à 64px (= avatar lg 56 + 8 px d'air) avant de devoir
+     scroller horizontalement. À 8 devs dans la sidebar SM, chaque barre
+     fait ~80 px, ce qui reste lisible. */
+  flex: 1 1 0;
+  min-width: 64px;
+  max-width: 120px;
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   height: 100%;
-  min-width: 96px;
 }
 
 .reveal-bar__column {

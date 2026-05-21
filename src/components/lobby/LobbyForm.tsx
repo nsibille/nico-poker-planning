@@ -12,7 +12,7 @@ import { useGameStore } from '@/store/gameStore'
 import { createClient } from '@/lib/supabase/client'
 import { generateRoomId } from '@/lib/game/utils'
 import { randomPlayerEmoji } from '@/lib/game/emojis'
-import { MAX_DEV, MAX_SM } from '@/lib/game/constants'
+import { MAX_DEV } from '@/lib/game/constants'
 import type { Role } from '@/types'
 
 export function LobbyForm() {
@@ -82,17 +82,18 @@ export function LobbyForm() {
         .single()
       if (!roomData) { showToast('Room introuvable'); setLoading(false); return }
 
-      // Check limits
-      const { count: roleCount } = await supabase
-        .from('players')
-        .select('id', { count: 'exact', head: true })
-        .eq('room_id', roomId)
-        .eq('role', role)
-      const limit = role === 'developer' ? MAX_DEV : MAX_SM
-      if ((roleCount ?? 0) >= limit) {
-        showToast(`Room complète pour ce rôle (max ${limit})`)
-        setLoading(false)
-        return
+      // Check limits — devs are capped, Scrum Masters have no hard limit.
+      if (role === 'developer') {
+        const { count: devCount } = await supabase
+          .from('players')
+          .select('id', { count: 'exact', head: true })
+          .eq('room_id', roomId)
+          .eq('role', 'developer')
+        if ((devCount ?? 0) >= MAX_DEV) {
+          showToast(`Équipe complète — max ${MAX_DEV} développeurs par room`)
+          setLoading(false)
+          return
+        }
       }
 
       // Check duplicate name
