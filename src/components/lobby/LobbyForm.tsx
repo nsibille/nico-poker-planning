@@ -1,14 +1,17 @@
 'use client'
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { Spinner } from '@/components/ui/Spinner'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { Toast, useToast } from '@/components/ui/Toast'
 import { RoleSelector } from './RoleSelector'
+import { EmojiPicker } from './EmojiPicker'
 import { useSession } from '@/hooks/useSession'
 import { useGameStore } from '@/store/gameStore'
 import { createClient } from '@/lib/supabase/client'
 import { generateRoomId } from '@/lib/game/utils'
+import { randomPlayerEmoji } from '@/lib/game/emojis'
 import { MAX_DEV, MAX_SM } from '@/lib/game/constants'
 import type { Role } from '@/types'
 
@@ -16,12 +19,39 @@ export function LobbyForm() {
   const router = useRouter()
   const { userId, loading: sessionLoading } = useSession()
   const { toast, showToast, clearToast } = useToast()
-  const { setMyName, setMyRole, setMyPlayerId } = useGameStore()
+  const { myPlayerId, myRoomId, setMyName, setMyRole, setMyPlayerId, setMyRoomId, setMyEmoji, reset } = useGameStore()
 
   const [name, setName] = useState('')
   const [role, setRole] = useState<Role | null>(null)
   const [roomId, setRoomId] = useState('')
+  const [emoji, setEmoji] = useState<string>(() => randomPlayerEmoji())
   const [loading, setLoading] = useState(false)
+  // While we check a persisted session against the DB, hide the form to avoid a flash.
+  const [restoring, setRestoring] = useState<boolean>(!!(myPlayerId && myRoomId))
+
+  // If we have a persisted session, verify the player still exists in DB and resume.
+  // If the player was deleted (e.g. cleared from another tab, or stale data), reset and
+  // show the lobby form so the user can re-join.
+  useEffect(() => {
+    if (!myPlayerId || !myRoomId) { setRestoring(false); return }
+    let cancelled = false
+    const supabase = createClient()
+    ;(async () => {
+      const { data } = await supabase
+        .from('players')
+        .select('id, room_id')
+        .eq('id', myPlayerId)
+        .maybeSingle()
+      if (cancelled) return
+      if (data && data.room_id === myRoomId) {
+        router.replace(`/room/${myRoomId}`)
+      } else {
+        reset()
+        setRestoring(false)
+      }
+    })()
+    return () => { cancelled = true }
+  }, [myPlayerId, myRoomId, reset, router])
 
   const handleGenerate = useCallback(() => {
     setRoomId(generateRoomId())
@@ -81,7 +111,7 @@ export function LobbyForm() {
       // Insert player
       const { data: player, error: playerError } = await supabase
         .from('players')
-        .insert({ room_id: roomId, name: name.trim(), role, user_id: userId })
+        .insert({ room_id: roomId, name: name.trim(), role, user_id: userId, emoji })
         .select()
         .single()
       if (playerError) {
@@ -97,11 +127,24 @@ export function LobbyForm() {
       setMyName(name.trim())
       setMyRole(role)
       setMyPlayerId(player.id)
+      setMyRoomId(roomId)
+      setMyEmoji(emoji)
       router.push(`/room/${roomId}`)
     } catch {
       showToast('Une erreur est survenue')
       setLoading(false)
     }
+  }
+
+  if (restoring) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 0', gap: '12px' }}>
+        <Spinner />
+        <p style={{ fontFamily: 'var(--font-primary)', color: 'var(--color-text-muted)', fontSize: 'var(--text-sm)' }}>
+          Reprise de ta session…
+        </p>
+      </div>
+    )
   }
 
   return (
@@ -115,6 +158,8 @@ export function LobbyForm() {
           maxLength={32}
           autoFocus
         />
+
+        <EmojiPicker value={emoji} onChange={setEmoji} />
 
         <RoleSelector value={role} onChange={setRole} />
 

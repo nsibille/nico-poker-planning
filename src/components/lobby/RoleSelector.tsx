@@ -6,37 +6,39 @@ interface RoleSelectorProps {
   onChange: (role: Role) => void
 }
 
+const ROLES: Array<{ id: Role; icon: string; title: string; sub: string }> = [
+  { id: 'developer',    icon: '🧑‍💻', title: 'Développeur', sub: 'Je vote' },
+  { id: 'scrum-master', icon: '🎯',   title: 'Scrum Master', sub: 'J\'anime' },
+]
+
 export function RoleSelector({ value, onChange }: RoleSelectorProps) {
   return (
     <div className="flex flex-col gap-2">
       <label className="text-sm font-medium" style={{ color: 'var(--color-text-primary)', fontFamily: 'var(--font-primary)' }}>
         Rôle
       </label>
-      <div className="flex gap-3">
-        <button
-          type="button"
-          onClick={() => onChange('developer')}
-          className="btn-secondary-md flex-1 flex items-center justify-center gap-2"
-          style={value === 'developer' ? {
-            background: 'var(--color-role-dev-light)',
-            borderColor: 'var(--color-role-dev)',
-            color: 'var(--color-role-dev-dark)',
-          } : undefined}
-        >
-          <span>🧑‍💻</span> Développeur
-        </button>
-        <button
-          type="button"
-          onClick={() => onChange('scrum-master')}
-          className="btn-secondary-md flex-1 flex items-center justify-center gap-2"
-          style={value === 'scrum-master' ? {
-            background: 'var(--color-brand-primary-50)',
-            borderColor: 'var(--color-brand-primary)',
-            color: 'var(--color-brand-primary)',
-          } : undefined}
-        >
-          <span>🎯</span> Scrum Master
-        </button>
+      <div className="role-card-group" role="radiogroup" aria-label="Rôle">
+        {ROLES.map(r => {
+          const selected = value === r.id
+          return (
+            <button
+              key={r.id}
+              type="button"
+              role="radio"
+              aria-checked={selected}
+              data-role={r.id}
+              onClick={() => onChange(r.id)}
+              className={`role-card ${selected ? 'role-card--selected' : ''}`}
+            >
+              <span className="role-card__icon" aria-hidden>{r.icon}</span>
+              <span className="role-card__text">
+                <span className="role-card__title">{r.title}</span>
+                <span className="role-card__sub">{r.sub}</span>
+              </span>
+              <span className="role-card__check" aria-hidden>✓</span>
+            </button>
+          )
+        })}
       </div>
     </div>
   )

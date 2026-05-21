@@ -10,16 +10,18 @@ export function usePlayers(roomId: string) {
   useEffect(() => {
     if (!roomId) return
     const supabase = createClient()
+    let cancelled = false
 
-    supabase
-      .from('players')
-      .select('*')
-      .eq('room_id', roomId)
-      .order('joined_at')
-      .then(({ data }) => {
-        setPlayers((data ?? []) as Player[])
-        setLoading(false)
-      })
+    async function refetch() {
+      const { data } = await supabase
+        .from('players')
+        .select('*')
+        .eq('room_id', roomId)
+        .order('joined_at')
+      if (cancelled) return
+      setPlayers((data ?? []) as Player[])
+      setLoading(false)
+    }
 
     const channel = supabase
       .channel(`players-${roomId}`)
@@ -28,7 +30,8 @@ export function usePlayers(roomId: string) {
         { event: '*', schema: 'public', table: 'players', filter: `room_id=eq.${roomId}` },
         (payload) => {
           if (payload.eventType === 'INSERT') {
-            setPlayers(prev => [...prev, payload.new as Player])
+            const np = payload.new as Player
+            setPlayers(prev => prev.some(p => p.id === np.id) ? prev : [...prev, np])
           } else if (payload.eventType === 'DELETE') {
             setPlayers(prev => prev.filter(p => p.id !== payload.old.id))
           } else if (payload.eventType === 'UPDATE') {
@@ -36,9 +39,14 @@ export function usePlayers(roomId: string) {
           }
         }
       )
-      .subscribe()
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') void refetch()
+      })
 
-    return () => { supabase.removeChannel(channel) }
+    return () => {
+      cancelled = true
+      supabase.removeChannel(channel)
+    }
   }, [roomId])
 
   return { players, loading }

@@ -14,6 +14,7 @@ export type Database = {
     Tables: {
       players: {
         Row: {
+          emoji: string | null
           id: string
           joined_at: string
           name: string
@@ -22,6 +23,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          emoji?: string | null
           id?: string
           joined_at?: string
           name: string
@@ -30,6 +32,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          emoji?: string | null
           id?: string
           joined_at?: string
           name?: string

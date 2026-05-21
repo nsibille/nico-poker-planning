@@ -1,6 +1,9 @@
 'use client'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { BadgeRoomId, BadgeRound, BadgePhase } from '@/components/ui/Badge'
+import { useGameStore } from '@/store/gameStore'
+import { createClient } from '@/lib/supabase/client'
 import type { Room } from '@/types'
 
 interface RoomHeaderProps {
@@ -10,6 +13,21 @@ interface RoomHeaderProps {
 
 export function RoomHeader({ room, connected }: RoomHeaderProps) {
   const router = useRouter()
+  const { myPlayerId, reset } = useGameStore()
+  const [leaving, setLeaving] = useState(false)
+
+  const handleLeave = async () => {
+    if (leaving) return
+    setLeaving(true)
+    if (myPlayerId) {
+      const supabase = createClient()
+      // Best-effort delete — even if it fails (offline, RLS), we still clear the
+      // local session so the user lands on a fresh lobby.
+      await supabase.from('players').delete().eq('id', myPlayerId).then(() => {}, () => {})
+    }
+    reset()
+    router.push('/')
+  }
 
   return (
     <nav className="nav-room-header">
@@ -31,10 +49,11 @@ export function RoomHeader({ room, connected }: RoomHeaderProps) {
         )}
       </div>
       <button
-        onClick={() => router.push('/')}
+        onClick={handleLeave}
+        disabled={leaving}
         className="btn-ghost-sm"
       >
-        Quitter
+        {leaving ? 'Déconnexion…' : 'Quitter'}
       </button>
     </nav>
   )

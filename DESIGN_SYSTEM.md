@@ -842,6 +842,9 @@ Variantes  : sm, md, lg | success, warning, danger, info, neutral
 }
 ```
 
+### `fx-reveal-burst`
+**Animation festive plein écran au passage en phase `revealed`.** Canvas plein écran fixé en surimpression (`pointer-events: none`, `z-index: 9999`), généré via `canvas-confetti`. À chaque révélation, un des 6 presets random est joué : `fireworks`, `bigBang`, `sideCannons`, `starShower`, `schoolPride`, `goldenRain`. Palette principale alignée sur les couleurs de marque (`#4970ff`, `#ffb24d`, etc.) sauf `starShower` (palette dorée) et `goldenRain` (palette dorée). Composant : `RevealOverlay` (`src/components/room/RevealOverlay.tsx`).
+
 ---
 
 ## Index des slugs
@@ -882,3 +885,27 @@ Variantes  : sm, md, lg | success, warning, danger, info, neutral
 | `spinner-sm` | Feedback | Spinner chargement |
 | `toast-success` | Toast | Notification succès — teal |
 | `toast-error` | Toast | Notification erreur — coral |
+| `fx-reveal-burst` | FX | Animation festive plein écran au reveal — 6 presets random |
+| `reveal-dashboard` | Reveal | Conteneur du tableau de bord post-reveal |
+| `reveal-mean-hero` | Reveal | Tuile moyenne XL — gradient teinté par niveau de consensus |
+| `reveal-consensus-badge` | Reveal | Badge niveau consensus (perfect / aligned / discuss / divergent) |
+| `reveal-chart` | Reveal | Conteneur bar chart gamifié (axe Fibonacci à gauche + barres) |
+| `reveal-bar` | Reveal | Barre verticale d'un participant — variants outlier/unknown/missing |
+| `reveal-bar__fill` | Reveal | Remplissage de la barre — dégradés cool/mid/warm/hot selon valeur |
+| `reveal-bar__token` | Reveal | Token au-dessus de la barre (avatar + pill valeur + tier badge) |
+| `reveal-bar__tier` | Reveal | Mini badge EASY/MEDIUM/HARD/EPIC façon free-to-play |
+| `reveal-chart__mean-line` | Reveal | Ligne pointillée de la moyenne tracée sur le chart |
+| `emoji-picker` | Lobby | Sélecteur d'emoji avatar — preview + dé re-roll + grille |
+| `role-card-group` | Lobby | Grille 2 col du sélecteur de rôle |
+| `role-card` | Lobby | Carte rôle (icône + titre + subtitle + check badge) — variants developer (amber) / scrum-master (brand) |
+| `reveal-bar__reopen` | Reveal | Bouton "↺ Re-voter" sous chaque barre — SM only |
+| `reveal-reopen-chip` | Reveal | Pill CTA dans le banner de divergence — "Rouvrir le vote de X" |
+| `reveal-reopen-hint` | Reveal | Astuce discrète SM quand pas de divergence |
+| `vote-grid--reopened` | Vote | Variant card-surface quand le SM a rouvert le vote du dev |
+| `vote-grid__reopen-banner` | Vote | Banner d'info dans le VoteGrid en mode rouvert |
+| `story-status-pill` | Story | Pill état story (vote en cours / révélé) avec dot "modifications non sauvegardées" |
+| `story-helper` | Story | Helper text discret sous le textarea (instructions) |
+| `avatar-lg` | Avatar | Variante grande (56 px) pour le scoreboard |
+| `avatar-emoji` | Avatar | Span emoji intérieur quand l'avatar a un emoji |
+| `reveal-discussion-banner` | Reveal | Banner appelant à discuter quand divergence — souligne les outliers |
+| `reveal-stat` | Reveal | Mini statistique (Min/Max/Votants...) du dashboard |
