@@ -161,6 +161,7 @@ export default function RoomPage() {
               roomId={roomId}
               isScrumMaster={isScrumMaster}
               storyTitle={displayStory}
+              currentStory={stories.find(s => s.round === displayRound) ?? null}
             />
           )}
 

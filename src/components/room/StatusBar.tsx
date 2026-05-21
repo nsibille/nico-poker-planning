@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { Button } from '@/components/ui/Button'
+import { Toast, useToast } from '@/components/ui/Toast'
 import { createClient } from '@/lib/supabase/client'
 import { useGameStore } from '@/store/gameStore'
 import { computeRevealStats } from '@/lib/game/reveal-stats'
@@ -23,6 +24,7 @@ interface StatusBarProps {
 export function StatusBar({ roomId, phase, round, liveRound, isHistoryMode, story, players, votes, isScrumMaster }: StatusBarProps) {
   const { setSelectedVote } = useGameStore()
   const [loading, setLoading] = useState(false)
+  const { toast, showToast, clearToast } = useToast()
 
   const devs = players.filter(p => p.role === 'developer')
   const hasActiveVote = (devId: string) => votes.some(v => v.player_id === devId && v.value !== '')
@@ -38,27 +40,48 @@ export function StatusBar({ roomId, phase, round, liveRound, isHistoryMode, stor
     const stats = computeRevealStats(players, votes)
     // Snapshot the round → stories before flipping the phase. Upsert lets us
     // re-reveal an already-revealed round (e.g. after the SM re-opens votes).
-    await supabase.from('stories').upsert({
+    const { error: storyError } = await supabase.from('stories').upsert({
       room_id: roomId,
       round: liveRound,
       title: story,
       final_mean: stats.mean,
       consensus: stats.consensus,
     }, { onConflict: 'room_id,round' })
-    await supabase.from('rooms').update({ phase: 'revealed' }).eq('id', roomId)
+    if (storyError) {
+      showToast(`Snapshot story échoué : ${storyError.message}. La migration timeline a-t-elle été appliquée ?`)
+      setLoading(false)
+      return
+    }
+    const { error: roomError } = await supabase.from('rooms').update({ phase: 'revealed' }).eq('id', roomId)
+    if (roomError) showToast(`Reveal échoué : ${roomError.message}`)
     setLoading(false)
   }
 
   async function handleNextRound() {
     setLoading(true)
     const supabase = createClient()
-    // Bumping round resets the per-round game state. `viewing_round` is
-    // already null here (history controls are hidden), but we reset it
-    // defensively anyway so the new round is the displayed one.
-    await supabase
+    // First attempt: also reset viewing_round (history mode). If the column
+    // doesn't exist yet (migration not applied), retry without that field so
+    // the SM is at least unblocked.
+    let { error } = await supabase
       .from('rooms')
       .update({ phase: 'waiting', story: '', round: liveRound + 1, viewing_round: null })
       .eq('id', roomId)
+    if (error && /viewing_round/.test(error.message)) {
+      const retry = await supabase
+        .from('rooms')
+        .update({ phase: 'waiting', story: '', round: liveRound + 1 })
+        .eq('id', roomId)
+      error = retry.error
+      if (!error) {
+        showToast('Round avancé, mais la migration timeline n\'est pas appliquée — applique le SQL pour activer l\'historique.')
+      }
+    }
+    if (error) {
+      showToast(`Prochain round échoué : ${error.message}`)
+      setLoading(false)
+      return
+    }
     setSelectedVote(null)
     setLoading(false)
   }
@@ -73,6 +96,7 @@ export function StatusBar({ roomId, phase, round, liveRound, isHistoryMode, stor
             ? `Tu consultes le round ${round}. Clique « Re-voter » sous un participant pour rouvrir son vote, ou reviens au round courant (${liveRound}) pour continuer.`
             : `Round ${round} — vue historique partagée par le Scrum Master.`}
         </span>
+        {toast && <Toast message={toast.message} type={toast.type} onClose={clearToast} />}
       </div>
     )
   }
@@ -134,6 +158,7 @@ export function StatusBar({ roomId, phase, round, liveRound, isHistoryMode, stor
           )}
         </div>
       )}
+      {toast && <Toast message={toast.message} type={toast.type} onClose={clearToast} />}
     </div>
   )
 }
