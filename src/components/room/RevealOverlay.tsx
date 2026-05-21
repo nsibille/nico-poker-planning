@@ -8,22 +8,25 @@ type Preset = (fire: typeof confetti) => void
 const COLORS = ['#4970ff', '#ffb24d', '#ff5e7e', '#42d392', '#a266ff', '#ffd84d', '#ff7e3a', '#3ad1ff']
 
 function fireworks(fire: typeof confetti) {
-  const duration = 2200
-  const end = Date.now() + duration
+  const end = Date.now() + 1100
   const colors = COLORS
+  let tick = 0
   ;(function frame() {
-    fire({ particleCount: 5, angle: 60, spread: 70, origin: { x: 0, y: 0.7 }, colors, startVelocity: 55 })
-    fire({ particleCount: 5, angle: 120, spread: 70, origin: { x: 1, y: 0.7 }, colors, startVelocity: 55 })
-    if (Math.random() < 0.6) {
+    tick++
+    if (tick % 2 === 0) {
+      fire({ particleCount: 3, angle: 60, spread: 60, origin: { x: 0, y: 0.75 }, colors, startVelocity: 48 })
+      fire({ particleCount: 3, angle: 120, spread: 60, origin: { x: 1, y: 0.75 }, colors, startVelocity: 48 })
+    }
+    if (Math.random() < 0.12) {
       fire({
-        particleCount: 80,
-        startVelocity: 30,
+        particleCount: 30,
+        startVelocity: 25,
         spread: 360,
-        ticks: 60,
-        origin: { x: Math.random() * 0.8 + 0.1, y: Math.random() * 0.4 + 0.2 },
+        ticks: 50,
+        origin: { x: Math.random() * 0.7 + 0.15, y: Math.random() * 0.35 + 0.2 },
         colors,
         shapes: ['circle', 'square'],
-        scalar: 1.1,
+        scalar: 1,
       })
     }
     if (Date.now() < end) requestAnimationFrame(frame)
@@ -32,60 +35,68 @@ function fireworks(fire: typeof confetti) {
 
 function bigBang(fire: typeof confetti) {
   const defaults = { origin: { x: 0.5, y: 0.55 }, colors: COLORS }
-  fire({ ...defaults, particleCount: 200, spread: 100, startVelocity: 55, scalar: 1.2 })
-  setTimeout(() => fire({ ...defaults, particleCount: 120, spread: 120, startVelocity: 45, scalar: 0.9 }), 180)
-  setTimeout(() => fire({ ...defaults, particleCount: 80, spread: 160, startVelocity: 25, scalar: 0.8 }), 380)
-  setTimeout(() => fire({ ...defaults, particleCount: 60, spread: 360, startVelocity: 15, scalar: 0.7, ticks: 200 }), 600)
+  fire({ ...defaults, particleCount: 90, spread: 90, startVelocity: 48, scalar: 1 })
+  setTimeout(() => fire({ ...defaults, particleCount: 50, spread: 130, startVelocity: 35, scalar: 0.85 }), 220)
+  setTimeout(() => fire({ ...defaults, particleCount: 30, spread: 200, startVelocity: 20, scalar: 0.75, ticks: 150 }), 480)
 }
 
 function sideCannons(fire: typeof confetti) {
-  const end = Date.now() + 1500
+  const end = Date.now() + 800
+  let tick = 0
   ;(function frame() {
-    fire({ particleCount: 8, angle: 60, spread: 55, origin: { x: 0, y: 0.65 }, colors: COLORS, startVelocity: 65 })
-    fire({ particleCount: 8, angle: 120, spread: 55, origin: { x: 1, y: 0.65 }, colors: COLORS, startVelocity: 65 })
+    tick++
+    if (tick % 2 === 0) {
+      fire({ particleCount: 5, angle: 60, spread: 50, origin: { x: 0, y: 0.7 }, colors: COLORS, startVelocity: 55 })
+      fire({ particleCount: 5, angle: 120, spread: 50, origin: { x: 1, y: 0.7 }, colors: COLORS, startVelocity: 55 })
+    }
     if (Date.now() < end) requestAnimationFrame(frame)
   })()
 }
 
 function starShower(fire: typeof confetti) {
-  const defaults = { spread: 360, ticks: 120, gravity: 0.4, decay: 0.94, startVelocity: 30, shapes: ['star'] as confetti.Shape[], colors: ['#ffd84d', '#ffb24d', '#fff8c4', '#ffe680', '#ffffff'] }
+  const defaults = { spread: 300, ticks: 100, gravity: 0.5, decay: 0.93, startVelocity: 25, shapes: ['star'] as confetti.Shape[], colors: ['#ffd84d', '#ffb24d', '#fff8c4', '#ffe680', '#ffffff'] }
   function shoot() {
-    fire({ ...defaults, particleCount: 50, scalar: 1.3, origin: { x: Math.random(), y: Math.random() * 0.4 } })
-    fire({ ...defaults, particleCount: 20, scalar: 0.8, origin: { x: Math.random(), y: Math.random() * 0.4 } })
-    fire({ ...defaults, particleCount: 12, scalar: 2.2, origin: { x: Math.random(), y: Math.random() * 0.4 } })
+    fire({ ...defaults, particleCount: 22, scalar: 1.1, origin: { x: Math.random() * 0.8 + 0.1, y: Math.random() * 0.3 + 0.1 } })
+    fire({ ...defaults, particleCount: 8, scalar: 1.6, origin: { x: Math.random() * 0.8 + 0.1, y: Math.random() * 0.3 + 0.1 } })
   }
   shoot()
-  setTimeout(shoot, 300)
-  setTimeout(shoot, 600)
-  setTimeout(shoot, 900)
+  setTimeout(shoot, 350)
 }
 
 function schoolPride(fire: typeof confetti) {
-  const end = Date.now() + 2000
+  const end = Date.now() + 1000
   const colors = ['#4970ff', '#ffb24d']
+  let tick = 0
   ;(function frame() {
-    fire({ particleCount: 4, angle: 60, spread: 60, origin: { x: 0 }, colors })
-    fire({ particleCount: 4, angle: 120, spread: 60, origin: { x: 1 }, colors })
+    tick++
+    if (tick % 2 === 0) {
+      fire({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0, y: 0.85 }, colors, startVelocity: 45 })
+      fire({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1, y: 0.85 }, colors, startVelocity: 45 })
+    }
     if (Date.now() < end) requestAnimationFrame(frame)
   })()
 }
 
 function goldenRain(fire: typeof confetti) {
-  const end = Date.now() + 1800
+  const end = Date.now() + 1000
   const colors = ['#ffd84d', '#ffb24d', '#fff1a8', '#ff9d2e']
+  let tick = 0
   ;(function frame() {
-    fire({
-      particleCount: 6,
-      angle: 270,
-      spread: 120,
-      startVelocity: 25,
-      gravity: 1.1,
-      origin: { x: Math.random(), y: -0.1 },
-      colors,
-      shapes: ['circle'],
-      scalar: 1.1,
-      ticks: 200,
-    })
+    tick++
+    if (tick % 3 === 0) {
+      fire({
+        particleCount: 3,
+        angle: 270,
+        spread: 110,
+        startVelocity: 22,
+        gravity: 1.1,
+        origin: { x: Math.random(), y: -0.1 },
+        colors,
+        shapes: ['circle'],
+        scalar: 0.95,
+        ticks: 160,
+      })
+    }
     if (Date.now() < end) requestAnimationFrame(frame)
   })()
 }
