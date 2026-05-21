@@ -35,9 +35,11 @@ export function StatusBar({ roomId, phase, round, players, votes, isScrumMaster 
   async function handleNextRound() {
     setLoading(true)
     const supabase = createClient()
+    // Start the new round in 'waiting' so the SM must define the next story before
+    // the developers can vote — same gate as the very first round.
     await supabase
       .from('rooms')
-      .update({ phase: 'voting', story: '', round: round + 1 })
+      .update({ phase: 'waiting', story: '', round: round + 1 })
       .eq('id', roomId)
     setSelectedVote(null)
     setLoading(false)

@@ -903,6 +903,8 @@ Variantes  : sm, md, lg | success, warning, danger, info, neutral
 | `reveal-reopen-hint` | Reveal | Astuce discrète SM quand pas de divergence |
 | `vote-grid--reopened` | Vote | Variant card-surface quand le SM a rouvert le vote du dev |
 | `vote-grid__reopen-banner` | Vote | Banner d'info dans le VoteGrid en mode rouvert |
+| `story-status-pill` | Story | Pill état story (vote en cours / révélé) avec dot "modifications non sauvegardées" |
+| `story-helper` | Story | Helper text discret sous le textarea (instructions) |
 | `avatar-lg` | Avatar | Variante grande (56 px) pour le scoreboard |
 | `avatar-emoji` | Avatar | Span emoji intérieur quand l'avatar a un emoji |
 | `reveal-discussion-banner` | Reveal | Banner appelant à discuter quand divergence — souligne les outliers |
