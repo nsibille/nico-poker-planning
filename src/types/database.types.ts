@@ -58,6 +58,7 @@ export type Database = {
           round: number
           story: string
           updated_at: string
+          viewing_round: number | null
         }
         Insert: {
           created_at?: string
@@ -66,6 +67,7 @@ export type Database = {
           round?: number
           story?: string
           updated_at?: string
+          viewing_round?: number | null
         }
         Update: {
           created_at?: string
@@ -74,8 +76,47 @@ export type Database = {
           round?: number
           story?: string
           updated_at?: string
+          viewing_round?: number | null
         }
         Relationships: []
+      }
+      stories: {
+        Row: {
+          room_id: string
+          round: number
+          title: string
+          final_mean: number | null
+          consensus: string | null
+          revealed_at: string
+          updated_at: string
+        }
+        Insert: {
+          room_id: string
+          round: number
+          title?: string
+          final_mean?: number | null
+          consensus?: string | null
+          revealed_at?: string
+          updated_at?: string
+        }
+        Update: {
+          room_id?: string
+          round?: number
+          title?: string
+          final_mean?: number | null
+          consensus?: string | null
+          revealed_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stories_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       votes: {
         Row: {

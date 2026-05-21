@@ -842,6 +842,50 @@ Variantes  : sm, md, lg | success, warning, danger, info, neutral
 }
 ```
 
+### `story-timeline`
+**Rail historique des stories (SM uniquement, colonne de droite)**
+- Position : sticky en haut, hauteur max viewport, scroll interne
+- Liste verticale d'items, un par round révélé + un virtuel pour le round live non révélé
+- Chaque item : rang `#N`, dot coloré (consensus), pill `live` ou `en cours`, titre tronqué 2 lignes, moyenne, label consensus
+- Couleur du dot et de l'item actif teintée par le consensus (`perfect`/`aligned`/`discuss`/`divergent`/`empty`)
+- Au clic : ouvre le scoreboard de ce round pour tout le monde (mode historique)
+
+```css
+.story-timeline { position: sticky; top: var(--space-4); background: var(--color-bg-surface); border-radius: var(--radius-xl); padding: var(--space-5); box-shadow: var(--shadow-card); }
+/* Voir globals.css pour les sous-composants : __header, __list, __item, __dot, __mean, __consensus, __live-pill, __active-hint */
+```
+
+---
+
+### `story-timeline__item`
+**Item cliquable de la timeline**
+- État par défaut : bordure neutre, dot teinté `--timeline-tint`
+- État actif : ring autour + dégradé léger de fond, bordure teintée
+- État `is-pending` (round live pas encore révélé) : bordure dashed
+
+---
+
+### `history-banner`
+**Bandeau d'information affiché en haut du panel central quand le SM consulte un round historique**
+- Fond violet `--color-violet-50`, bordure pleine `--color-violet`
+- Icône 📜, titre "Vue historique — Round X", subtitle avec le round live, bouton CTA "Retour au round courant"
+
+```css
+.history-banner { background: var(--color-violet-50); border: 1.5px solid var(--color-violet); border-radius: var(--radius-lg); padding: 12px 16px; }
+.history-banner__cta { border-radius: var(--radius-full); border: 1.5px solid var(--color-violet); color: var(--color-violet); }
+.history-banner__cta:hover { background: var(--color-violet); color: white; }
+```
+
+---
+
+### `layout-room-grid--with-timeline`
+**Variante 3 colonnes du grid salle de jeu — affichée uniquement aux Scrum Masters**
+- `grid-template-columns: 240px minmax(0,1fr) 300px`
+- Max-width 1320 px (vs 1100 px pour le layout-room-grid standard)
+- Sous 1080 px : retombe en 2 colonnes (timeline passe en pleine largeur sous le reste)
+
+---
+
 ### `fx-reveal-burst`
 **Animation festive plein écran au passage en phase `revealed`.** Canvas plein écran fixé en surimpression (`pointer-events: none`, `z-index: 9999`), généré via `canvas-confetti`. À chaque révélation, un des 6 presets random est joué : `fireworks`, `bigBang`, `sideCannons`, `starShower`, `schoolPride`, `goldenRain`. Palette principale alignée sur les couleurs de marque (`#4970ff`, `#ffb24d`, etc.) sauf `starShower` (palette dorée) et `goldenRain` (palette dorée). Composant : `RevealOverlay` (`src/components/room/RevealOverlay.tsx`).
 
@@ -909,3 +953,7 @@ Variantes  : sm, md, lg | success, warning, danger, info, neutral
 | `avatar-emoji` | Avatar | Span emoji intérieur quand l'avatar a un emoji |
 | `reveal-discussion-banner` | Reveal | Banner appelant à discuter quand divergence — souligne les outliers |
 | `reveal-stat` | Reveal | Mini statistique (Min/Max/Votants...) du dashboard |
+| `story-timeline` | Timeline | Rail historique des stories (SM only) — sticky droite |
+| `story-timeline__item` | Timeline | Item cliquable d'un round (rang + dot consensus + moyenne) |
+| `history-banner` | Banner | Bandeau "Vue historique — Round X" + CTA Retour |
+| `layout-room-grid--with-timeline` | Layout | Variante 3 col du grid (240 / 1fr / 300) — SM only |

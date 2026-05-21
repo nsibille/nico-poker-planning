@@ -8,11 +8,14 @@ import { VoteGrid } from '@/components/room/VoteGrid'
 import { StatusBar } from '@/components/room/StatusBar'
 import { RevealOverlay } from '@/components/room/RevealOverlay'
 import { RevealDashboard } from '@/components/room/RevealDashboard'
+import { StoryTimeline } from '@/components/room/StoryTimeline'
 import { Toast, useToast } from '@/components/ui/Toast'
 import { Spinner } from '@/components/ui/Spinner'
 import { useRoom } from '@/hooks/useRoom'
 import { usePlayers } from '@/hooks/usePlayers'
 import { useVotes } from '@/hooks/useVotes'
+import { useStories } from '@/hooks/useStories'
+import { createClient } from '@/lib/supabase/client'
 import { useGameStore } from '@/store/gameStore'
 
 export default function RoomPage() {
@@ -22,16 +25,27 @@ export default function RoomPage() {
   const { toast, showToast, clearToast } = useToast()
 
   const { myPlayerId, myRoomId, myRole, selectedVote, setSelectedVote, reset } = useGameStore()
-  // Wait for zustand's persisted state to hydrate before deciding to redirect.
-  // Otherwise an immediate "no session" bounce fires on first render after refresh.
   const [hydrated, setHydrated] = useState(false)
   useEffect(() => { setHydrated(true) }, [])
 
   const { room, loading: roomLoading } = useRoom(roomId)
   const { players } = usePlayers(roomId)
-  const { votes } = useVotes(roomId, room?.round ?? 1)
+  const { stories } = useStories(roomId)
 
-  // Redirect if room not found after loading
+  // History mode: when SM has clicked a past story, all clients display that
+  // round in 'revealed' phase. The "live" round (room.round / room.phase) is
+  // preserved untouched — only the displayed view changes.
+  const viewingRound = room?.viewing_round ?? null
+  const displayRound = viewingRound ?? room?.round ?? 1
+  const isHistoryMode = viewingRound !== null
+  const historyStory = isHistoryMode ? stories.find(s => s.round === viewingRound) : null
+  const displayPhase: 'waiting' | 'voting' | 'revealed' = isHistoryMode
+    ? 'revealed'
+    : (room?.phase as 'waiting' | 'voting' | 'revealed' | undefined) ?? 'waiting'
+  const displayStory = isHistoryMode ? (historyStory?.title ?? '') : (room?.story ?? '')
+
+  const { votes } = useVotes(roomId, displayRound)
+
   useEffect(() => {
     if (!roomLoading && !room) {
       showToast('Room introuvable')
@@ -39,7 +53,6 @@ export default function RoomPage() {
     }
   }, [room, roomLoading, router, showToast])
 
-  // Redirect if no player session, OR session belongs to a different room.
   useEffect(() => {
     if (!hydrated) return
     if (!myPlayerId || (myRoomId && myRoomId !== roomId)) {
@@ -47,8 +60,6 @@ export default function RoomPage() {
     }
   }, [hydrated, myPlayerId, myRoomId, roomId, router])
 
-  // If the persisted player no longer exists in DB (e.g. removed elsewhere), clear
-  // the session and bounce back to the lobby so the user can re-join cleanly.
   useEffect(() => {
     if (!hydrated || !myPlayerId || !players.length) return
     const stillExists = players.some(p => p.id === myPlayerId)
@@ -58,11 +69,10 @@ export default function RoomPage() {
     }
   }, [hydrated, myPlayerId, players, reset, router])
 
-  // When the SM re-opens a developer's vote (sets vote.value to '' — our "no
-  // vote" sentinel), clear the local optimistic selectedVote so the re-shown
-  // grid starts unselected rather than showing the previous pick highlighted.
+  // When a developer's vote gets re-opened (by the SM, in displayPhase==='revealed'),
+  // clear the local optimistic selectedVote so the re-shown grid starts unselected.
   const reopenedTrigger = myRole === 'developer'
-    && room?.phase === 'revealed'
+    && displayPhase === 'revealed'
     && !votes.some(v => v.player_id === myPlayerId && v.value !== '')
   useEffect(() => {
     if (reopenedTrigger && selectedVote) setSelectedVote(null)
@@ -85,50 +95,57 @@ export default function RoomPage() {
     )
   }
 
-  const phase = room.phase as 'waiting' | 'voting' | 'revealed'
   const isScrumMaster = myRole === 'scrum-master'
   const myVoteRow = votes.find(v => v.player_id === myPlayerId)
-  // A vote row with empty value is the SM's "reopened" sentinel — treat it as
-  // if we hadn't voted yet.
   const myActiveVote = myVoteRow && myVoteRow.value !== '' ? myVoteRow : undefined
-  // A developer whose vote was cleared by the SM in revealed phase ("re-voter")
-  // should see the VoteGrid again, even though the global phase is still 'revealed'.
-  const reopenedForMe = myRole === 'developer' && phase === 'revealed' && !myActiveVote
-  const showVoteGrid = myRole === 'developer' && (phase !== 'revealed' || reopenedForMe)
-  // Don't fall back to the locally-cached selectedVote when we're re-opened — the
-  // user is supposed to start from a clean slate, not see their previous pick still
-  // highlighted.
+  const reopenedForMe = myRole === 'developer' && displayPhase === 'revealed' && !myActiveVote
+  const showVoteGrid = myRole === 'developer' && (displayPhase !== 'revealed' || reopenedForMe)
   const currentVote = reopenedForMe ? null : (myActiveVote?.value ?? selectedVote)
 
   return (
     <div className="layout-room">
-      <RoomHeader room={room} connected={true} />
+      <RoomHeader
+        room={room}
+        connected={true}
+        displayRound={displayRound}
+        displayPhase={displayPhase}
+        isHistoryMode={isHistoryMode}
+      />
 
-      <div className="layout-room-grid">
+      <div className={isScrumMaster ? 'layout-room-grid layout-room-grid--with-timeline' : 'layout-room-grid'}>
         {/* Colonne gauche — participants */}
         <div className="flex flex-col gap-4">
           <PlayersList
             players={players}
             votes={votes}
-            phase={phase}
+            phase={displayPhase}
             myPlayerId={myPlayerId}
           />
         </div>
 
-        {/* Colonne droite — story + vote + status */}
+        {/* Colonne centre — story + vote + status */}
         <div className="flex flex-col gap-4">
+          {isHistoryMode && (
+            <HistoryBanner
+              roomId={roomId}
+              viewingRound={viewingRound!}
+              liveRound={room.round}
+            />
+          )}
+
           <StoryPanel
             roomId={roomId}
-            story={room.story}
-            phase={phase}
+            story={displayStory}
+            phase={displayPhase}
             isScrumMaster={isScrumMaster}
+            historyRound={isHistoryMode ? viewingRound : null}
           />
 
           {showVoteGrid && (
             <VoteGrid
               roomId={roomId}
-              round={room.round}
-              phase={phase}
+              round={displayRound}
+              phase={displayPhase}
               reopened={reopenedForMe}
               myPlayerId={myPlayerId}
               myRole={myRole}
@@ -136,29 +153,68 @@ export default function RoomPage() {
             />
           )}
 
-          {phase === 'revealed' && (
+          {displayPhase === 'revealed' && (
             <RevealDashboard
               players={players}
               votes={votes}
-              round={room.round}
+              round={displayRound}
               roomId={roomId}
               isScrumMaster={isScrumMaster}
+              storyTitle={displayStory}
             />
           )}
 
           <StatusBar
             roomId={roomId}
-            phase={phase}
-            round={room.round}
+            phase={displayPhase}
+            round={displayRound}
+            liveRound={room.round}
+            isHistoryMode={isHistoryMode}
+            story={displayStory}
             players={players}
             votes={votes}
             isScrumMaster={isScrumMaster}
           />
         </div>
+
+        {/* Colonne droite — timeline SM uniquement */}
+        {isScrumMaster && (
+          <StoryTimeline
+            roomId={roomId}
+            stories={stories}
+            liveRound={room.round}
+            livePhase={room.phase as 'waiting' | 'voting' | 'revealed'}
+            liveStory={room.story}
+            viewingRound={viewingRound}
+          />
+        )}
       </div>
 
       {toast && <Toast message={toast.message} type={toast.type} onClose={clearToast} />}
-      <RevealOverlay phase={phase} />
+      <RevealOverlay phase={displayPhase} />
+    </div>
+  )
+}
+
+function HistoryBanner({ roomId, viewingRound, liveRound }: { roomId: string; viewingRound: number; liveRound: number }) {
+  const [busy, setBusy] = useState(false)
+  async function exit() {
+    if (busy) return
+    setBusy(true)
+    const supabase = createClient()
+    await supabase.from('rooms').update({ viewing_round: null }).eq('id', roomId)
+    setBusy(false)
+  }
+  return (
+    <div className="history-banner">
+      <span className="history-banner__icon" aria-hidden>📜</span>
+      <div className="history-banner__body">
+        <strong>Vue historique — Round {viewingRound}</strong>
+        <p>Tu peux relancer un vote ou modifier la story. Round live actuel : <strong>{liveRound}</strong>.</p>
+      </div>
+      <button type="button" className="history-banner__cta" onClick={exit} disabled={busy}>
+        {busy ? '…' : '← Retour au round courant'}
+      </button>
     </div>
   )
 }

@@ -1,5 +1,5 @@
 'use client'
-import { useState, useTransition } from 'react'
+import { useEffect, useRef, useState, useTransition } from 'react'
 import { Avatar } from '@/components/ui/Avatar'
 import { Toast, useToast } from '@/components/ui/Toast'
 import { createClient } from '@/lib/supabase/client'
@@ -21,6 +21,9 @@ interface RevealDashboardProps {
   round: number
   roomId: string
   isScrumMaster: boolean
+  /** Story title for the displayed round — passed-through to keep the
+   *  stories.final_mean / consensus snapshot in sync after re-votes. */
+  storyTitle?: string
 }
 
 function barFillForValue(value: number): string {
@@ -118,7 +121,7 @@ function Bar({ entry, index, isScrumMaster, reopening, onReopen }: BarProps) {
   )
 }
 
-export function RevealDashboard({ players, votes, round, roomId, isScrumMaster }: RevealDashboardProps) {
+export function RevealDashboard({ players, votes, round, roomId, isScrumMaster, storyTitle }: RevealDashboardProps) {
   const [pendingId, setPendingId] = useState<string | null>(null)
   const [, startTransition] = useTransition()
   const { toast, showToast, clearToast } = useToast()
@@ -126,6 +129,22 @@ export function RevealDashboard({ players, votes, round, roomId, isScrumMaster }
   const stats = computeRevealStats(players, votes)
   const { entries, numericCount, mean, min, max, consensus, outliers, questionCount, missingCount } = stats
   const allOutliersTwoVoters = numericCount === 2 && outliers.length === 2
+
+  // SM keeps the stories snapshot's mean/consensus in sync when votes change
+  // (e.g. after a re-vote). One client (the SM) owning the write avoids races.
+  const lastSyncedRef = useRef<string>('')
+  useEffect(() => {
+    if (!isScrumMaster) return
+    const fingerprint = `${round}|${mean ?? 'null'}|${consensus}|${storyTitle ?? ''}`
+    if (lastSyncedRef.current === fingerprint) return
+    lastSyncedRef.current = fingerprint
+    const supabase = createClient()
+    void supabase
+      .from('stories')
+      .update({ final_mean: mean, consensus })
+      .eq('room_id', roomId)
+      .eq('round', round)
+  }, [isScrumMaster, mean, consensus, round, roomId, storyTitle])
 
   async function reopenVote(playerId: string) {
     if (!isScrumMaster || pendingId) return

@@ -6,7 +6,20 @@ export interface Room {
   phase: Phase
   story: string
   round: number
+  viewing_round: number | null
   created_at: string
+  updated_at: string
+}
+
+export type ConsensusLevel = 'perfect' | 'aligned' | 'discuss' | 'divergent' | 'empty'
+
+export interface Story {
+  room_id: string
+  round: number
+  title: string
+  final_mean: number | null
+  consensus: ConsensusLevel | null
+  revealed_at: string
   updated_at: string
 }
 
