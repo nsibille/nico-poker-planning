@@ -13,9 +13,9 @@ export function PlayerRow({ player, vote, phase, isMe }: PlayerRowProps) {
   return (
     <div className="card-player-row">
       <Avatar name={player.name} role={player.role as 'developer' | 'scrum-master'} emoji={player.emoji} />
-      <div className="player-name">
-        {player.name}
-        {isMe && <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', marginLeft: '6px' }}>(moi)</span>}
+      <div className="player-name" title={player.name}>
+        <span className="player-name__label">{player.name}</span>
+        {isMe && <span className="player-name__me">(moi)</span>}
       </div>
       <BadgeRole role={player.role as 'developer' | 'scrum-master'} />
       {player.role === 'developer' && (() => {
