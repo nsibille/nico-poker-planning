@@ -4,7 +4,7 @@ export const fr = {
   meta: {
     title: 'Scrumbler, planning poker pour équipes agiles',
     description:
-      'Estime, révèle, recommence. Aucun compte requis, connexion anonyme.',
+      'Le planning poker qui transforme le refinement en moment d’équipe. Vote rapide, débat qui aligne, anonyme par défaut, sans compte.',
   },
   nav: {
     product: 'Produit',
@@ -15,10 +15,10 @@ export const fr = {
     closeMenu: 'Fermer le menu',
   },
   hero: {
-    eyebrow: 'Planning poker, nouvelle génération',
+    eyebrow: 'Le rituel qu’on a envie de faire',
     title: 'Estime tes stories,\nrévèle d’un coup,\nrecommence.',
     lead:
-      'Scrumbler est un planning poker anonyme par défaut, sans compte, en temps réel. Pensé pour le rythme d’un vrai sprint, pas pour faire joli en réunion.',
+      'Les rituels d’estimation, c’est trop souvent une corvée. Scrumbler en fait un moment d’équipe : vote en aveugle, résultats en direct, débat sans accusation pour aller chercher l’alignement, et franchement fun.',
     ctaPrimary: 'Lance une partie',
     ctaSecondary: 'Découvre le produit',
     proof: 'Aucun compte. Un code de salle partagé, c’est tout.',
@@ -26,28 +26,28 @@ export const fr = {
   problem: {
     eyebrow: 'Pourquoi Scrumbler',
     title:
-      'Les estimations agiles ne devraient pas demander un compte, un onboarding, ni un Excel.',
+      'Les rituels d’estimation devraient engager l’équipe, pas l’endormir.',
     items: [
       {
-        title: 'Sans compte, sans friction',
+        title: 'Personne ne décroche',
         body:
-          'Aucun email, aucun mot de passe. Un avatar emoji, un pseudo, et c’est parti. La salle se crée en moins de cinq secondes.',
+          'Le format est rythmé, gamifié, visuel. Le vote prend trente secondes, la révélation est un petit événement, le débat reste vivant. On y va parce qu’on a envie d’y aller.',
       },
       {
-        title: 'Anonyme par défaut',
+        title: 'Toutes les voix comptent',
         body:
-          'Les votes restent cachés jusqu’à la révélation. Personne ne s’aligne sur le premier qui pose une carte, et la divergence devient une discussion plutôt qu’une honte.',
+          'Votes cachés jusqu’à la révélation : personne ne s’aligne sur le premier qui pose une carte, les juniors osent, les écarts deviennent une discussion plutôt qu’une honte.',
       },
       {
-        title: 'Temps réel, vraiment',
+        title: 'L’alignement, pour de vrai',
         body:
-          'Synchronisation Supabase Realtime, latence sous-seconde. Quand un coéquipier vote, tu le sais dans la foulée.',
+          'Quand les votes divergent, Scrumbler met le débat sur la table sans pointer du doigt. On entend le pourquoi, on revote, on avance ensemble.',
       },
     ],
   },
   features: {
     eyebrow: 'Ce que tu vas aimer',
-    title: 'Tout ce qu’il faut pour estimer vite, rien de plus.',
+    title: 'Tout ce qu’il faut pour que l’équipe se prenne au jeu, rien de plus.',
     items: [
       {
         emoji: '🎯',
@@ -145,12 +145,12 @@ export const fr = {
     ],
   },
   finalCta: {
-    title: 'Prêt à estimer en équipe, sans compte, sans friction ?',
-    body: 'Une salle se crée en cinq secondes. Tu n’as rien à installer.',
+    title: 'Prêt à faire de ton prochain refinement un moment d’équipe ?',
+    body: 'Une salle se crée en cinq secondes. Aucun compte, rien à installer.',
     cta: 'Lance une partie',
   },
   footer: {
-    tagline: 'Planning poker pour équipes agiles.',
+    tagline: 'Planning poker pour équipes qui jouent le jeu.',
     columns: {
       product: {
         title: 'Produit',
