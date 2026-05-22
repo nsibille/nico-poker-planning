@@ -1,5 +1,5 @@
 'use client'
-import { useState, useTransition } from 'react'
+import { useEffect, useState, useTransition } from 'react'
 import { Avatar } from '@/components/ui/Avatar'
 import { Toast, useToast } from '@/components/ui/Toast'
 import { createClient } from '@/lib/supabase/client'
@@ -9,11 +9,18 @@ import {
   consensusIcon,
   consensusLabel,
   formatMean,
-  FIB_NUMERIC,
   type ConsensusLevel,
   type VoteEntry,
 } from '@/lib/game/reveal-stats'
-import type { Player, Vote } from '@/types'
+import {
+  activeValues,
+  isNumericScale,
+  numericValues,
+  roundUpToScaleCard,
+  unitLabel,
+  type EstimationScale,
+} from '@/lib/game/scales'
+import type { Player, Vote, Story } from '@/types'
 
 interface RevealDashboardProps {
   players: Player[]
@@ -21,39 +28,48 @@ interface RevealDashboardProps {
   round: number
   roomId: string
   isScrumMaster: boolean
+  scale: EstimationScale
+  storyTitle?: string
+  /** Row from `stories` matching the displayed round, if any. Used to detect
+   *  drift between computed stats and the snapshot (e.g. after a re-vote) and
+   *  resync only when needed. */
+  currentStory?: Story | null
 }
 
-function barFillForValue(value: number): string {
-  if (value <= 2)  return 'reveal-bar__fill--cool'    // 1, 2 — green
-  if (value <= 5)  return 'reveal-bar__fill--mid'     // 3, 5 — teal/blue
-  if (value <= 8)  return 'reveal-bar__fill--warm'    // 8 — amber
-  return 'reveal-bar__fill--hot'                       // 13, 21 — coral
-}
-
-function tierLabel(value: number): string {
-  if (value <= 2)  return 'EASY'
-  if (value <= 5)  return 'MEDIUM'
-  if (value <= 8)  return 'HARD'
+function tierForRatio(ratio: number): string {
+  if (ratio <= 0.25) return 'EASY'
+  if (ratio <= 0.5) return 'MEDIUM'
+  if (ratio <= 0.75) return 'HARD'
   return 'EPIC'
+}
+
+function fillForRatio(ratio: number): string {
+  if (ratio <= 0.25) return 'reveal-bar__fill--cool'
+  if (ratio <= 0.5)  return 'reveal-bar__fill--mid'
+  if (ratio <= 0.75) return 'reveal-bar__fill--warm'
+  return 'reveal-bar__fill--hot'
 }
 
 interface BarProps {
   entry: VoteEntry
   index: number
+  totalActive: number
   isScrumMaster: boolean
   reopening: boolean
   onReopen: (playerId: string) => void
 }
 
-function Bar({ entry, index, isScrumMaster, reopening, onReopen }: BarProps) {
+function Bar({ entry, index, totalActive, isScrumMaster, reopening, onReopen }: BarProps) {
   const isMissing = entry.value === null
-  const isUnknown = entry.value === '?'
-  const numeric = entry.numeric ?? 0
+  const isUnknown = entry.value === '?' || entry.value === '☕'
+  const ratio = totalActive <= 1
+    ? 0
+    : ((entry.scaleIndex ?? 0)) / Math.max(1, totalActive - 1)
   const heightPercent = isMissing || isUnknown
     ? 18
-    : Math.max(12, ((entry.fibIndex ?? 0) + 1) / FIB_NUMERIC.length * 100)
-  const fillClass = isMissing || isUnknown ? '' : barFillForValue(numeric)
-  const tier = !isMissing && !isUnknown ? tierLabel(numeric) : null
+    : Math.max(12, ((entry.scaleIndex ?? 0) + 1) / totalActive * 100)
+  const fillClass = isMissing || isUnknown ? '' : fillForRatio(ratio)
+  const tier = !isMissing && !isUnknown ? tierForRatio(ratio) : null
   const delay = 0.25 + index * 0.12
 
   const variant = isMissing
@@ -64,8 +80,6 @@ function Bar({ entry, index, isScrumMaster, reopening, onReopen }: BarProps) {
     ? 'reveal-bar--outlier'
     : ''
 
-  // SM can re-open only players who already cast a value — re-opening a missing
-  // player is a no-op since they have nothing to clear.
   const canReopen = isScrumMaster && !isMissing
 
   return (
@@ -118,23 +132,54 @@ function Bar({ entry, index, isScrumMaster, reopening, onReopen }: BarProps) {
   )
 }
 
-export function RevealDashboard({ players, votes, round, roomId, isScrumMaster }: RevealDashboardProps) {
+export function RevealDashboard({ players, votes, round, roomId, isScrumMaster, scale, currentStory }: RevealDashboardProps) {
   const [pendingId, setPendingId] = useState<string | null>(null)
   const [, startTransition] = useTransition()
   const { toast, showToast, clearToast } = useToast()
 
-  const stats = computeRevealStats(players, votes)
-  const { entries, numericCount, mean, min, max, consensus, outliers, questionCount, missingCount } = stats
-  const allOutliersTwoVoters = numericCount === 2 && outliers.length === 2
+  const stats = computeRevealStats(scale, players, votes)
+  const { entries, activeCount, mean, mode, min, max, consensus, outliers, questionCount, coffeeCount, missingCount } = stats
+  const allOutliersTwoVoters = activeCount === 2 && outliers.length === 2
+
+  const active = activeValues(scale)
+  const isNum = isNumericScale(scale)
+  const unit = unitLabel(scale.unit)
+  // Stat principale : la moyenne si l'échelle est numérique, sinon le mode.
+  const heroValue: string = isNum
+    ? (mean !== null ? formatMean(mean) : '—')
+    : (mode !== null ? String(mode) : '—')
+  const heroLabel = isNum ? 'Moyenne' : 'Vote majoritaire'
+  // JH : carte supérieure de l'échelle pour donner une estimation prudente
+  const daysRoundUp = scale.unit === 'days' && mean !== null
+    ? roundUpToScaleCard(scale, mean)
+    : null
+
+  // SM keeps the stories snapshot's mean/consensus in sync. We only write when
+  // the stored row's values actually differ from what we just computed — that
+  // way we never overwrite a freshly-set value (race with handleReveal) and
+  // we still catch up after a re-vote.
+  useEffect(() => {
+    if (!isScrumMaster) return
+    if (!currentStory) return
+    const storedMean = currentStory.final_mean
+    const meansEqual = (storedMean === null && mean === null)
+      || (storedMean !== null && mean !== null && Math.abs(storedMean - mean) < 1e-9)
+    if (meansEqual && currentStory.consensus === consensus) return
+    const supabase = createClient()
+    void supabase
+      .from('stories')
+      .update({ final_mean: mean, consensus })
+      .eq('room_id', roomId)
+      .eq('round', round)
+      .then(({ error }) => {
+        if (error) showToast(`Sync timeline : ${error.message}`)
+      })
+  }, [isScrumMaster, mean, consensus, round, roomId, currentStory, showToast])
 
   async function reopenVote(playerId: string) {
     if (!isScrumMaster || pendingId) return
     setPendingId(playerId)
     const supabase = createClient()
-    // On ne supprime PAS la ligne (éviterait d'ajouter une policy RLS DELETE) —
-    // on remet la value à '' qui est notre sentinel "pas de vote effectif".
-    // Le hook useVotes propage l'UPDATE en temps réel à tous les clients ; côté
-    // dev, reopenedForMe passe à true et la grille réapparaît.
     const { error } = await supabase
       .from('votes')
       .update({ value: '' })
@@ -157,20 +202,26 @@ export function RevealDashboard({ players, votes, round, roomId, isScrumMaster }
     )
   }
 
-  // Mean line position: interpolate between the two surrounding Fib rungs so a mean of 6.5
-  // sits halfway between the "5" and "8" axis ticks instead of snapping to one of them.
+  // Ligne de moyenne : uniquement pour les échelles numériques. Position
+  // interpolée entre les deux cartes numériques qui encadrent la moyenne pour
+  // que 6.5 se place entre les ticks 5 et 8 (pas snap sur l'un des deux).
   const meanPercent = (() => {
-    if (mean === null) return null
+    if (!isNum || mean === null) return null
+    const nums = numericValues(scale)
+    if (nums.length === 0) return null
+    if (mean <= nums[0]) return (1 / active.length) * 100
+    if (mean >= nums[nums.length - 1]) return 100
     let lo = 0
-    let hi = FIB_NUMERIC.length - 1
-    for (let i = 0; i < FIB_NUMERIC.length - 1; i++) {
-      if (FIB_NUMERIC[i] <= mean && mean <= FIB_NUMERIC[i + 1]) { lo = i; hi = i + 1; break }
+    let hi = nums.length - 1
+    for (let i = 0; i < nums.length - 1; i++) {
+      if (nums[i] <= mean && mean <= nums[i + 1]) { lo = i; hi = i + 1; break }
     }
-    if (mean <= FIB_NUMERIC[0]) return ((0 + 1) / FIB_NUMERIC.length) * 100
-    if (mean >= FIB_NUMERIC[FIB_NUMERIC.length - 1]) return 100
-    const t = (mean - FIB_NUMERIC[lo]) / (FIB_NUMERIC[hi] - FIB_NUMERIC[lo])
-    const idx = lo + t
-    return ((idx + 1) / FIB_NUMERIC.length) * 100
+    const t = (mean - nums[lo]) / (nums[hi] - nums[lo])
+    // Position de chaque carte numérique sur l'axe = son index dans `active`.
+    const loActiveIdx = active.findIndex(v => v === nums[lo])
+    const hiActiveIdx = active.findIndex(v => v === nums[hi])
+    const idx = loActiveIdx + t * (hiActiveIdx - loActiveIdx)
+    return ((idx + 1) / active.length) * 100
   })()
 
   const needsDiscussion = (consensus === 'discuss' || consensus === 'divergent') && outliers.length > 0
@@ -184,13 +235,21 @@ export function RevealDashboard({ players, votes, round, roomId, isScrumMaster }
 
       <div className="reveal-hero">
         <div className="reveal-mean-hero" data-consensus={consensus}>
-          <div className="reveal-mean-hero__value">{mean !== null ? formatMean(mean) : '—'}</div>
-          <div className="reveal-mean-hero__label">Moyenne</div>
+          <div className="reveal-mean-hero__value">
+            {heroValue}
+            {unit && heroValue !== '—' && <span className="reveal-mean-hero__unit"> {unit}</span>}
+          </div>
+          <div className="reveal-mean-hero__label">{heroLabel}</div>
+          {daysRoundUp !== null && (
+            <div className="reveal-mean-hero__hint">
+              Carte sup. : <strong>{daysRoundUp} {unit}</strong>
+            </div>
+          )}
         </div>
 
         <div className="reveal-hero__stats">
           <ConsensusBadge level={consensus} />
-          {mean !== null && (
+          {min !== null && max !== null && (
             <div className="reveal-stat-row">
               <Stat label="Min" value={String(min)} />
               <span className="reveal-stat-divider">→</span>
@@ -198,8 +257,9 @@ export function RevealDashboard({ players, votes, round, roomId, isScrumMaster }
             </div>
           )}
           <div className="reveal-stat-row reveal-stat-row--small">
-            <Stat label="Votants" value={String(numericCount)} />
+            <Stat label="Votants" value={String(activeCount)} />
             {questionCount > 0 && <Stat label="Indécis (?)" value={String(questionCount)} />}
+            {coffeeCount > 0 && <Stat label="Pause (☕)" value={String(coffeeCount)} />}
             {missingCount > 0 && <Stat label="Pas voté" value={String(missingCount)} />}
           </div>
         </div>
@@ -207,21 +267,27 @@ export function RevealDashboard({ players, votes, round, roomId, isScrumMaster }
 
       <div className="reveal-chart">
         <div className="reveal-chart__axis" aria-hidden>
-          {[...FIB_NUMERIC].reverse().map((n, i) => (
+          {[...active].reverse().map((n, i) => (
             <span
-              key={n}
+              key={`${n}-${i}`}
               className="reveal-chart__axis-tick"
-              style={{ bottom: `${((FIB_NUMERIC.length - i) / FIB_NUMERIC.length) * 100}%` }}
+              style={{ bottom: `${((active.length - i) / active.length) * 100}%` }}
             >
-              {n}
+              {String(n)}
             </span>
           ))}
         </div>
 
         <div className="reveal-chart__bars">
-          {meanPercent !== null && (
+          {meanPercent !== null && mean !== null && (
             <div className="reveal-chart__mean-line" style={{ bottom: `${meanPercent}%` }}>
-              <span className="reveal-chart__mean-label">Moy. {formatMean(mean as number)}</span>
+              <span
+                className="reveal-chart__mean-marker"
+                title={`Moyenne : ${formatMean(mean)}${unit ? ` ${unit}` : ''}`}
+                aria-label={`Moyenne : ${formatMean(mean)}${unit ? ` ${unit}` : ''}`}
+              >
+                M
+              </span>
             </div>
           )}
           {entries.map((e, i) => (
@@ -229,6 +295,7 @@ export function RevealDashboard({ players, votes, round, roomId, isScrumMaster }
               key={e.player.id}
               entry={e}
               index={i}
+              totalActive={active.length}
               isScrumMaster={isScrumMaster}
               reopening={pendingId === e.player.id}
               onReopen={reopenVote}
@@ -258,7 +325,7 @@ export function RevealDashboard({ players, votes, round, roomId, isScrumMaster }
               ) : outliers.length === 1 ? (
                 <>
                   <span aria-hidden>{outliers[0].player.emoji ?? ''} </span>
-                  <span className="reveal-discussion-banner__name">{outliers[0].player.name}</span> a estimé <strong>{outliers[0].value}</strong> alors que la moyenne est <strong>{mean !== null ? formatMean(mean) : '—'}</strong>. Prenez un instant pour comprendre les hypothèses avant de re-voter.
+                  <span className="reveal-discussion-banner__name">{outliers[0].player.name}</span> a estimé <strong>{outliers[0].value}</strong> alors que {isNum ? 'la moyenne est' : 'le vote majoritaire est'} <strong>{heroValue}{unit ? ` ${unit}` : ''}</strong>. Prenez un instant pour comprendre les hypothèses avant de re-voter.
                 </>
               ) : (
                 <>
@@ -267,7 +334,7 @@ export function RevealDashboard({ players, votes, round, roomId, isScrumMaster }
                       <span aria-hidden>{o.player.emoji ?? ''} </span>
                       <span className="reveal-discussion-banner__name">{o.player.name}</span> ({o.value}){i < outliers.length - 1 ? ', ' : ''}
                     </span>
-                  ))} sortent du lot par rapport à la moyenne <strong>{mean !== null ? formatMean(mean) : '—'}</strong>. Prenez un instant pour comprendre les hypothèses avant de re-voter.
+                  ))} sortent du lot par rapport {isNum ? 'à la moyenne' : 'au vote majoritaire'} <strong>{heroValue}{unit ? ` ${unit}` : ''}</strong>. Prenez un instant pour comprendre les hypothèses avant de re-voter.
                 </>
               )}
             </p>

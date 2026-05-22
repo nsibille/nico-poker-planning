@@ -1,5 +1,4 @@
 import { Avatar } from '@/components/ui/Avatar'
-import { BadgeRole } from '@/components/ui/Badge'
 import type { Player, Vote, Phase } from '@/types'
 
 interface PlayerRowProps {
@@ -10,14 +9,16 @@ interface PlayerRowProps {
 }
 
 export function PlayerRow({ player, vote, phase, isMe }: PlayerRowProps) {
+  // No role badge here — the section header ("SCRUM MASTERS" / "DÉVELOPPEURS")
+  // in PlayersList already disambiguates, and dropping the chip gives much
+  // more room for the name in the narrow sidebar.
   return (
     <div className="card-player-row">
       <Avatar name={player.name} role={player.role as 'developer' | 'scrum-master'} emoji={player.emoji} />
-      <div className="player-name">
-        {player.name}
-        {isMe && <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', marginLeft: '6px' }}>(moi)</span>}
+      <div className="player-name" title={player.name}>
+        <span className="player-name__label">{player.name}</span>
+        {isMe && <span className="player-name__me">(moi)</span>}
       </div>
-      <BadgeRole role={player.role as 'developer' | 'scrum-master'} />
       {player.role === 'developer' && (() => {
         // value === '' = sentinel "vote rouvert" → considéré comme pas voté.
         const activeVote = vote && vote.value !== '' ? vote : undefined

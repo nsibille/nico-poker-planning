@@ -56,26 +56,73 @@ export type Database = {
           id: string
           phase: string
           round: number
+          scale_id: string
+          scale_values: Json | null
           story: string
           updated_at: string
+          ended_at: string | null
         }
         Insert: {
           created_at?: string
           id: string
           phase?: string
           round?: number
+          scale_id?: string
+          scale_values?: Json | null
           story?: string
           updated_at?: string
+          ended_at?: string | null
         }
         Update: {
           created_at?: string
           id?: string
           phase?: string
           round?: number
+          scale_id?: string
+          scale_values?: Json | null
           story?: string
           updated_at?: string
+          ended_at?: string | null
         }
         Relationships: []
+      }
+      stories: {
+        Row: {
+          room_id: string
+          round: number
+          title: string
+          final_mean: number | null
+          consensus: string | null
+          revealed_at: string
+          updated_at: string
+        }
+        Insert: {
+          room_id: string
+          round: number
+          title?: string
+          final_mean?: number | null
+          consensus?: string | null
+          revealed_at?: string
+          updated_at?: string
+        }
+        Update: {
+          room_id?: string
+          round?: number
+          title?: string
+          final_mean?: number | null
+          consensus?: string | null
+          revealed_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stories_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       votes: {
         Row: {
