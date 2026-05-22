@@ -909,3 +909,7 @@ Variantes  : sm, md, lg | success, warning, danger, info, neutral
 | `avatar-emoji` | Avatar | Span emoji intérieur quand l'avatar a un emoji |
 | `reveal-discussion-banner` | Reveal | Banner appelant à discuter quand divergence — souligne les outliers |
 | `reveal-stat` | Reveal | Mini statistique (Min/Max/Votants...) du dashboard |
+| `scale-preview` | Lobby | Aperçu en chips des cartes de l'échelle sélectionnée au lobby |
+| `scale-preview__chip` | Lobby | Chip pill (1 carte) à l'intérieur de `scale-preview` |
+| `reveal-mean-hero__unit` | Reveal | Suffixe d'unité (pts / JH) en petit à droite du chiffre principal |
+| `reveal-mean-hero__hint` | Reveal | Sous-ligne discrète sous le hero (ex. arrondi JH carte supérieure) |

@@ -2,10 +2,10 @@
 import { useState } from 'react'
 import { VoteCard } from './VoteCard'
 import { createClient } from '@/lib/supabase/client'
-import { FIBONACCI } from '@/lib/game/constants'
 import { useGameStore } from '@/store/gameStore'
 import { Toast, useToast } from '@/components/ui/Toast'
 import type { Phase } from '@/types'
+import type { EstimationScale } from '@/lib/game/scales'
 
 interface VoteGridProps {
   roomId: string
@@ -15,9 +15,10 @@ interface VoteGridProps {
   myPlayerId: string | null
   myRole: 'developer' | 'scrum-master' | null
   currentVote: string | null
+  scale: EstimationScale
 }
 
-export function VoteGrid({ roomId, round, phase, reopened = false, myPlayerId, myRole, currentVote }: VoteGridProps) {
+export function VoteGrid({ roomId, round, phase, reopened = false, myPlayerId, myRole, currentVote, scale }: VoteGridProps) {
   const { setSelectedVote } = useGameStore()
   const { toast, showToast, clearToast } = useToast()
   const [confirmedVote, setConfirmedVote] = useState<string | null>(null)
@@ -87,15 +88,18 @@ export function VoteGrid({ roomId, round, phase, reopened = false, myPlayerId, m
         {title}
       </h3>
       <div className="flex flex-wrap gap-3 justify-center">
-        {FIBONACCI.map(val => (
-          <VoteCard
-            key={val}
-            value={val}
-            selected={currentVote === val}
-            disabled={disabled}
-            onClick={() => handleCardClick(val)}
-          />
-        ))}
+        {scale.values.map(val => {
+          const str = String(val)
+          return (
+            <VoteCard
+              key={str}
+              value={str}
+              selected={currentVote === str}
+              disabled={disabled}
+              onClick={() => handleCardClick(str)}
+            />
+          )
+        })}
       </div>
       {canVote && displayConfirmed && (
         <p style={{ textAlign: 'center', fontSize: 'var(--text-sm)', color: 'var(--color-success)', fontFamily: 'var(--font-primary)', fontWeight: 'var(--fw-medium)' }}>

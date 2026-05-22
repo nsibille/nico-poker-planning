@@ -56,6 +56,8 @@ export type Database = {
           id: string
           phase: string
           round: number
+          scale_id: string
+          scale_values: Json | null
           story: string
           updated_at: string
         }
@@ -64,6 +66,8 @@ export type Database = {
           id: string
           phase?: string
           round?: number
+          scale_id?: string
+          scale_values?: Json | null
           story?: string
           updated_at?: string
         }
@@ -72,6 +76,8 @@ export type Database = {
           id?: string
           phase?: string
           round?: number
+          scale_id?: string
+          scale_values?: Json | null
           story?: string
           updated_at?: string
         }

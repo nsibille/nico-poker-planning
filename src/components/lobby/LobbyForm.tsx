@@ -13,6 +13,12 @@ import { createClient } from '@/lib/supabase/client'
 import { generateRoomId } from '@/lib/game/utils'
 import { randomPlayerEmoji } from '@/lib/game/emojis'
 import { MAX_DEV, MAX_SM } from '@/lib/game/constants'
+import {
+  PREDEFINED_SCALES,
+  PREDEFINED_SCALE_IDS,
+  parseCustomValues,
+  getScale,
+} from '@/lib/game/scales'
 import type { Role } from '@/types'
 
 export function LobbyForm() {
@@ -25,6 +31,8 @@ export function LobbyForm() {
   const [role, setRole] = useState<Role | null>(null)
   const [roomId, setRoomId] = useState('')
   const [emoji, setEmoji] = useState<string>(() => randomPlayerEmoji())
+  const [scaleId, setScaleId] = useState<string>('fibonacci')
+  const [customRaw, setCustomRaw] = useState<string>('')
   const [loading, setLoading] = useState(false)
   // While we check a persisted session against the DB, hide the form to avoid a flash.
   const [restoring, setRestoring] = useState<boolean>(!!(myPlayerId && myRoomId))
@@ -64,14 +72,24 @@ export function LobbyForm() {
     if (!roomId.trim()) { showToast('L\'ID de room est requis'); return }
     if (!userId) { showToast('Session non prête, réessaie'); return }
 
+    const customValues = scaleId === 'custom' ? parseCustomValues(customRaw) : null
+    if (scaleId === 'custom' && (!customValues || customValues.length === 0)) {
+      showToast('Échelle perso : ajoute au moins une valeur')
+      return
+    }
+
     setLoading(true)
     const supabase = createClient()
 
     try {
-      // Upsert room
+      // Upsert room — scale_id / scale_values ne sont appliqués qu'à la
+      // création (ignoreDuplicates → no-op si la room existe déjà).
       const { error: roomError } = await supabase
         .from('rooms')
-        .upsert({ id: roomId }, { onConflict: 'id', ignoreDuplicates: true })
+        .upsert(
+          { id: roomId, scale_id: scaleId, scale_values: customValues },
+          { onConflict: 'id', ignoreDuplicates: true },
+        )
       if (roomError) throw roomError
 
       // Verify room exists
@@ -185,6 +203,13 @@ export function LobbyForm() {
           </div>
         </div>
 
+        <ScalePicker
+          scaleId={scaleId}
+          onScaleChange={setScaleId}
+          customRaw={customRaw}
+          onCustomChange={setCustomRaw}
+        />
+
         <Button
           type="submit"
           variant="primary"
@@ -200,5 +225,60 @@ export function LobbyForm() {
         <Toast message={toast.message} type={toast.type} onClose={clearToast} />
       )}
     </>
+  )
+}
+
+interface ScalePickerProps {
+  scaleId: string
+  onScaleChange: (id: string) => void
+  customRaw: string
+  onCustomChange: (raw: string) => void
+}
+
+function ScalePicker({ scaleId, onScaleChange, customRaw, onCustomChange }: ScalePickerProps) {
+  const preview = getScale(
+    scaleId,
+    scaleId === 'custom' ? parseCustomValues(customRaw) : null,
+  )
+
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label
+        className="text-sm font-medium"
+        style={{ color: 'var(--color-text-primary)', fontFamily: 'var(--font-primary)' }}
+      >
+        Échelle d&apos;estimation
+      </label>
+      <select
+        className="input-text-md"
+        value={scaleId}
+        onChange={e => onScaleChange(e.target.value)}
+      >
+        {PREDEFINED_SCALE_IDS.map(id => (
+          <option key={id} value={id}>{PREDEFINED_SCALES[id].name}</option>
+        ))}
+        <option value="custom">Personnalisée…</option>
+      </select>
+
+      {scaleId === 'custom' && (
+        <input
+          className="input-text-md"
+          placeholder="Ex: 1, 2, 4, 8, 16 ou XS, S, M, L"
+          value={customRaw}
+          onChange={e => onCustomChange(e.target.value)}
+          style={{ marginTop: 4 }}
+        />
+      )}
+
+      <div className="scale-preview" aria-label="Aperçu des cartes">
+        {preview.values.length === 0 ? (
+          <span className="scale-preview__empty">Saisis des valeurs séparées par des virgules.</span>
+        ) : (
+          preview.values.map((v, i) => (
+            <span key={`${v}-${i}`} className="scale-preview__chip">{String(v)}</span>
+          ))
+        )}
+      </div>
+    </div>
   )
 }

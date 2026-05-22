@@ -6,6 +6,8 @@ export interface Room {
   phase: Phase
   story: string
   round: number
+  scale_id: string
+  scale_values: (number | string)[] | null
   created_at: string
   updated_at: string
 }

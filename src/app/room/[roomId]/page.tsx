@@ -14,6 +14,7 @@ import { useRoom } from '@/hooks/useRoom'
 import { usePlayers } from '@/hooks/usePlayers'
 import { useVotes } from '@/hooks/useVotes'
 import { useGameStore } from '@/store/gameStore'
+import { getScale } from '@/lib/game/scales'
 
 export default function RoomPage() {
   const params = useParams()
@@ -87,6 +88,7 @@ export default function RoomPage() {
 
   const phase = room.phase as 'waiting' | 'voting' | 'revealed'
   const isScrumMaster = myRole === 'scrum-master'
+  const scale = getScale(room.scale_id, room.scale_values)
   const myVoteRow = votes.find(v => v.player_id === myPlayerId)
   // A vote row with empty value is the SM's "reopened" sentinel — treat it as
   // if we hadn't voted yet.
@@ -133,6 +135,7 @@ export default function RoomPage() {
               myPlayerId={myPlayerId}
               myRole={myRole}
               currentVote={currentVote ?? null}
+              scale={scale}
             />
           )}
 
@@ -143,6 +146,7 @@ export default function RoomPage() {
               round={room.round}
               roomId={roomId}
               isScrumMaster={isScrumMaster}
+              scale={scale}
             />
           )}
 
