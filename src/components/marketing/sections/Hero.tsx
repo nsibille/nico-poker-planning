@@ -40,53 +40,14 @@ export function Hero({ locale, dict }: Props) {
 }
 
 function HeroPreview() {
-  // Mini-mockup of a reveal scoreboard, pure CSS, no screenshot dependency.
   return (
     <div className="marketing-hero__preview" aria-hidden>
-      <div className="hero-preview-card">
-        <div className="hero-preview-card__top">
-          <div className="hero-preview-card__chip">
-            <span style={{ fontSize: 13 }}>🃏</span>
-            <span>scrumbler.app/room/<code className="mono-coral">abc-123</code></span>
-          </div>
-          <div className="hero-preview-card__role">🎯 Scrum Master</div>
-        </div>
-
-        <div className="hero-preview-card__story">
-          <span className="eyebrow eyebrow--mini">Story</span>
-          <h3>Refactor du module d’authentification</h3>
-        </div>
-
-        <div className="hero-preview-card__grid">
-          {[
-            { p: '🦊 Lina', v: '5' },
-            { p: '🐼 Tom', v: '8' },
-            { p: '🦉 Sam', v: '5' },
-            { p: '🦊 Pol', v: '8' },
-            { p: '🐙 Jin', v: '13' },
-          ].map((row, i) => (
-            <div key={i} className="hero-preview-card__row">
-              <span className="hero-preview-card__player">{row.p}</span>
-              <span className="hero-preview-card__vote">{row.v}</span>
-            </div>
-          ))}
-        </div>
-
-        <div className="hero-preview-card__stats">
-          <div>
-            <span className="eyebrow eyebrow--mini">Médiane</span>
-            <strong>8</strong>
-          </div>
-          <div>
-            <span className="eyebrow eyebrow--mini">Consensus</span>
-            <strong>78%</strong>
-          </div>
-          <div>
-            <span className="eyebrow eyebrow--mini">Tier</span>
-            <strong className="hero-preview-card__tier">MEDIUM</strong>
-          </div>
-        </div>
-      </div>
+      <iframe
+        src="/scrumbler-loop.html"
+        title="Démo Scrumbler en boucle"
+        loading="lazy"
+        className="hero-preview-frame"
+      />
     </div>
   )
 }
