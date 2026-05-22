@@ -9,11 +9,48 @@
 ## 0 · Brand snapshot
 
 - **Name** Scrumbler
-- **Tagline** *Planning poker pour équipes agiles, estime, révèle, recommence.*
+- **Tagline** *Planning poker pour équipes qui jouent le jeu.*
+- **Promise** Transformer le rituel d'estimation, d'une corvée à un moment d'équipe : vote rapide, débat qui aligne, et un peu de fun, vraiment.
 - **What it is** A lightweight, anonymous-by-default planning-poker app for agile teams.
-- **Voice** Tutoiement, verbe d'abord, jamais accusateur. **Em dash interdit** (voir `CLAUDE.md`).
+- **Voice** Tutoiement, verbe d'abord, jamais accusateur, sans corporate-speak. **Em dash interdit** (voir `CLAUDE.md`).
 - **Language** French, with a few untranslated English game terms (Scrum Master, EPIC).
 - **Mascot glyph** 🃏 (used sparingly, the logo carries the brand)
+
+---
+
+## 0.5 · Mission · WHY
+
+Le pourquoi de Scrumbler. À relire à chaque fois qu'une copy marketing, un titre de section ou un wording produit a besoin d'être recadré. Cette section prime sur toute formulation purement utilitaire (« outil », « productivité », « process ») trouvée ailleurs dans les surfaces du produit.
+
+### Le constat
+
+Trop souvent, les rituels d'estimation agile sont une corvée. Tout le monde dort, on prend ça comme un moment obligé, l'équipe se démotive. Résultat : du temps perdu, des estimations bâclées, de l'engagement en berne. Or c'est *exactement* le moment où l'équipe devrait s'aligner, faire entendre toutes les voix, et clarifier ce qui doit l'être.
+
+### La conviction
+
+Un rituel d'estimation, c'est d'abord un moment d'équipe. Quand il fonctionne, on vote vite, on voit clair, on débat des écarts, on aligne tout le monde, et on prend même un peu de plaisir à le faire. Tout le monde se prend au jeu, toutes les voix sont entendues, et l'alignement devient un effet de bord naturel.
+
+### La promesse Scrumbler
+
+Transformer le planning poker en moment d'équipe gamifié :
+
+- **Vote rapide, résultats en direct.** Pas d'attente, aucun calcul à la main. La machine fait la médiane, l'humain fait le débat.
+- **Anonyme par défaut, safe place.** Aucune voix ne s'aligne sur la première carte posée, les juniors osent, les écarts ne sont pas une honte.
+- **Débat structuré sur les écarts.** Quand ça diverge, l'app met le débat sur la table. On cherche l'alignement, pas le coupable.
+- **Fun, vraiment.** Reveal théâtral, confettis, rythme. Les rituels qu'on a envie de faire sont ceux qui marchent.
+
+### Conséquence pour la copy
+
+Quand on parle de Scrumbler, on parle d'équipe qui **joue** (pas de tâche à cocher), de débat qui **aligne** (pas de divergence à corriger), et de rituel qu'on a **envie** de faire (pas d'un outil de plus). On évite « outil », « productivité pure », « process ». On préfère « moment d'équipe », « se prendre au jeu », « toutes les voix », « alignement ».
+
+| Plutôt… | … que |
+|---|---|
+| moment d'équipe | session de travail |
+| se prendre au jeu | utiliser l'outil |
+| toutes les voix | retours utilisateurs |
+| aller chercher l'alignement | converger sur une estimation |
+| sans corvée | sans friction (seul) |
+| rituel qu'on a envie de faire | meeting efficace |
 
 ---
 
