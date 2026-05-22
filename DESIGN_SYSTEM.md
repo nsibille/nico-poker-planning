@@ -1,7 +1,9 @@
-# Design System — Sprint Poker Planning
-> Version 2.0 — Charte graphique mise à jour d'après les assets de marque fournis.
+# Design System, Scrumbler (ex Sprint Poker Planning)
+> Version 2.1, alignée sur `BRAND.md` v1.0.0 (identité visuelle Scrumbler).
 > **Règle absolue :** avant de créer un composant, consulter ce fichier.
 > Si le composant existe → réutiliser son slug. S'il n'existe pas → le créer ici avec un slug unique, puis l'implémenter.
+> **Règle voix** : pas d'em dash (U+2014). Voir `CLAUDE.md` Règles non négociables.
+> **Règle logo** : utiliser le composant `Lockup` (`src/components/marketing/Lockup.tsx`) qui pioche dans les variantes officielles de `public/brand/logo/` (BRAND §1.1).
 
 ---
 
@@ -11,9 +13,11 @@
 
 **Typographie** : Police **Neuwelt** (Bold pour les titres et chiffres des cartes, Medium pour les labels UI, Regular pour le corps, Light pour les textes secondaires). Géométrique, précise, forte personnalité sans être agressive. À charger via `@font-face` ou CDN si disponible, sinon fallback `'DM Sans', system-ui, sans-serif`.
 
-**Éléments décoratifs** : Formes géométriques arrondies (blobs, cercles évidés, rectangles à grands rayons) en couleurs secondaires à faible opacité — utilisées comme accents de fond sur les pages lobby et header. Jamais en avant-plan.
+**Éléments décoratifs** : Formes géométriques arrondies (blobs, cercles évidés, rectangles à grands rayons) en couleurs secondaires à faible opacité, utilisées comme accents de fond sur les pages lobby et header. Jamais en avant-plan.
 
-**Rayons** : généreux — les boutons principaux sont `border-radius: 999px` (pill), les cards ont `16-20px`.
+**Card pattern (BRAND §5.1)** : silhouettes de cartes inclinées à -8°, opacité 6-16%, **uniquement sur surfaces sombres** (brand-dark, gradients brand-primary, hero/CTA marketing, header app). Slug : `bg-card-pattern` (+ modifiers `--soft` / `--bold`).
+
+**Rayons** : généreux, les boutons principaux sont `border-radius: 999px` (pill), les cards ont `16-20px`, les hero cards `28px` (`--radius-2xl`).
 
 ---
 
@@ -891,6 +895,166 @@ Variantes  : sm, md, lg | success, warning, danger, info, neutral
 
 ---
 
+### `bg-card-pattern`
+**Texture brand : silhouettes de cartes répétées sur surfaces sombres.**
+Source SVG : `/brand/patterns/card-pattern.svg`. Appliqué via pseudo-élément `::before`
+positionné absolu, `mix-blend-mode: screen` pour éclaircir uniquement les zones sombres.
+Modifiers : `--soft` (opacity 0.06), default (0.10), `--bold` (0.16).
+
+```css
+.bg-card-pattern { position: relative; isolation: isolate; }
+.bg-card-pattern::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: url('/brand/patterns/card-pattern.svg') repeat;
+  background-size: 320px 320px;
+  mix-blend-mode: screen;
+  opacity: 0.10;
+  pointer-events: none;
+  z-index: 0;
+}
+.bg-card-pattern > * { position: relative; z-index: 1; }
+```
+
+Usage : `lobby-hero`, `marketing-footer`, `marketing-final-cta__card`.
+Interdit sur fond clair (BRAND §5.1).
+
+---
+
+### `lobby-hero`
+**Bande brand-dark en haut de la lobby `/app`, avec card pattern.**
+Largeur 100%, contient le `Lockup` (variante `horizontal-dark`), eyebrow tracked en sky,
+et une tagline blanche à 72% d'opacité. La carte du formulaire (`card-surface--elevated`)
+chevauche le bas du hero via `margin-top: -56px` sur `.layout-lobby-inner`.
+
+```css
+.lobby-hero {
+  width: 100%;
+  background: var(--color-brand-dark);
+  color: white;
+  padding: 40px 16px 80px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.lobby-hero__inner { display: inline-flex; flex-direction: column; align-items: center; gap: 16px; }
+.lobby-hero__tagline { font-size: 15px; color: rgba(255,255,255,0.72); max-width: 360px; }
+.lobby-hero__eyebrow { font-size: 11px; letter-spacing: 0.10em; text-transform: uppercase; color: var(--color-sky); }
+```
+
+---
+
+### `card-surface--elevated`
+**Variante surélevée de `card-surface` pour le formulaire lobby au-dessus du hero.**
+Rayon `--radius-2xl`, ombre composite (deep + brand glow), padding accru.
+
+```css
+.card-surface--elevated {
+  border-radius: var(--radius-2xl);
+  padding: 32px 24px;
+  box-shadow: 0 12px 40px rgba(40,48,80,0.10), 0 2px 8px rgba(73,112,255,0.05);
+}
+```
+
+---
+
+### `lobby-footnote`
+**Sous-texte discret de la lobby, sous la carte du formulaire.**
+
+```css
+.lobby-footnote {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+```
+
+---
+
+## Composants marketing
+
+### `Lockup` (composant React)
+**Source : `src/components/marketing/Lockup.tsx`.**
+Pioche dans `public/brand/logo/` selon `variant` et `theme`.
+- `variant`: `horizontal` (défaut) · `mark` · `vertical`
+- `theme`: `light` (défaut, fond clair) · `dark` (fond sombre, utilise `logo-horizontal-dark.svg`)
+- `size`: hauteur en px (40 par défaut)
+- Toujours wrappé dans un `<Link>` vers `/[locale]` pour servir d'ancre vers la home.
+
+Interdictions BRAND §1 :
+- Pas de rotation hors -8° / 0°
+- Pas de recoloration hors 4 variantes officielles
+- Pas de drop-shadow custom
+
+---
+
+### `marketing-header`
+**Header sticky du site marketing.** Backdrop-blur translucide sur `--color-bg-page`,
+lockup à gauche, nav au centre (Produit · Tarifs · Changelog), CTA pill + lang switch FR/EN à droite.
+Burger menu sous 860px.
+
+---
+
+### `marketing-footer`
+**Footer brand-dark avec card pattern.** Brand block (Lockup theme=dark + tagline)
++ 2 colonnes de liens (Produit / Légal), barre bottom avec copyright et email coral.
+Slug `bg-card-pattern` appliqué pour la texture.
+
+---
+
+### `marketing-hero`
+**Hero landing.** Titre `var(--text-display)` (64px, clamp responsive),
+deco-blobs/circles en pastel, mockup reveal `hero-preview-card` en aplomb 2 colonnes
+sous 720px.
+
+---
+
+### `marketing-section`
+**Primitive de section marketing.** `padding: 96px 24px`, inner max-width 1120px.
+Sous-classes : `marketing-problem`, `marketing-features`, `marketing-how`,
+`marketing-pricing-teaser`, `marketing-faq`, `marketing-final-cta`,
+`marketing-pricing`, `marketing-changelog`, `marketing-legal`.
+
+---
+
+### `marketing-final-cta__card`
+**Encart brand-gradient + card pattern (CTA fin de landing).**
+Background `linear-gradient(135deg, #4970FF, #3358E0)`, blobs deco + `bg-card-pattern--bold`
+en overlay, contenu blanc, bouton pill blanc/brand inversé.
+
+---
+
+### `eyebrow`
+**Sur-titre tracké uppercase, BRAND §3.2.**
+
+```css
+.eyebrow {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--color-brand-primary);
+}
+.eyebrow--mini { font-size: 10px; color: var(--color-text-muted); }
+```
+
+---
+
+### `mono-coral`
+**Code inline coral monospace, BRAND §3.3.** URLs, room codes, valeurs Fibonacci.
+
+```css
+.mono-coral {
+  font-family: var(--font-mono);
+  color: var(--color-coral);
+  font-size: 0.92em;
+}
+```
+
+---
+
 ## Index des slugs
 
 | Slug | Type | Description |
@@ -970,4 +1134,23 @@ Variantes  : sm, md, lg | success, warning, danger, info, neutral
 | `award-card` | Recap | Carte d'award (flip-in 3D) avec icône bouncy + shine sweep — variants par id |
 | `player-row` | Recap | Ligne joueur du leaderboard alignement — top 3 teintés or/argent/bronze |
 | `highlight-card` | Recap | Story remarquable (consensuelle vs chaude) |
-| `recap-story` | Recap | Item compact d'une story dans la liste finale — bordure gauche colorée |
+| `recap-story` | Recap | Item compact d'une story dans la liste finale, bordure gauche colorée |
+| `bg-card-pattern` | Brand | Texture cartes inclinées sur surfaces sombres (BRAND §5.1), modifiers `--soft` / `--bold` |
+| `lobby-hero` | Layout | Bande brand-dark de la lobby `/app` avec Lockup + tagline + card pattern |
+| `card-surface--elevated` | Card | Variante surélevée pour formulaire lobby (rayon 2xl, ombre composite) |
+| `lobby-footnote` | Lobby | Sous-texte discret sous la carte du formulaire |
+| `Lockup` | Brand | Composant logo officiel React, variants horizontal/mark/vertical, theme light/dark |
+| `eyebrow` | Marketing | Sur-titre tracké uppercase (BRAND §3.2), modifier `--mini` |
+| `mono-coral` | Marketing | Code inline coral monospace (BRAND §3.3) |
+| `marketing-header` | Marketing | Header sticky backdrop-blur, lockup + nav + CTA + lang switch |
+| `marketing-footer` | Marketing | Footer brand-dark avec card pattern, 2 cols liens |
+| `marketing-hero` | Marketing | Hero landing avec titre display 64px + mockup reveal |
+| `marketing-section` | Marketing | Primitive section (padding 96px, max-width 1120px) |
+| `marketing-final-cta__card` | Marketing | Encart brand-gradient + card pattern, CTA fin de landing |
+| `marketing-feature-card` | Marketing | Carte feature avec emoji 32px, hover lift |
+| `marketing-how__step` | Marketing | Step "How it works" avec numéro pill brand-50 |
+| `marketing-faq__item` | Marketing | Item FAQ avec details/summary, chev rotating |
+| `marketing-plan-card` | Marketing | Carte de plan tarifaire, modifier `--highlight` (border brand + shadow) |
+| `marketing-changelog__entry` | Marketing | Item changelog versionné avec arrow bullets |
+| `marketing-legal` | Marketing | Layout pages légales (privacy/terms/cookies) |
+| `marketing-lang-switch` | Marketing | Pill outline FR/EN dans le header |

@@ -467,6 +467,20 @@ html, body {
   padding: var(--space-6);
   box-shadow: var(--shadow-card);
 }
+.card-surface--elevated {
+  border-radius: var(--radius-2xl);
+  padding: var(--space-8) var(--space-6);
+  box-shadow: 0 12px 40px rgba(40, 48, 80, 0.10), 0 2px 8px rgba(73, 112, 255, 0.05);
+  border-color: var(--color-border);
+}
+
+.lobby-footnote {
+  text-align: center;
+  margin-top: var(--space-5);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  font-family: var(--font-primary);
+}
 
 .card-player-row {
   display: flex;
@@ -679,9 +693,10 @@ html, body {
   min-height: 100vh;
   background: var(--color-bg-page);
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: var(--space-8) var(--space-4);
+  justify-content: flex-start;
+  padding: 0;
   position: relative;
   overflow: hidden;
 }
@@ -690,6 +705,65 @@ html, body {
   max-width: 460px;
   position: relative;
   z-index: 1;
+  padding: 0 var(--space-4) var(--space-8);
+  margin-top: -56px;
+}
+
+/* ── Brand pattern : tilted cards silhouettes (BRAND §5.1, dark surfaces only) ── */
+.bg-card-pattern {
+  position: relative;
+  isolation: isolate;
+}
+.bg-card-pattern::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url('/brand/patterns/card-pattern.svg');
+  background-size: 320px 320px;
+  background-repeat: repeat;
+  mix-blend-mode: screen;
+  opacity: 0.10;
+  pointer-events: none;
+  z-index: 0;
+}
+.bg-card-pattern--soft::before { opacity: 0.06; }
+.bg-card-pattern--bold::before { opacity: 0.16; }
+.bg-card-pattern > * { position: relative; z-index: 1; }
+
+/* ── Lobby hero (brand-dark band + card pattern, slug: lobby-hero) ── */
+.lobby-hero {
+  width: 100%;
+  background: var(--color-brand-dark);
+  color: white;
+  padding: var(--space-10) var(--space-4) calc(var(--space-16) + var(--space-4));
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.lobby-hero__inner {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+}
+.lobby-hero__tagline {
+  font-family: var(--font-primary);
+  font-size: var(--text-md);
+  font-weight: var(--fw-normal);
+  color: rgba(255, 255, 255, 0.72);
+  margin: 0;
+  letter-spacing: -0.005em;
+  max-width: 360px;
+  line-height: 1.45;
+}
+.lobby-hero__eyebrow {
+  font-size: var(--text-xs);
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--color-sky);
 }
 
 .layout-room {
@@ -1012,6 +1086,14 @@ html, body {
   color: var(--color-brand-dark);
   flex: 1;
   margin: 0;
+}
+.nav-room-header__lockup {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  padding-right: var(--space-3);
+  border-right: 1px solid var(--color-border);
+  margin-right: var(--space-1);
 }
 
 /* ── Decorative ── */

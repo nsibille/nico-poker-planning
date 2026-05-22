@@ -11,10 +11,10 @@ type Props = {
 export function Footer({ locale, dict }: Props) {
   const base = `/${locale}`
   return (
-    <footer className="marketing-footer">
+    <footer className="marketing-footer bg-card-pattern">
       <div className="marketing-footer__inner">
         <div className="marketing-footer__brand">
-          <Lockup locale={locale} size={36} />
+          <Lockup locale={locale} size={36} theme="dark" />
           <p className="marketing-footer__tagline">{dict.tagline}</p>
         </div>
 

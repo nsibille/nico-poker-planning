@@ -1,5 +1,7 @@
 'use client'
 import { useState } from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { BadgeRoomId, BadgeRound, BadgePhase } from '@/components/ui/Badge'
 import { useGameStore } from '@/store/gameStore'
@@ -35,10 +37,16 @@ export function RoomHeader({ room, connected, displayRound, displayPhase, isHist
   return (
     <nav className="nav-room-header">
       <div className="flex items-center gap-2 flex-1">
-        <span style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--fw-bold)', color: 'var(--color-brand-primary)', fontFamily: 'var(--font-primary)' }}>
-          🃏
-        </span>
-        <h2>Sprint Poker</h2>
+        <Link href="/fr" aria-label="Scrumbler" className="nav-room-header__lockup">
+          <Image
+            src="/brand/logo/logo-horizontal.svg"
+            alt="Scrumbler"
+            width={140}
+            height={32}
+            priority
+            style={{ height: 28, width: 'auto' }}
+          />
+        </Link>
         <BadgeRoomId id={room.id} />
         <BadgeRound round={displayRound ?? room.round} />
         <BadgePhase phase={displayPhase ?? (room.phase as 'waiting' | 'voting' | 'revealed')} />
