@@ -2,9 +2,9 @@
 // Em dash forbidden (see CLAUDE.md, non-negotiable rule).
 export const en = {
   meta: {
-    title: 'Scrumbler, planning poker for agile teams',
+    title: 'Scrumbler, the planning poker that wakes the team up',
     description:
-      'Estimate, reveal, repeat. No account required, anonymous by default.',
+      'Estimate fast, debate loud, align for real. Anonymous votes, instant maths, a ritual that finally comes alive.',
   },
   nav: {
     product: 'Product',
@@ -15,10 +15,10 @@ export const en = {
     closeMenu: 'Close menu',
   },
   hero: {
-    eyebrow: 'Planning poker, next generation',
-    title: 'Estimate your stories,\nreveal in one beat,\nrepeat.',
+    eyebrow: 'Planning poker, the lively version',
+    title: 'Estimate fast,\ndebate loud,\nalign for real.',
     lead:
-      'Scrumbler is an anonymous-by-default, no-account, real-time planning poker. Built for the pace of an actual sprint, not for looking good in a meeting.',
+      'Scrumbler turns your estimation ritual into the moment the team actually wakes up. Anonymous votes free every voice, instant maths saves the minutes, and a gamified format that makes everyone want to play.',
     ctaPrimary: 'Start a game',
     ctaSecondary: 'See the product',
     proof: 'No account. Share a room code, that’s it.',
@@ -26,64 +26,64 @@ export const en = {
   problem: {
     eyebrow: 'Why Scrumbler',
     title:
-      'Agile estimates shouldn’t require an account, an onboarding, or a spreadsheet.',
+      'The real job of planning poker is aligning the team. Not just spitting out a number.',
     items: [
       {
-        title: 'No account, no friction',
+        title: 'The vote serves the debate, not the other way round',
         body:
-          'No email, no password. Pick an emoji avatar and a nickname, you’re in. A room spins up in under five seconds.',
+          'The number drops in two clicks, the maths is instant. Every minute saved goes where it matters: surfacing assumptions, hearing the quieter voices, aligning for real.',
       },
       {
-        title: 'Anonymous by default',
+        title: 'Anonymous, therefore honest',
         body:
-          'Votes stay hidden until reveal. Nobody anchors on the first card down, and divergence becomes a discussion rather than a confession.',
+          'Votes stay hidden until reveal. Nobody anchors on the first card down, and divergence becomes a discussion, not a confession.',
       },
       {
-        title: 'Real-time, truly',
+        title: 'Gamified, therefore engaging',
         body:
-          'Supabase Realtime sync, sub-second latency. When a teammate votes, you see it in the same heartbeat.',
+          'Cards, theatrical reveal, confetti, tiered scoreboard. The ritual becomes a moment the team looks forward to. Everyone gets into it.',
       },
     ],
   },
   features: {
     eyebrow: 'What you’ll love',
-    title: 'Everything you need to estimate fast, and nothing more.',
+    title: 'Everything to estimate fast, debate honestly, and keep the team in the game.',
     items: [
       {
         emoji: '🎯',
         title: 'Dedicated roles',
         body:
-          'Scrum Master or Developer: each role gets its own surface, palette and gestures.',
+          'Scrum Master or Developer: each role gets its own surface, palette and gestures. Everyone in their seat at the table.',
       },
       {
         emoji: '🎲',
         title: 'Fibonacci cards',
         body:
-          'The agile classic: 1, 2, 3, 5, 8, 13, 21, ?, ☕. A ☕ card to call a break, a ? to call out missing info.',
+          'The agile classic: 1, 2, 3, 5, 8, 13, 21, ?, ☕. The ☕ calls a break, the ? calls out missing info. Two extra voices at the table.',
       },
       {
         emoji: '🎉',
         title: 'Theatrical reveal',
         body:
-          'Reveal scoreboard with tier gradients, confetti, and stats: mean, median, deviation, consensus.',
+          'Reveal scoreboard with tier gradients, confetti, full stats (mean, median, deviation, consensus). The moment you wait for, not the one you rush.',
       },
       {
         emoji: '💬',
-        title: 'Targeted discussion',
+        title: 'Debate where it counts',
         body:
-          'When one vote diverges, Scrumbler invites a discussion. Neutral, never blaming.',
+          'When a vote diverges, Scrumbler opens a neutral discussion. The voice that might have stayed quiet gets heard, and the team aligns on facts, not on the loudest opinion.',
       },
       {
         emoji: '↺',
         title: 'One-click re-vote',
         body:
-          'Mind changed? Click your card again, the vote turns private. No need to restart the round.',
+          'Debate moved a decision? Click your card again, the vote turns private. No need to restart the round.',
       },
       {
         emoji: '📊',
         title: 'Session recap',
         body:
-          'Timeline of stories, markdown export, shareable summary. Next refinement starts with full context.',
+          'Timeline of stories, markdown export, shareable summary. The context sticks, the next refinement starts running.',
       },
     ],
   },
@@ -95,7 +95,7 @@ export const en = {
         n: '01',
         title: 'Create the room',
         body:
-          'Pick a nickname, an emoji avatar, a role. You get a code to share, no email invites.',
+          'Nickname, emoji avatar, role. You get a code to share, no email, no invite chain.',
       },
       {
         n: '02',
@@ -105,9 +105,9 @@ export const en = {
       },
       {
         n: '03',
-        title: 'Estimate, reveal, repeat',
+        title: 'Estimate, debate, align',
         body:
-          'The Scrum Master enters a story and opens the vote. Everyone plays a card. Reveal, discuss if needed, next round.',
+          'Anonymous vote, theatrical reveal, instant maths. When numbers diverge, the app opens the floor. Everyone talks, everyone aligns, next round.',
       },
     ],
   },
@@ -115,7 +115,7 @@ export const en = {
     eyebrow: 'Pricing',
     title: 'Free, plain and simple.',
     body:
-      'Scrumbler is free for teams: unlimited rooms, players, rounds. Premium tiers will land when we have something genuinely worth charging for, not before.',
+      'Unlimited rooms, unlimited players, unlimited rounds. Premium tiers will land when we have something genuinely worth charging for, not before.',
     cta: 'See the full pricing',
   },
   faq: {
@@ -145,12 +145,12 @@ export const en = {
     ],
   },
   finalCta: {
-    title: 'Ready to estimate as a team, no account, no friction?',
-    body: 'A room spins up in five seconds. Nothing to install.',
+    title: 'Make your next refinement the one the team finishes wide awake.',
+    body: 'A room spins up in five seconds. Nothing to install, no account, just a code to share.',
     cta: 'Start a game',
   },
   footer: {
-    tagline: 'Planning poker for agile teams.',
+    tagline: 'The planning poker that wakes the team up.',
     columns: {
       product: {
         title: 'Product',
@@ -181,7 +181,7 @@ export const en = {
         name: 'Crew',
         price: '€0',
         cadence: 'forever',
-        description: 'For teams that just want to estimate fast, cleanly, with no friction.',
+        description: 'For teams that want to estimate fast, debate honestly, align without pain.',
         features: [
           'Unlimited rooms',
           'Unlimited players',

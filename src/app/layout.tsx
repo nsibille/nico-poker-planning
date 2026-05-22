@@ -6,11 +6,11 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://scrumbler.app'
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'Scrumbler · Planning poker pour équipes agiles',
+    default: 'Scrumbler · Le planning poker qui réveille l’équipe',
     template: '%s · Scrumbler',
   },
   description:
-    'Planning poker pour équipes agiles. Estime, révèle, recommence. Aucun compte requis, connexion anonyme.',
+    'Estime vite, débat franchement, aligne pour de bon. Vote anonyme, calcul auto, et un rituel d’estimation qui devient enfin un bon moment.',
   applicationName: 'Scrumbler',
   authors: [{ name: 'Scrumbler' }],
   keywords: [
@@ -35,24 +35,24 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     siteName: 'Scrumbler',
-    title: 'Scrumbler · Planning poker pour équipes agiles',
+    title: 'Scrumbler · Le planning poker qui réveille l’équipe',
     description:
-      'Estime, révèle, recommence. Aucun compte requis, connexion anonyme.',
+      'Estime vite, débat franchement, aligne pour de bon. Vote anonyme, calcul auto, rituel enfin vivant.',
     url: siteUrl,
     images: [
       {
         url: '/brand/social/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Scrumbler · Planning poker pour équipes agiles',
+        alt: 'Scrumbler · Le planning poker qui réveille l’équipe',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Scrumbler · Planning poker pour équipes agiles',
+    title: 'Scrumbler · Le planning poker qui réveille l’équipe',
     description:
-      'Estime, révèle, recommence. Aucun compte requis, connexion anonyme.',
+      'Estime vite, débat franchement, aligne pour de bon. Vote anonyme, calcul auto, rituel enfin vivant.',
     images: ['/brand/social/twitter-card.png'],
   },
   robots: { index: true, follow: true },
