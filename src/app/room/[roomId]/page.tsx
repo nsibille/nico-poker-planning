@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useSyncExternalStore } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { RoomHeader } from '@/components/room/RoomHeader'
 import { PlayersList } from '@/components/room/PlayersList'
@@ -23,10 +23,16 @@ export default function RoomPage() {
   const { toast, showToast, clearToast } = useToast()
 
   const { myPlayerId, myRoomId, myRole, selectedVote, setSelectedVote, reset } = useGameStore()
-  // Wait for zustand's persisted state to hydrate before deciding to redirect.
-  // Otherwise an immediate "no session" bounce fires on first render after refresh.
-  const [hydrated, setHydrated] = useState(false)
-  useEffect(() => { setHydrated(true) }, [])
+  // On attend que l'état persisté de zustand soit ré-hydraté avant de décider
+  // de rediriger, sinon un bounce "no session" instantané se déclenche au
+  // premier render après refresh. useSyncExternalStore branché sur l'API
+  // d'hydratation de zustand-persist renvoie false en SSR/premier paint puis
+  // true dès la fin de l'hydratation — pas de setState dans useEffect.
+  const hydrated = useSyncExternalStore(
+    cb => useGameStore.persist.onFinishHydration(cb),
+    () => useGameStore.persist.hasHydrated(),
+    () => false,
+  )
 
   const { room, loading: roomLoading } = useRoom(roomId)
   const { players } = usePlayers(roomId)

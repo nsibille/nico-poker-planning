@@ -34,14 +34,16 @@ export function LobbyForm() {
   const [scaleId, setScaleId] = useState<string>('fibonacci')
   const [customRaw, setCustomRaw] = useState<string>('')
   const [loading, setLoading] = useState(false)
-  // While we check a persisted session against the DB, hide the form to avoid a flash.
-  const [restoring, setRestoring] = useState<boolean>(!!(myPlayerId && myRoomId))
+  // Tant qu'on a une session persistée non vérifiée, on masque le formulaire.
+  // État dérivé du store : si la vérif DB échoue, le reset() ci-dessous remet
+  // myPlayerId à null et restoring repasse à false automatiquement.
+  const restoring = !!(myPlayerId && myRoomId)
 
-  // If we have a persisted session, verify the player still exists in DB and resume.
-  // If the player was deleted (e.g. cleared from another tab, or stale data), reset and
-  // show the lobby form so the user can re-join.
+  // Si on a une session persistée, on vérifie que le player existe encore en
+  // DB et on reprend. S'il a été supprimé (autre onglet, données stale), on
+  // reset et le formulaire réapparaît.
   useEffect(() => {
-    if (!myPlayerId || !myRoomId) { setRestoring(false); return }
+    if (!myPlayerId || !myRoomId) return
     let cancelled = false
     const supabase = createClient()
     ;(async () => {
@@ -55,7 +57,6 @@ export function LobbyForm() {
         router.replace(`/room/${myRoomId}`)
       } else {
         reset()
-        setRestoring(false)
       }
     })()
     return () => { cancelled = true }

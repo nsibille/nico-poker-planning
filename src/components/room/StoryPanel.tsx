@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Textarea } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { createClient } from '@/lib/supabase/client'
@@ -14,11 +14,17 @@ interface StoryPanelProps {
 
 export function StoryPanel({ roomId, story, phase, isScrumMaster }: StoryPanelProps) {
   const [draft, setDraft] = useState(story)
+  const [lastSyncedStory, setLastSyncedStory] = useState(story)
   const [saving, setSaving] = useState(false)
 
-  // Sync draft when the room's story changes server-side (e.g. another SM updates it,
-  // or we start a new round with an empty story).
-  useEffect(() => { setDraft(story) }, [story])
+  // Si la story change côté serveur (autre SM, nouveau round), on resynchronise
+  // le brouillon local. Pattern "store previous & compare during render"
+  // recommandé par React au lieu d'un useEffect → setState
+  // (https://react.dev/learn/you-might-not-need-an-effect).
+  if (story !== lastSyncedStory) {
+    setLastSyncedStory(story)
+    setDraft(story)
+  }
 
   // Non-SM: read-only display whatever the phase.
   if (!isScrumMaster) {
