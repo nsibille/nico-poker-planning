@@ -2,16 +2,17 @@
 
 > Single source of truth for the Scrumbler visual identity. Use this alongside the asset pack in `brand-assets/`. If something isn't documented here, ask design before improvising.
 
-**Version** 1.0.0 · **Date** 22 mai 2026
+**Version** 1.1.0 · **Date** 22 mai 2026
 
 ---
 
 ## 0 · Brand snapshot
 
 - **Name** Scrumbler
-- **Tagline** *Planning poker pour équipes agiles, estime, révèle, recommence.*
-- **What it is** A lightweight, anonymous-by-default planning-poker app for agile teams.
-- **Voice** Tutoiement, verbe d'abord, jamais accusateur. **Em dash interdit** (voir `CLAUDE.md`).
+- **Tagline** *Estime, débat, aligne. Et amuse-toi.*
+- **What it is** Le planning poker qui transforme le rituel en moment vivant : vote anonyme, calcul auto, débat ouvert, équipe alignée. Gamifié, sans compte, en temps réel.
+- **Positioning** Trop de rituels agiles tournent à la corvée. Scrumbler ranime le moment : le vote est rapide, le calcul est instantané, et tout le temps gagné part dans ce qui compte vraiment, l'alignement, le débat, les voix qu'on n'entend pas d'habitude. Le tout dans une safe place, gamifiée, où l'équipe se prend au jeu.
+- **Voice** Tutoiement, verbe d'abord, jamais accusateur, jamais donneur de leçon. Punchy mais pas péremptoire. **Em dash interdit** (voir `CLAUDE.md`).
 - **Language** French, with a few untranslated English game terms (Scrum Master, EPIC).
 - **Mascot glyph** 🃏 (used sparingly, the logo carries the brand)
 
@@ -217,8 +218,8 @@ The brand palette (blue · amber · coral · teal · violet · sky) burst, used 
 <meta name="theme-color" content="#4970FF"/>
 
 <!-- Social preview -->
-<meta property="og:title" content="Scrumbler, Planning poker pour équipes agiles"/>
-<meta property="og:description" content="Estime, révèle, recommence. Aucun compte requis, connexion anonyme."/>
+<meta property="og:title" content="Scrumbler, le planning poker qui réveille l'équipe"/>
+<meta property="og:description" content="Estime vite, débat franchement, aligne pour de bon. Vote anonyme, calcul auto, rituel enfin vivant."/>
 <meta property="og:image" content="/social/og-image.png"/>
 <meta property="og:image:width" content="1200"/>
 <meta property="og:image:height" content="630"/>
@@ -273,7 +274,7 @@ export function Lockup({ size = 40 }) {
 
 ## 8 · Voice & tone
 
-Four rules. Hold the line on these and the product sounds like Scrumbler without having to sign it.
+Cinq règles. Tiens-les, et Scrumbler sonne comme Scrumbler sans avoir à signer.
 
 ### Règle 01, Tutoie.
 L'app est anonyme et collégiale, on ne « vous » pas l'utilisateur.
@@ -296,12 +297,19 @@ Les outliers ne sont pas une faute. On invite, on n'accuse pas.
 - ✓ *Discussion nécessaire : quelqu'un a estimé très différemment du groupe.*
 - ✗ *Erreur de vote : un développeur s'est trompé.*
 
+### Règle 05 Punchy, jamais donneur de leçons.
+On parle franc, on a un peu d'humour, mais on ne fait pas la morale sur « comment bien faire ses rituels ». L'équipe sait, on lui propose juste un meilleur terrain de jeu.
+- ✓ *Le vote tombe en deux clics. Le débat, c'est là que ça se joue.*
+- ✗ *Beaucoup d'équipes échouent à animer leur planning poker. Voici comment bien faire.*
+- ✗ *Enfin un outil qui prend l'agilité au sérieux.*
+
 ### Microcopy patterns
 
 - **Loading**: `Reprise de ta session…`, `Enregistrement…`. Toujours le glyphe `…`, jamais trois points.
 - **Confirmation**: `✓ Vote enregistré : 5. Reclique la carte pour annuler.`
 - **Empty state**: `Aucune story définie. Renseigne-la pour lancer le vote.`
 - **Errors**: blunt but not blaming, `Réouverture échouée : {reason}`.
+- **Reveal**: `Carte révélée. À toi de défendre ton chiffre.` On invite au débat, on ne tranche pas à la place de l'équipe.
 
 ---
 
@@ -343,6 +351,7 @@ brand-assets/
 
 | Version | Date | Notes |
 |---|---|---|
+| 1.1.0   | 2026-05-22 | Positionnement actualisé : vote rapide au service du débat, de l'alignement, du fun. Ajout règle de voix 05 (punchy, jamais donneur de leçons). |
 | 1.0.0   | 2026-05-22 | Initial brand book. Question-card mark, full token set, 4 voice rules. |
 
 ---
