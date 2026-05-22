@@ -9,8 +9,6 @@ export interface VoteEntry {
   value: string | null
   numeric: number | null
   fibIndex: number | null
-  /** Distance to mean in Fibonacci-index steps (0 = same column, 1 = neighbor card, etc.). */
-  fibDistance: number | null
   isOutlier: boolean
 }
 
@@ -84,7 +82,7 @@ export function computeRevealStats(players: Player[], votes: Vote[]): RevealStat
         fibIndex = idx >= 0 ? idx : nearestFibIndex(n)
       }
     }
-    return { player, value: raw, numeric, fibIndex, fibDistance: null, isOutlier: false }
+    return { player, value: raw, numeric, fibIndex, isOutlier: false }
   })
 
   const numericEntries = entries.filter(e => e.numeric !== null) as Array<VoteEntry & { numeric: number; fibIndex: number }>
@@ -115,10 +113,6 @@ export function computeRevealStats(players: Player[], votes: Vote[]): RevealStat
   const indices = numericEntries.map(e => e.fibIndex)
   const spreadIndex = Math.max(...indices) - Math.min(...indices)
 
-  for (const e of numericEntries) {
-    e.fibDistance = Math.abs(e.fibIndex - meanFibIndex)
-  }
-
   let consensus: ConsensusLevel
   if (spreadIndex === 0 && questionCount === 0) consensus = 'perfect'
   else if (spreadIndex <= 1) consensus = 'aligned'
@@ -127,19 +121,19 @@ export function computeRevealStats(players: Player[], votes: Vote[]): RevealStat
 
   let outliers: VoteEntry[] = []
   if (consensus === 'discuss' || consensus === 'divergent') {
-    if (numericEntries.length === 2) {
-      // Avec seulement 2 votants en désaccord il n'y a pas de "majorité" à
-      // laquelle se référer — les deux points de vue doivent être discutés
-      // et tous deux peuvent être rouverts par le SM.
-      outliers = numericEntries
-      outliers.forEach(o => { o.isOutlier = true })
-    } else {
-      const maxDist = Math.max(...numericEntries.map(e => e.fibDistance ?? 0))
-      if (maxDist > 0) {
-        outliers = numericEntries.filter(e => (e.fibDistance ?? 0) === maxDist)
-        outliers.forEach(o => { o.isOutlier = true })
-      }
-    }
+    // Clustering simple sur l'index Fibonacci : la "taille de cluster" d'un
+    // votant est le nombre de votants à ≤ 1 cran de lui (lui inclus). Si un
+    // cluster regroupe strictement plus de la moitié des votants, on flagge
+    // ceux qui n'en font pas partie. Sinon aucune majorité claire — tout le
+    // monde discute.
+    const sizes = numericEntries.map(e =>
+      numericEntries.filter(o => Math.abs(o.fibIndex - e.fibIndex) <= 1).length,
+    )
+    const maxCluster = Math.max(...sizes)
+    outliers = maxCluster > numericEntries.length / 2
+      ? numericEntries.filter((_, i) => sizes[i] < maxCluster)
+      : numericEntries
+    outliers.forEach(o => { o.isOutlier = true })
   }
 
   return {
