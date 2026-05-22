@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Scrumbler — une partie en 25 secondes</title>
+<style>
+  /* ── Tokens brand (cf. DESIGN_SYSTEM.md) ─────────────────────────────── */
+  :root{
+    --brand:#4970ff; --brand-50:#eef1ff; --brand-100:#dce3ff; --brand-600:#3358e0;
+    --navy:#283050; --muted:#6b7299; --hint:#a0a8c0;
+    --bg:#f5f6fa; --surface:#ffffff; --border:#e8eaf0;
+    --amber:#ffb450; --amber-50:#fff8ed; --amber-dark:#8a5a00;
+    --coral:#ff7f66; --coral-50:#ffe5e0; --coral-dark:#b33a24;
+    --teal:#a8e0e5; --teal-600:#3fb8c4; --teal-dark:#1e7a82; --teal-50:#dcf3f5;
+    --sky:#64c1fa; --indigo:#6691ff; --violet:#9485f2;
+    --r-lg:16px; --r-xl:20px; --r-2xl:28px; --pill:9999px;
+    --shadow-card:0 2px 12px rgba(73,112,255,0.08);
+    --shadow-pop:0 12px 28px rgba(73,112,255,0.35);
+    --font:'Neuwelt','DM Sans',system-ui,sans-serif;
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;height:100%;background:var(--bg);font-family:var(--font);color:var(--navy);overflow:hidden}
+
+  /* Décor */
+  .stage{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .deco{position:absolute;pointer-events:none;border-radius:60% 40% 50% 50% / 50% 60% 40% 50%;opacity:.18;filter:blur(2px)}
+  .deco-ring{position:absolute;border-radius:50%;border:10px solid currentColor;opacity:.18;pointer-events:none}
+
+  /* Card scène */
+  .scene{
+    position:relative;
+    width:min(960px, 92vw);
+    height:min(560px, 78vh);
+    background:var(--surface);
+    border-radius:var(--r-2xl);
+    box-shadow:0 20px 60px rgba(40,48,80,.10), var(--shadow-card);
+    border:1px solid var(--border);
+    padding:28px 32px;
+    overflow:hidden;
+    display:grid;
+    grid-template-rows:auto auto 1fr auto;
+    gap:18px;
+  }
+
+  /* Header scrumbler */
+  .scene-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .badge-room{display:inline-flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:var(--pill);padding:6px 14px;font-size:13px;color:var(--muted);font-family:'JetBrains Mono',monospace;letter-spacing:.04em}
+  .badge-room .dot{font-family:var(--font)}
+  .badge-room .accent{color:var(--coral)}
+  .head-spacer{flex:1}
+  .sm-tag{display:inline-flex;align-items:center;gap:8px;font-weight:500;color:var(--navy);font-size:14px}
+  .sm-tag .em{font-size:18px}
+
+  /* Phase pill (anime entre voting/revealed) */
+  .phase-pill{
+    display:inline-flex;align-items:center;gap:8px;
+    border-radius:var(--pill);padding:5px 14px;font-size:13px;font-weight:500;
+    transition:background .35s ease, color .35s ease, border-color .35s ease;
+    background:var(--bg);color:var(--hint);border:1px solid var(--border);
+  }
+  .phase-pill .pulse{width:8px;height:8px;border-radius:50%;background:currentColor;box-shadow:0 0 0 0 currentColor;animation:pulseDot 1.6s ease-out infinite}
+  @keyframes pulseDot{0%{box-shadow:0 0 0 0 rgba(255,180,80,.4)}100%{box-shadow:0 0 0 14px rgba(255,180,80,0)}}
+
+  /* Story panel */
+  .story{
+    background:var(--bg);
+    border-radius:var(--r-lg);
+    padding:16px 22px;
+    border:1px solid var(--border);
+    transition:background .3s ease, border-color .3s ease;
+  }
+  .story .label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:500;margin-bottom:6px}
+  .story .title{font-size:22px;font-weight:700;color:var(--navy);min-height:32px;letter-spacing:-.01em;line-height:1.2;position:relative}
+  .story .title::after{content:'';display:inline-block;width:2px;height:1em;margin-left:2px;background:var(--brand);vertical-align:-3px;animation:caret 0.9s steps(1) infinite;opacity:0}
+  .story.is-typing .title::after{opacity:1}
+  @keyframes caret{50%{opacity:0}}
+
+  /* Players row */
+  .players{
+    display:grid;
+    grid-template-columns:repeat(5, 1fr);
+    gap:14px;
+    align-items:end;
+  }
+  .seat{
+    position:relative;
+    background:var(--bg);
+    border:1.5px solid var(--border);
+    border-radius:var(--r-lg);
+    padding:14px 8px 16px;
+    text-align:center;
+    height:140px;
+    display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+    transform:translateY(20px) scale(.96);
+    opacity:0;
+    transition:opacity .45s ease, transform .45s cubic-bezier(.2,.7,.2,1.2), border-color .35s ease, background .35s ease;
+  }
+  .seat.is-joined{opacity:1;transform:translateY(0) scale(1)}
+  .seat.is-hot{border-color:var(--coral);background:#fff6f3}
+  .seat.is-aligned{border-color:var(--teal-600);background:var(--teal-50)}
+  .seat .who{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--navy);font-weight:500}
+  .seat .emoji{font-size:18px;line-height:1}
+  /* Card states */
+  .card{
+    margin-top:auto;
+    width:54px;height:74px;
+    border-radius:var(--r-lg);
+    background:var(--surface);
+    border:1.5px solid var(--border);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 2px 8px rgba(40,48,80,.08);
+    font-weight:700;font-size:26px;color:var(--brand);
+    position:relative;
+    transform-style:preserve-3d;
+    transition:transform .55s cubic-bezier(.2,.7,.2,1.2), box-shadow .35s, background .35s, color .35s, border-color .35s;
+  }
+  .card .face,.card .back{
+    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;border-radius:inherit;
+  }
+  .card .back{
+    background:linear-gradient(135deg,var(--brand) 0%, #6f8cff 100%);
+    color:#fff;
+    transform:rotateY(180deg);
+    box-shadow:inset 0 0 0 4px rgba(255,255,255,.18);
+    font-family:var(--font);font-weight:700;font-size:14px;letter-spacing:.06em;
+  }
+  .card .face{color:var(--brand)}
+  .card.is-hidden{transform:rotateY(180deg)}
+  .card.is-pending{opacity:.5}
+  .card.is-pending .back{background:linear-gradient(135deg,#cfd5e8,#a8b1cc)}
+  .card.is-outlier{box-shadow:0 0 0 3px var(--coral), 0 8px 20px rgba(255,127,102,.35)}
+  .card.is-aligned-c{box-shadow:0 0 0 3px var(--teal-600), 0 8px 20px rgba(63,184,196,.32)}
+
+  /* Vote ripple — petite onde quand un dev vote pendant la phase voting */
+  .seat .ripple{position:absolute;left:50%;bottom:46px;width:8px;height:8px;border-radius:50%;background:var(--teal-600);opacity:0;transform:translateX(-50%)}
+  .seat.is-voted .ripple{animation:ripple 1.2s ease-out 1}
+  @keyframes ripple{0%{opacity:.7;transform:translate(-50%,0) scale(1)}100%{opacity:0;transform:translate(-50%,-10px) scale(4)}}
+
+  /* Footer stats */
+  .stats{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:24px;
+    padding-top:18px;
+    border-top:1px solid var(--border);
+    align-items:end;
+  }
+  .stat{text-align:center;opacity:0;transform:translateY(8px);transition:opacity .4s ease, transform .4s ease}
+  .stats.is-shown .stat{opacity:1;transform:translateY(0)}
+  .stat .l{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:500}
+  .stat .v{font-size:34px;font-weight:700;color:var(--navy);margin-top:6px;letter-spacing:-.02em}
+  .stat .v.brand{color:var(--brand)}
+  .stat .tier{display:inline-block;margin-top:6px;font-size:22px;letter-spacing:.04em;font-weight:700;color:var(--navy)}
+
+  /* Confetti bursts on consensus */
+  .confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden;border-radius:inherit}
+  .confetti i{
+    position:absolute;top:50%;left:50%;width:8px;height:12px;border-radius:2px;
+    opacity:0;transform:translate(-50%,-50%);
+  }
+  .stats.is-burst ~ .confetti i,
+  .scene.is-consensus .confetti i{animation:confetti 1.6s cubic-bezier(.2,.6,.2,1) forwards}
+  @keyframes confetti{
+    0%{opacity:0;transform:translate(-50%,-50%) rotate(0)}
+    20%{opacity:1}
+    100%{opacity:0;transform:translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(var(--r))}
+  }
+
+  /* Discussion arc — lignes courbes entre les outliers */
+  .debate-svg{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .35s ease}
+  .scene.is-debate .debate-svg{opacity:1}
+  .debate-svg path{stroke:var(--coral);stroke-width:2;stroke-dasharray:6 6;fill:none;animation:dash 1.2s linear infinite}
+  @keyframes dash{to{stroke-dashoffset:-24}}
+
+  /* Phase chip in head pulses on reveal */
+  .scene.is-voting .phase-pill{background:var(--amber-50);color:var(--amber-dark);border-color:var(--amber-50)}
+  .scene.is-revealed .phase-pill,
+  .scene.is-debate .phase-pill,
+  .scene.is-consensus .phase-pill{background:var(--teal-50);color:var(--teal-dark);border-color:var(--teal-50)}
+  .scene.is-onboarding .phase-pill{background:var(--bg);color:var(--hint);border-color:var(--border)}
+
+  /* Caption sous la card pour raconter chaque scène */
+  .caption{
+    position:absolute;left:50%;bottom:-58px;transform:translateX(-50%);
+    font-size:14px;color:var(--muted);letter-spacing:.02em;
+    background:rgba(255,255,255,.85);padding:6px 14px;border-radius:var(--pill);border:1px solid var(--border);
+    backdrop-filter:blur(8px);
+    opacity:0;transition:opacity .3s ease, transform .3s ease;
+  }
+  .caption.is-on{opacity:1;transform:translateX(-50%) translateY(-6px)}
+  .caption .em{margin-right:6px}
+
+  /* Progress bar : où en est la boucle */
+  .progress{position:absolute;left:0;right:0;bottom:0;height:3px;background:transparent}
+  .progress .bar{height:100%;background:linear-gradient(90deg,var(--brand),var(--violet),var(--teal-600));width:0%;transition:width .25s linear}
+
+  /* Floating SM coach bubble */
+  .coach{
+    position:absolute;left:24px;top:74px;
+    background:var(--brand);color:#fff;border-radius:var(--pill);
+    padding:8px 14px;font-size:13px;font-weight:500;box-shadow:var(--shadow-pop);
+    transform:translateY(-8px) scale(.92);opacity:0;
+    transition:opacity .35s ease, transform .35s cubic-bezier(.2,.7,.2,1.4);
+  }
+  .coach.is-on{opacity:1;transform:translateY(0) scale(1)}
+  .coach::after{content:'';position:absolute;left:24px;bottom:-6px;width:12px;height:12px;background:var(--brand);transform:rotate(45deg)}
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion:reduce){
+    *{animation-duration:.001ms !important;transition-duration:.001ms !important}
+  }
+</style>
+</head>
+<body>
+<div class="stage" aria-label="Démo Scrumbler en boucle">
+
+  <!-- décor de fond -->
+  <div class="deco" style="width:340px;height:280px;background:var(--teal);top:-60px;right:-80px"></div>
+  <div class="deco" style="width:240px;height:200px;background:var(--violet);bottom:40px;left:-60px"></div>
+  <div class="deco-ring" style="width:140px;height:140px;color:var(--amber);bottom:120px;right:60px"></div>
+  <div class="deco-ring" style="width:80px;height:80px;color:var(--sky);top:80px;left:80px"></div>
+
+  <div class="scene is-onboarding" id="scene">
+
+    <div class="coach" id="coach">Allez, on lance le vote ✨</div>
+
+    <div class="scene-head">
+      <div class="badge-room">
+        <span class="dot">🃏</span>
+        <span>scrumbler.app/room/<span class="accent">abc-123</span></span>
+      </div>
+      <span class="phase-pill" id="phasePill"><span class="pulse"></span><span id="phaseLabel">En attente</span></span>
+      <div class="head-spacer"></div>
+      <span class="sm-tag"><span class="em">🎯</span> Scrum Master</span>
+    </div>
+
+    <div class="story" id="story">
+      <div class="label">Story</div>
+      <div class="title" id="storyTitle"></div>
+    </div>
+
+    <div class="players" id="players">
+      <!-- 5 seats — alimentés en JS -->
+    </div>
+
+    <div class="stats" id="stats">
+      <div class="stat"><div class="l">Médiane</div><div class="v">8</div></div>
+      <div class="stat"><div class="l">Consensus</div><div class="v brand" id="consensusVal">78<small style="font-size:18px">%</small></div></div>
+      <div class="stat"><div class="l">Tier</div><div class="tier">MEDIUM</div></div>
+    </div>
+
+    <!-- SVG debat -->
+    <svg class="debate-svg" viewBox="0 0 960 560" preserveAspectRatio="none">
+      <path d="M 120 360 C 280 220, 520 220, 700 360" />
+      <path d="M 120 360 C 360 280, 600 280, 840 360" />
+    </svg>
+
+    <!-- Confetti -->
+    <div class="confetti" id="confetti"></div>
+
+    <!-- Caption -->
+    <div class="caption" id="caption"><span class="em">👋</span><span id="captionText">L'équipe arrive…</span></div>
+
+    <!-- Progress -->
+    <div class="progress"><div class="bar" id="bar"></div></div>
+  </div>
+</div>
+
+<script>
+(() => {
+  // ── Casting (depuis la maquette : Lina, Tom, Sam, Pol, Jin)
+  const cast = [
+    { name:'Lina', emoji:'🦊' },
+    { name:'Tom',  emoji:'🐼' },
+    { name:'Sam',  emoji:'🦉' },
+    { name:'Pol',  emoji:'🦊' },
+    { name:'Jin',  emoji:'🐙' },
+  ];
+  // Valeurs Fibonacci : 5 5 8 8 13 — médiane 8, deux outliers (5 ← cool, 13 → hot)
+  // On marque 5 et 13 comme outliers, 8 comme aligned
+  const votes = [
+    { v:'5',  cls:'is-outlier'  },
+    { v:'8',  cls:'is-aligned-c'},
+    { v:'5',  cls:'is-outlier'  },
+    { v:'8',  cls:'is-aligned-c'},
+    { v:'13', cls:'is-outlier'  },
+  ];
+
+  // ── DOM
+  const scene = document.getElementById('scene');
+  const playersEl = document.getElementById('players');
+  const storyTitleEl = document.getElementById('storyTitle');
+  const storyEl = document.getElementById('story');
+  const statsEl = document.getElementById('stats');
+  const phaseLabelEl = document.getElementById('phaseLabel');
+  const captionEl = document.getElementById('caption');
+  const captionText = document.getElementById('captionText');
+  const captionEm = captionEl.querySelector('.em');
+  const coach = document.getElementById('coach');
+  const bar = document.getElementById('bar');
+  const confetti = document.getElementById('confetti');
+
+  // Construire les seats
+  cast.forEach((p,i) => {
+    const seat = document.createElement('div');
+    seat.className = 'seat';
+    seat.dataset.idx = i;
+    seat.innerHTML = `
+      <div class="who"><span class="emoji">${p.emoji}</span><span>${p.name}</span></div>
+      <span class="ripple"></span>
+      <div class="card is-hidden is-pending" data-card>
+        <div class="face">${votes[i].v}</div>
+        <div class="back">SCRUM</div>
+      </div>
+    `;
+    playersEl.appendChild(seat);
+  });
+
+  // Confetti pieces
+  const palette = ['#4970ff','#ffb450','#a8e0e5','#ff7f66','#9485f2','#64c1fa'];
+  for (let i=0;i<48;i++){
+    const c = document.createElement('i');
+    const ang = Math.random()*Math.PI*2;
+    const dist = 220 + Math.random()*180;
+    c.style.setProperty('--dx', `${Math.cos(ang)*dist}px`);
+    c.style.setProperty('--dy', `${Math.sin(ang)*dist*.9 - 60}px`);
+    c.style.setProperty('--r', `${(Math.random()*720-360)}deg`);
+    c.style.background = palette[i % palette.length];
+    c.style.animationDelay = `${Math.random()*.25}s`;
+    confetti.appendChild(c);
+  }
+
+  // ── Helpers
+  const seats = [...playersEl.querySelectorAll('.seat')];
+  const cards = [...playersEl.querySelectorAll('[data-card]')];
+
+  function setPhase(name, cls){
+    phaseLabelEl.textContent = name;
+    scene.classList.remove('is-onboarding','is-voting','is-revealed','is-debate','is-consensus');
+    scene.classList.add(cls);
+  }
+  function caption(emoji, text){
+    captionEl.classList.remove('is-on');
+    setTimeout(()=>{
+      captionEm.textContent = emoji;
+      captionText.textContent = text;
+      captionEl.classList.add('is-on');
+    },120);
+  }
+  function showCoach(text, ms=1400){
+    coach.textContent = text;
+    coach.classList.add('is-on');
+    setTimeout(()=>coach.classList.remove('is-on'), ms);
+  }
+  function reset(){
+    seats.forEach(s => s.classList.remove('is-joined','is-voted','is-hot','is-aligned'));
+    cards.forEach(c => {
+      c.classList.add('is-hidden','is-pending');
+      c.classList.remove('is-outlier','is-aligned-c');
+    });
+    storyTitleEl.textContent = '';
+    storyEl.classList.remove('is-typing');
+    statsEl.classList.remove('is-shown','is-burst');
+    confetti.querySelectorAll('i').forEach(c => { c.style.animation='none'; void c.offsetWidth; c.style.animation=''; });
+    setPhase('En attente','is-onboarding');
+    caption('👋',"L'équipe arrive…");
+  }
+
+  // ── Typing effect pour la story
+  const STORY = "Refactor du module d'authentification";
+  function typeStory(){
+    return new Promise(resolve => {
+      storyEl.classList.add('is-typing');
+      let i = 0;
+      const tick = () => {
+        storyTitleEl.textContent = STORY.slice(0, ++i);
+        if (i < STORY.length) setTimeout(tick, 32 + Math.random()*30);
+        else { storyEl.classList.remove('is-typing'); resolve(); }
+      };
+      tick();
+    });
+  }
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+
+  // ── Boucle de scènes
+  async function loop(){
+    while (true) {
+      reset();
+      const total = 25000;
+      let t0 = performance.now();
+      const tick = () => {
+        const e = performance.now() - t0;
+        bar.style.width = Math.min(100, (e/total)*100) + '%';
+        if (e < total) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+
+      // 1) ONBOARDING — l'équipe rejoint la salle (5 × 350ms)
+      caption('👋', "L'équipe rejoint la room");
+      await wait(500);
+      for (let i = 0; i < seats.length; i++) {
+        seats[i].classList.add('is-joined');
+        await wait(280);
+      }
+      await wait(500);
+
+      // 2) SCRUM MASTER ANIME — typing de la story, coach bubble
+      setPhase('Vote en cours','is-voting');
+      caption('🎯', "Le Scrum Master pose la story");
+      showCoach("J'écris la story…", 1600);
+      await wait(250);
+      await typeStory();
+      await wait(300);
+
+      // 2b) Devs votent un par un (cartes face cachée + ripple + visual)
+      caption('🃏', "Chacun pose sa carte, en aveugle");
+      const order = [2,0,4,1,3]; // ordre arbitraire
+      for (const idx of order) {
+        seats[idx].classList.add('is-voted');
+        // micro-bounce de la carte sans révéler
+        const card = cards[idx];
+        card.classList.remove('is-pending');
+        card.animate(
+          [{transform:'rotateY(180deg) translateY(0)'},{transform:'rotateY(180deg) translateY(-8px)'},{transform:'rotateY(180deg) translateY(0)'}],
+          {duration:380, easing:'cubic-bezier(.2,.7,.2,1.2)'}
+        );
+        await wait(360);
+      }
+      await wait(400);
+
+      // 3) REVEAL — flip orchestré + transition phase
+      showCoach("Révèle les cartes 🎉", 1500);
+      caption('✨', "Reveal !");
+      setPhase('Révélé','is-revealed');
+      await wait(180);
+      // flip en cascade
+      for (let i = 0; i < cards.length; i++) {
+        const k = (i*2) % cards.length;
+        cards[k].classList.remove('is-hidden');
+        await wait(120);
+      }
+      await wait(600);
+
+      // 4) DEBAT — surligner les outliers (5, 13) + arcs SVG
+      setPhase('Débat','is-debate');
+      caption('💬', "On débat : pourquoi 5 ? pourquoi 13 ?");
+      // outliers (5 et 13) → coral ring + seat coral ; le reste (8) → teal aligned
+      cards.forEach((c,i) => c.classList.add(votes[i].cls));
+      seats.forEach((s,i) => {
+        if (votes[i].cls === 'is-outlier') s.classList.add('is-hot');
+        else s.classList.add('is-aligned');
+      });
+      showCoach("Lina ? Jin ? Vous justifiez ?", 2200);
+      await wait(2600);
+
+      // 5) CONSENSUS — bascule sur le 8, stats + confetti
+      caption('🤝', "Consensus à 8 — MEDIUM");
+      setPhase('Consensus','is-consensus');
+      // Les outliers se rapprochent : on transforme leurs cartes en 8 visuellement
+      const adjust = [0, 2, 4]; // index des outliers (5,5,13)
+      for (const idx of adjust) {
+        const card = cards[idx];
+        const face = card.querySelector('.face');
+        card.classList.remove('is-outlier');
+        card.classList.add('is-aligned-c');
+        seats[idx].classList.remove('is-hot');
+        seats[idx].classList.add('is-aligned');
+        // petite anim : flip-flop puis change la valeur
+        card.animate(
+          [{transform:'rotateY(0) scale(1)'},{transform:'rotateY(90deg) scale(.92)'},{transform:'rotateY(0) scale(1)'}],
+          {duration:480, easing:'cubic-bezier(.2,.7,.2,1.2)'}
+        );
+        setTimeout(()=> face.textContent = '8', 240);
+        await wait(220);
+      }
+      // Stats apparaissent + confetti
+      statsEl.classList.add('is-shown','is-burst');
+      // relancer les confetti (animation finie sur le 1er tour)
+      confetti.querySelectorAll('i').forEach(c => {
+        c.style.animation = 'none';
+        void c.offsetWidth;
+        c.style.animation = '';
+      });
+      await wait(2800);
+
+      // 6) Outro — léger fondu
+      caption('🔄', "Round suivant…");
+      await wait(900);
+    }
+  }
+
+  loop();
+})();
+</script>
+</body>
+</html>
