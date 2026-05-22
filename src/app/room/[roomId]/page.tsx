@@ -58,14 +58,14 @@ export default function RoomPage() {
   useEffect(() => {
     if (!roomLoading && !room) {
       showToast('Room introuvable')
-      setTimeout(() => router.push('/'), 1500)
+      setTimeout(() => router.push('/app'), 1500)
     }
   }, [room, roomLoading, router, showToast])
 
   useEffect(() => {
     if (!hydrated) return
     if (!myPlayerId || (myRoomId && myRoomId !== roomId)) {
-      router.push('/')
+      router.push('/app')
     }
   }, [hydrated, myPlayerId, myRoomId, roomId, router])
 
@@ -74,7 +74,7 @@ export default function RoomPage() {
     const stillExists = players.some(p => p.id === myPlayerId)
     if (!stillExists) {
       reset()
-      router.push('/')
+      router.push('/app')
     }
   }, [hydrated, myPlayerId, players, reset, router])
 

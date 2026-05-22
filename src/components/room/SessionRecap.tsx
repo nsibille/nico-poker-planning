@@ -74,7 +74,7 @@ export function SessionRecap({ roomId, players, stories, endedAt, scale }: Sessi
       await supabase.from('players').delete().eq('id', myPlayerId).then(() => {}, () => {})
     }
     reset()
-    router.push('/')
+    router.push('/app')
   }
 
   if (!allVotes) {

@@ -29,7 +29,7 @@ export function RoomHeader({ room, connected, displayRound, displayPhase, isHist
       await supabase.from('players').delete().eq('id', myPlayerId).then(() => {}, () => {})
     }
     reset()
-    router.push('/')
+    router.push('/app')
   }
 
   return (
