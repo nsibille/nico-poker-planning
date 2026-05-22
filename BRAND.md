@@ -9,9 +9,10 @@
 ## 0 · Brand snapshot
 
 - **Name** Scrumbler
-- **Tagline** *Planning poker pour équipes agiles, estime, révèle, recommence.*
-- **What it is** A lightweight, anonymous-by-default planning-poker app for agile teams.
-- **Voice** Tutoiement, verbe d'abord, jamais accusateur. **Em dash interdit** (voir `CLAUDE.md`).
+- **Tagline** *Estime vite, débats mieux, repars aligné.*
+- **Promise** Voter prend quelques secondes, les stats se calculent toutes seules. Tu gagnes du temps sur l'outil pour en passer sur ce qui compte : entendre toutes les voix, créer le débat, repartir aligné. Et tout ça reste **fun**, parce qu'un refinement n'a aucune obligation d'être mortel.
+- **What it is** A fast, anonymous-by-default, gamified planning-poker app for agile teams. Built to turn estimation into a live team moment, not a meeting to survive.
+- **Voice** Tutoiement, verbe d'abord, jamais accusateur, jamais professoral. **Em dash interdit** (voir `CLAUDE.md`).
 - **Language** French, with a few untranslated English game terms (Scrum Master, EPIC).
 - **Mascot glyph** 🃏 (used sparingly, the logo carries the brand)
 
@@ -295,6 +296,13 @@ On garde un ton direct sans être sec, avec virgule, point, parenthèses, ou deu
 Les outliers ne sont pas une faute. On invite, on n'accuse pas.
 - ✓ *Discussion nécessaire : quelqu'un a estimé très différemment du groupe.*
 - ✗ *Erreur de vote : un développeur s'est trompé.*
+
+### Règle 05, Joueur, pas professoral.
+Scrumbler vend ce qu'il fait, jamais ce que les autres ratent. On ne fait la leçon ni à l'utilisateur, ni à son équipe, ni au métier. Pas de « réveille tes rituels mornes », pas de « arrête de subir tes meetings », pas de discours sur ce qu'est un bon refinement. On parle de ce que Scrumbler permet, et on laisse l'équipe en tirer ses propres conclusions.
+- ✓ *Tout le monde joue, personne ne décroche.*
+- ✓ *Le rituel devient un moment d'équipe.*
+- ✗ *Arrête de subir tes refinements mornes.*
+- ✗ *La plupart des équipes gâchent leurs cérémonies agiles.*
 
 ### Microcopy patterns
 

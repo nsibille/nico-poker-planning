@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     template: '%s · Scrumbler',
   },
   description:
-    'Planning poker pour équipes agiles. Estime, révèle, recommence. Aucun compte requis, connexion anonyme.',
+    'Planning poker pour équipes agiles. Vote en quelques secondes, débats sur ce qui compte, repars aligné. Aucun compte requis.',
   applicationName: 'Scrumbler',
   authors: [{ name: 'Scrumbler' }],
   keywords: [
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     siteName: 'Scrumbler',
     title: 'Scrumbler · Planning poker pour équipes agiles',
     description:
-      'Estime, révèle, recommence. Aucun compte requis, connexion anonyme.',
+      'Vote en quelques secondes, débats sur ce qui compte, repars aligné. Aucun compte requis, connexion anonyme.',
     url: siteUrl,
     images: [
       {
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Scrumbler · Planning poker pour équipes agiles',
     description:
-      'Estime, révèle, recommence. Aucun compte requis, connexion anonyme.',
+      'Vote en quelques secondes, débats sur ce qui compte, repars aligné. Aucun compte requis, connexion anonyme.',
     images: ['/brand/social/twitter-card.png'],
   },
   robots: { index: true, follow: true },

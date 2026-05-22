@@ -16,7 +16,7 @@ export default function HomePage() {
           />
           <span className="lobby-hero__eyebrow">Planning poker</span>
           <p className="lobby-hero__tagline">
-            Estime tes user stories en équipe, sans compte, en temps réel.
+            Estime vite, débats mieux, repars aligné. Sans compte, en temps réel.
           </p>
         </div>
       </section>

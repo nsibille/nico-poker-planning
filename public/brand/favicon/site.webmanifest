@@ -1,7 +1,7 @@
 {
   "name": "Scrumbler",
   "short_name": "Scrumbler",
-  "description": "Planning poker pour équipes agiles — estime, révèle, recommence.",
+  "description": "Planning poker pour équipes agiles. Estime vite, débats mieux, repars aligné.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f5f6fa",

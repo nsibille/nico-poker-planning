@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Sprint Poker — Colors & Type
+   Sprint Poker, Colors & Type
    Source: nsibille/nico-poker-planning/src/app/globals.css
    --------------------------------------------------------------------------
    Drop-in stylesheet for any HTML built against the Sprint Poker design
@@ -17,7 +17,7 @@
 
 /* If Neuwelt files are dropped into fonts/, this block picks them up.
    NOTE TO READER: original product references "Neuwelt" but the repo ships
-   no font files — we substitute DM Sans, which has matching geometric
+   no font files, we substitute DM Sans, which has matching geometric
    character. Add Neuwelt-*.woff2 to ./fonts/ to upgrade. */
 @font-face {
   font-family: 'Neuwelt';
@@ -50,26 +50,26 @@
 
 /* ── Tokens ── */
 :root {
-  /* — Brand primary (electric blue) — */
+  /* Brand primary (electric blue) */
   --color-brand-primary:      #4970ff;
   --color-brand-primary-50:   #eef1ff;
   --color-brand-primary-100:  #dce3ff;
   --color-brand-primary-600:  #3358e0;
   --color-brand-dark:         #283050;
 
-  /* — Page surfaces — */
+  /* Page surfaces */
   --color-bg-page:            #f5f6fa;
   --color-bg-surface:         #ffffff;
   --color-bg-subtle:          #fafafa;
   --color-border:             #e8eaf0;
   --color-border-strong:      #d0d4e0;
 
-  /* — Foreground / text — */
+  /* Foreground / text */
   --color-text-primary:       #283050;
   --color-text-secondary:     #6b7299;
   --color-text-muted:         #a0a8c0;
 
-  /* — Player roles (semantic) — */
+  /* Player roles (semantic) */
   --color-role-sm:            #4970ff;   /* Scrum Master = brand blue */
   --color-role-sm-light:      #eef1ff;
   --color-role-sm-dark:       #283050;
@@ -77,7 +77,7 @@
   --color-role-dev-light:     #fff8ed;
   --color-role-dev-dark:      #8a5a00;
 
-  /* — Secondary palette — */
+  /* Secondary palette */
   --color-amber:              #ffb450;
   --color-amber-50:           #fff8ed;
   --color-amber-200:          #ffe4c0;
@@ -94,7 +94,7 @@
   --color-violet:             #9485f2;
   --color-violet-50:          #eae7fc;
 
-  /* — Semantic feedback — */
+  /* Semantic feedback */
   --color-success:            #3fb8c4;
   --color-success-light:      #dcf3f5;
   --color-success-dark:       #1e7a82;
@@ -107,13 +107,13 @@
   --color-info:               #4970ff;
   --color-info-light:         #eef1ff;
 
-  /* — Reveal bar gradients (gamified scoreboard) — */
+  /* Reveal bar gradients (gamified scoreboard) */
   --gradient-fill-cool: linear-gradient(180deg, #6ee2a1 0%, #3fb88e 60%, #2a9a78 100%);
   --gradient-fill-mid:  linear-gradient(180deg, #6ec5ff 0%, #4970ff 60%, #3358e0 100%);
   --gradient-fill-warm: linear-gradient(180deg, #ffd97a 0%, #ffb24d 60%, #f08c1a 100%);
   --gradient-fill-hot:  linear-gradient(180deg, #ff9b7a 0%, #ff5e7e 60%, #d63666 100%);
 
-  /* — Typography — */
+  /* Typography */
   --font-primary:  'Neuwelt', 'DM Sans', system-ui, -apple-system, sans-serif;
   --font-mono:     'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
 
@@ -131,7 +131,7 @@
   --fw-medium:  500;
   --fw-bold:    700;
 
-  /* — Spacing scale — */
+  /* Spacing scale */
   --space-1:  4px;
   --space-2:  8px;
   --space-3:  12px;
@@ -143,15 +143,15 @@
   --space-12: 48px;
   --space-16: 64px;
 
-  /* — Radius scale — */
+  /* Radius scale */
   --radius-sm:   6px;
   --radius-md:   10px;
   --radius-lg:   16px;
   --radius-xl:   20px;
   --radius-2xl:  28px;
-  --radius-full: 9999px;   /* Pills — all primary buttons */
+  --radius-full: 9999px;   /* Pills, all primary buttons */
 
-  /* — Shadow scale — */
+  /* Shadow scale */
   --shadow-xs:   0 1px 2px rgba(40,48,80,0.06);
   --shadow-sm:   0 2px 8px rgba(40,48,80,0.08);
   --shadow-md:   0 4px 16px rgba(40,48,80,0.10);
@@ -250,7 +250,7 @@ html, body {
   color: var(--color-text-primary);
 }
 
-/* Display: the big Fibonacci / mean numbers — Neuwelt Bold pushed hard */
+/* Display: the big Fibonacci / mean numbers, Neuwelt Bold pushed hard */
 .display-number {
   font-family: var(--font-primary);
   font-size: var(--text-3xl);
