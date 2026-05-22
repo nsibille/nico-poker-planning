@@ -19,7 +19,7 @@ function getOrCreateUserId(): string {
 }
 
 // L'userId est purement local (localStorage) et ne change jamais après le
-// premier lookup côté client — pas de subscribe nécessaire.
+// premier lookup côté client, pas de subscribe nécessaire.
 const noopSubscribe = () => () => {}
 
 export function useSession() {

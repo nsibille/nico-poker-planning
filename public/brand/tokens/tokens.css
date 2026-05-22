@@ -1,0 +1,261 @@
+/* ==========================================================================
+   Sprint Poker — Colors & Type
+   Source: nsibille/nico-poker-planning/src/app/globals.css
+   --------------------------------------------------------------------------
+   Drop-in stylesheet for any HTML built against the Sprint Poker design
+   system. Includes:
+     - Brand + neutral + semantic color tokens
+     - Player-role palette (Scrum Master = blue, Developer = amber)
+     - Secondary palette (teal/amber/coral/sky/indigo/violet)
+     - Typography tokens (Neuwelt / DM Sans fallback)
+     - Spacing, radius, shadow tokens
+     - Semantic typographic styles (h1/h2/body/code/eyebrow)
+   ========================================================================== */
+
+/* ── Font face: prefer Neuwelt locally; fall back to DM Sans via Google ── */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+/* If Neuwelt files are dropped into fonts/, this block picks them up.
+   NOTE TO READER: original product references "Neuwelt" but the repo ships
+   no font files — we substitute DM Sans, which has matching geometric
+   character. Add Neuwelt-*.woff2 to ./fonts/ to upgrade. */
+@font-face {
+  font-family: 'Neuwelt';
+  src: url('./fonts/Neuwelt-Light.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Neuwelt';
+  src: url('./fonts/Neuwelt-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Neuwelt';
+  src: url('./fonts/Neuwelt-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Neuwelt';
+  src: url('./fonts/Neuwelt-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ── Tokens ── */
+:root {
+  /* — Brand primary (electric blue) — */
+  --color-brand-primary:      #4970ff;
+  --color-brand-primary-50:   #eef1ff;
+  --color-brand-primary-100:  #dce3ff;
+  --color-brand-primary-600:  #3358e0;
+  --color-brand-dark:         #283050;
+
+  /* — Page surfaces — */
+  --color-bg-page:            #f5f6fa;
+  --color-bg-surface:         #ffffff;
+  --color-bg-subtle:          #fafafa;
+  --color-border:             #e8eaf0;
+  --color-border-strong:      #d0d4e0;
+
+  /* — Foreground / text — */
+  --color-text-primary:       #283050;
+  --color-text-secondary:     #6b7299;
+  --color-text-muted:         #a0a8c0;
+
+  /* — Player roles (semantic) — */
+  --color-role-sm:            #4970ff;   /* Scrum Master = brand blue */
+  --color-role-sm-light:      #eef1ff;
+  --color-role-sm-dark:       #283050;
+  --color-role-dev:           #ffb450;   /* Developer = amber */
+  --color-role-dev-light:     #fff8ed;
+  --color-role-dev-dark:      #8a5a00;
+
+  /* — Secondary palette — */
+  --color-amber:              #ffb450;
+  --color-amber-50:           #fff8ed;
+  --color-amber-200:          #ffe4c0;
+  --color-coral:              #ff7f66;
+  --color-coral-50:           #ffe5e0;
+  --color-coral-200:          #ffbeb2;
+  --color-teal:               #a8e0e5;
+  --color-teal-50:            #dcf3f5;
+  --color-teal-600:           #3fb8c4;
+  --color-sky:                #64c1fa;
+  --color-sky-50:             #e0f3fe;
+  --color-indigo:             #6691ff;
+  --color-indigo-50:          #e0e9ff;
+  --color-violet:             #9485f2;
+  --color-violet-50:          #eae7fc;
+
+  /* — Semantic feedback — */
+  --color-success:            #3fb8c4;
+  --color-success-light:      #dcf3f5;
+  --color-success-dark:       #1e7a82;
+  --color-warning:            #ffb450;
+  --color-warning-light:      #fff8ed;
+  --color-warning-dark:       #8a5a00;
+  --color-danger:             #ff7f66;
+  --color-danger-light:       #ffe5e0;
+  --color-danger-dark:        #b33a24;
+  --color-info:               #4970ff;
+  --color-info-light:         #eef1ff;
+
+  /* — Reveal bar gradients (gamified scoreboard) — */
+  --gradient-fill-cool: linear-gradient(180deg, #6ee2a1 0%, #3fb88e 60%, #2a9a78 100%);
+  --gradient-fill-mid:  linear-gradient(180deg, #6ec5ff 0%, #4970ff 60%, #3358e0 100%);
+  --gradient-fill-warm: linear-gradient(180deg, #ffd97a 0%, #ffb24d 60%, #f08c1a 100%);
+  --gradient-fill-hot:  linear-gradient(180deg, #ff9b7a 0%, #ff5e7e 60%, #d63666 100%);
+
+  /* — Typography — */
+  --font-primary:  'Neuwelt', 'DM Sans', system-ui, -apple-system, sans-serif;
+  --font-mono:     'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+
+  --text-xs:    11px;
+  --text-sm:    13px;
+  --text-base:  14px;
+  --text-md:    15px;
+  --text-lg:    18px;
+  --text-xl:    24px;
+  --text-2xl:   32px;
+  --text-3xl:   48px;
+
+  --fw-light:   300;
+  --fw-normal:  400;
+  --fw-medium:  500;
+  --fw-bold:    700;
+
+  /* — Spacing scale — */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* — Radius scale — */
+  --radius-sm:   6px;
+  --radius-md:   10px;
+  --radius-lg:   16px;
+  --radius-xl:   20px;
+  --radius-2xl:  28px;
+  --radius-full: 9999px;   /* Pills — all primary buttons */
+
+  /* — Shadow scale — */
+  --shadow-xs:   0 1px 2px rgba(40,48,80,0.06);
+  --shadow-sm:   0 2px 8px rgba(40,48,80,0.08);
+  --shadow-md:   0 4px 16px rgba(40,48,80,0.10);
+  --shadow-lg:   0 8px 32px rgba(40,48,80,0.12);
+  --shadow-card: 0 2px 12px rgba(73,112,255,0.08);   /* Blue-tinted card shadow */
+  --shadow-card-hover: 0 8px 24px rgba(73,112,255,0.20);
+  --shadow-primary-btn: 0 4px 14px rgba(73,112,255,0.30);
+  --shadow-reveal-btn:  0 6px 20px rgba(73,112,255,0.35);
+}
+
+/* ==========================================================================
+   Semantic typography styles
+   Use these classes instead of hard-coding font-size + weight on every element.
+   ========================================================================== */
+
+html, body {
+  font-family: var(--font-primary);
+  color: var(--color-text-primary);
+  background: var(--color-bg-page);
+  -webkit-font-smoothing: antialiased;
+}
+
+.h1, h1 {
+  font-family: var(--font-primary);
+  font-size: var(--text-2xl);
+  font-weight: var(--fw-bold);
+  color: var(--color-text-primary);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.h2, h2 {
+  font-family: var(--font-primary);
+  font-size: var(--text-xl);
+  font-weight: var(--fw-bold);
+  color: var(--color-brand-dark);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.h3, h3 {
+  font-family: var(--font-primary);
+  font-size: var(--text-md);
+  font-weight: var(--fw-bold);
+  color: var(--color-text-primary);
+  line-height: 1.3;
+  margin: 0;
+}
+
+.body, p {
+  font-family: var(--font-primary);
+  font-size: var(--text-md);
+  font-weight: var(--fw-normal);
+  color: var(--color-text-primary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.body-sm {
+  font-family: var(--font-primary);
+  font-size: var(--text-sm);
+  font-weight: var(--fw-normal);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.eyebrow {
+  font-family: var(--font-primary);
+  font-size: var(--text-xs);
+  font-weight: var(--fw-medium);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.label {
+  font-family: var(--font-primary);
+  font-size: var(--text-sm);
+  font-weight: var(--fw-medium);
+  color: var(--color-text-primary);
+}
+
+.hint {
+  font-family: var(--font-primary);
+  font-size: var(--text-xs);
+  font-weight: var(--fw-normal);
+  color: var(--color-text-muted);
+}
+
+.mono, code {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  letter-spacing: 0.02em;
+  color: var(--color-text-primary);
+}
+
+/* Display: the big Fibonacci / mean numbers — Neuwelt Bold pushed hard */
+.display-number {
+  font-family: var(--font-primary);
+  font-size: var(--text-3xl);
+  font-weight: var(--fw-bold);
+  color: var(--color-brand-primary);
+  letter-spacing: -0.03em;
+  line-height: 1;
+}

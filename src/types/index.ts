@@ -42,7 +42,7 @@ export interface Vote {
   round: number
   value: string
   created_at: string
-  /** Optional — present once migration 20260521020000 is applied. Used to
+  /** Optional, present once migration 20260521020000 is applied. Used to
    *  compute response times in the session recap (= last vote change). */
   updated_at?: string
 }

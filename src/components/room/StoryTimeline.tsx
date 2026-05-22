@@ -60,7 +60,7 @@ export function StoryTimeline({ stories, liveRound, livePhase, liveStory, viewin
         <span className="story-timeline__eyebrow">Scrum Master</span>
         <h3 className="story-timeline__title">Timeline</h3>
         <p className="story-timeline__hint">
-          Navigation locale — clique pour consulter un round passé sans déranger les participants.
+          Navigation locale, clique pour consulter un round passé sans déranger les participants.
         </p>
       </header>
 
@@ -77,7 +77,7 @@ export function StoryTimeline({ stories, liveRound, livePhase, liveStory, viewin
               ? formatMean(item.final_mean)
               : item.isPending
                 ? '…'
-                : '—'
+                : '-'
 
             return (
               <li key={item.round} className="story-timeline__item-wrap">
@@ -87,8 +87,8 @@ export function StoryTimeline({ stories, liveRound, livePhase, liveStory, viewin
                   className={`story-timeline__item${isActive ? ' is-active' : ''}${item.isPending ? ' is-pending' : ''}`}
                   onClick={() => openStory(item.round)}
                   title={item.isPending
-                    ? `Round ${item.round} en cours — clique pour revenir au round courant`
-                    : `Round ${item.round} — ${item.title}`}
+                    ? `Round ${item.round} en cours, clique pour revenir au round courant`
+                    : `Round ${item.round}, ${item.title}`}
                   data-consensus={item.consensus ?? 'empty'}
                   style={tint ? { ['--timeline-tint' as string]: tint.bar, ['--timeline-ring' as string]: tint.ring } : undefined}
                 >

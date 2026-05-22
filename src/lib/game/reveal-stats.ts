@@ -26,7 +26,7 @@ export interface RevealStats {
   questionCount: number
   coffeeCount: number
   missingCount: number
-  /** Moyenne — null si l'échelle n'est pas numérique. */
+  /** Moyenne, null si l'échelle n'est pas numérique. */
   mean: number | null
   /** Valeur la plus fréquente parmi les votes actifs. Tie-break : index le + élevé. */
   mode: string | number | null
@@ -47,9 +47,9 @@ const CONSENSUS_LABEL: Record<ConsensusLevel, string> = {
 }
 
 const CONSENSUS_HINT: Record<ConsensusLevel, string> = {
-  perfect: 'Tout le monde a voté la même valeur — direct au prochain ticket.',
+  perfect: 'Tout le monde a voté la même valeur, direct au prochain ticket.',
   aligned: 'Les estimations sont proches. Le ticket peut être validé.',
-  discuss: 'Les écarts sont notables — un échange rapide est recommandé.',
+  discuss: 'Les écarts sont notables, un échange rapide est recommandé.',
   divergent: 'Les estimations divergent fortement. Discutez avant de valider.',
   empty: '',
 }
@@ -73,7 +73,7 @@ export function computeRevealStats(scale: EstimationScale, players: Player[], vo
 
   const entries: VoteEntry[] = devs.map(player => {
     const v = votes.find(x => x.player_id === player.id)
-    // Vote row avec value='' = sentinel "reopened" — comme un vote absent.
+    // Vote row avec value='' = sentinel "reopened", comme un vote absent.
     const raw = v && v.value !== '' ? v.value : null
     let numeric: number | null = null
     let scaleIndex: number | null = null
@@ -104,7 +104,7 @@ export function computeRevealStats(scale: EstimationScale, players: Player[], vo
     }
   }
 
-  // Mode — utile pour les échelles non-numériques mais calculé partout.
+  // Mode, utile pour les échelles non-numériques mais calculé partout.
   // Tie-break = index le plus haut (estimation prudente).
   const counts = new Map<number, number>()
   for (const e of activeEntries) counts.set(e.scaleIndex, (counts.get(e.scaleIndex) ?? 0) + 1)
@@ -131,7 +131,7 @@ export function computeRevealStats(scale: EstimationScale, players: Player[], vo
 
   // Clustering simple sur l'index de l'échelle : cluster d'un votant = nombre
   // de votants à ≤ 1 cran (lui inclus). Si un cluster regroupe strictement plus
-  // de la moitié des votants, on flagge les autres. Sinon aucune majorité —
+  // de la moitié des votants, on flagge les autres. Sinon aucune majorité ,
   // tout le monde discute.
   let outliers: VoteEntry[] = []
   if (consensus === 'discuss' || consensus === 'divergent') {

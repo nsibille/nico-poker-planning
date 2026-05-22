@@ -1,0 +1,26 @@
+{
+  "name": "Scrumbler",
+  "short_name": "Scrumbler",
+  "description": "Planning poker pour équipes agiles — estime, révèle, recommence.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f6fa",
+  "theme_color": "#4970ff",
+  "icons": [
+    {
+      "src": "/favicon/android-chrome-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon/android-chrome-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

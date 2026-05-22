@@ -18,7 +18,7 @@ export interface PlayerStats {
   lowest: number | null
   /** Their highest numeric vote (most pessimistic). */
   highest: number | null
-  /** Average response time (in seconds) — last vote change minus the round's
+  /** Average response time (in seconds), last vote change minus the round's
    *  start (heuristically: the earliest vote in that round). Null if not
    *  computable (no rounds finalised with a numeric vote). */
   averageResponseSec: number | null
@@ -35,7 +35,7 @@ export interface Award {
 
 export interface SessionStats {
   perPlayer: PlayerStats[]
-  /** Stories (rounds) included in the analysis — only those with at least one numeric vote. */
+  /** Stories (rounds) included in the analysis, only those with at least one numeric vote. */
   storiesWithData: Story[]
   /** Mean across all numeric votes of the session. */
   globalMean: number | null
@@ -83,7 +83,7 @@ export function computeSessionStats(
     votesByPlayer.set(v.player_id, list)
   }
 
-  // Per-round mean (use the snapshot from stories table when available — that's
+  // Per-round mean (use the snapshot from stories table when available, that's
   // what was actually validated by the team). Otherwise compute from votes.
   const roundMean = new Map<number, number>()
   const storiesByRound = new Map<number, Story>()
@@ -290,7 +290,7 @@ export function computeSessionStats(
     })
   }
 
-  // La Machine (fastest average response time — last vote change makes faith)
+  // La Machine (fastest average response time, last vote change makes faith)
   const machine = [...perPlayer]
     .filter(p => p.averageResponseSec !== null && p.numericVotes > 0)
     .sort((a, b) => (a.averageResponseSec as number) - (b.averageResponseSec as number))[0]
@@ -321,7 +321,7 @@ export function computeSessionStats(
 
 /** Human-readable duration: 8.4s / 1m 23s / 2m 05s. */
 export function formatDuration(seconds: number): string {
-  if (!isFinite(seconds) || seconds < 0) return '—'
+  if (!isFinite(seconds) || seconds < 0) return ','
   if (seconds < 60) {
     return seconds < 10 ? `${seconds.toFixed(1)}s` : `${Math.round(seconds)}s`
   }

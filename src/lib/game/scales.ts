@@ -82,12 +82,12 @@ export function unitLabel(unit: ScaleUnit): string {
   return ''
 }
 
-/** Valeurs "actives" — sans `?`/`☕`. */
+/** Valeurs "actives", sans `?`/`☕`. */
 export function activeValues(scale: EstimationScale): (number | string)[] {
   return scale.values.filter(v => !SPECIAL_VALUES.has(String(v)))
 }
 
-/** Sous-ensemble numérique trié — utile pour l'axe du chart et l'arrondi JH. */
+/** Sous-ensemble numérique trié, utile pour l'axe du chart et l'arrondi JH. */
 export function numericValues(scale: EstimationScale): number[] {
   return activeValues(scale)
     .filter((v): v is number => typeof v === 'number')
