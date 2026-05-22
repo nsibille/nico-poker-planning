@@ -9,9 +9,12 @@ import type { Room } from '@/types'
 interface RoomHeaderProps {
   room: Room
   connected: boolean
+  displayRound?: number
+  displayPhase?: 'waiting' | 'voting' | 'revealed'
+  isHistoryMode?: boolean
 }
 
-export function RoomHeader({ room, connected }: RoomHeaderProps) {
+export function RoomHeader({ room, connected, displayRound, displayPhase, isHistoryMode }: RoomHeaderProps) {
   const router = useRouter()
   const { myPlayerId, reset } = useGameStore()
   const [leaving, setLeaving] = useState(false)
@@ -37,8 +40,17 @@ export function RoomHeader({ room, connected }: RoomHeaderProps) {
         </span>
         <h2>Sprint Poker</h2>
         <BadgeRoomId id={room.id} />
-        <BadgeRound round={room.round} />
-        <BadgePhase phase={room.phase as 'waiting' | 'voting' | 'revealed'} />
+        <BadgeRound round={displayRound ?? room.round} />
+        <BadgePhase phase={displayPhase ?? (room.phase as 'waiting' | 'voting' | 'revealed')} />
+        {isHistoryMode && (
+          <span
+            className="badge-phase-waiting"
+            style={{ borderColor: 'var(--color-violet)', color: 'var(--color-violet)', background: 'var(--color-violet-50)' }}
+            title="Tu consultes un round déjà révélé"
+          >
+            📜 Historique
+          </span>
+        )}
         {!connected && (
           <span
             className="badge-phase-waiting"

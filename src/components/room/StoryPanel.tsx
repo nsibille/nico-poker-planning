@@ -10,9 +10,11 @@ interface StoryPanelProps {
   story: string
   phase: Phase
   isScrumMaster: boolean
+  /** When set, edits target stories[round].title instead of rooms.story (history mode). */
+  historyRound?: number | null
 }
 
-export function StoryPanel({ roomId, story, phase, isScrumMaster }: StoryPanelProps) {
+export function StoryPanel({ roomId, story, phase, isScrumMaster, historyRound }: StoryPanelProps) {
   const [draft, setDraft] = useState(story)
   const [lastSyncedStory, setLastSyncedStory] = useState(story)
   const [saving, setSaving] = useState(false)
@@ -48,7 +50,15 @@ export function StoryPanel({ roomId, story, phase, isScrumMaster }: StoryPanelPr
     if (saving) return
     setSaving(true)
     const supabase = createClient()
-    if (isWaiting) {
+    if (historyRound != null) {
+      // History mode: edit the snapshotted story title without touching the
+      // live room state.
+      await supabase
+        .from('stories')
+        .update({ title: draft })
+        .eq('room_id', roomId)
+        .eq('round', historyRound)
+    } else if (isWaiting) {
       // Persist story AND launch the round → phase 'voting'.
       await supabase.from('rooms').update({ story: draft, phase: 'voting' }).eq('id', roomId)
     } else {

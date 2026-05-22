@@ -1,5 +1,5 @@
 'use client'
-import { useState, useTransition } from 'react'
+import { useEffect, useState, useTransition } from 'react'
 import { Avatar } from '@/components/ui/Avatar'
 import { Toast, useToast } from '@/components/ui/Toast'
 import { createClient } from '@/lib/supabase/client'
@@ -20,7 +20,7 @@ import {
   unitLabel,
   type EstimationScale,
 } from '@/lib/game/scales'
-import type { Player, Vote } from '@/types'
+import type { Player, Vote, Story } from '@/types'
 
 interface RevealDashboardProps {
   players: Player[]
@@ -29,6 +29,11 @@ interface RevealDashboardProps {
   roomId: string
   isScrumMaster: boolean
   scale: EstimationScale
+  storyTitle?: string
+  /** Row from `stories` matching the displayed round, if any. Used to detect
+   *  drift between computed stats and the snapshot (e.g. after a re-vote) and
+   *  resync only when needed. */
+  currentStory?: Story | null
 }
 
 function tierForRatio(ratio: number): string {
@@ -127,7 +132,7 @@ function Bar({ entry, index, totalActive, isScrumMaster, reopening, onReopen }: 
   )
 }
 
-export function RevealDashboard({ players, votes, round, roomId, isScrumMaster, scale }: RevealDashboardProps) {
+export function RevealDashboard({ players, votes, round, roomId, isScrumMaster, scale, currentStory }: RevealDashboardProps) {
   const [pendingId, setPendingId] = useState<string | null>(null)
   const [, startTransition] = useTransition()
   const { toast, showToast, clearToast } = useToast()
@@ -148,6 +153,28 @@ export function RevealDashboard({ players, votes, round, roomId, isScrumMaster, 
   const daysRoundUp = scale.unit === 'days' && mean !== null
     ? roundUpToScaleCard(scale, mean)
     : null
+
+  // SM keeps the stories snapshot's mean/consensus in sync. We only write when
+  // the stored row's values actually differ from what we just computed — that
+  // way we never overwrite a freshly-set value (race with handleReveal) and
+  // we still catch up after a re-vote.
+  useEffect(() => {
+    if (!isScrumMaster) return
+    if (!currentStory) return
+    const storedMean = currentStory.final_mean
+    const meansEqual = (storedMean === null && mean === null)
+      || (storedMean !== null && mean !== null && Math.abs(storedMean - mean) < 1e-9)
+    if (meansEqual && currentStory.consensus === consensus) return
+    const supabase = createClient()
+    void supabase
+      .from('stories')
+      .update({ final_mean: mean, consensus })
+      .eq('room_id', roomId)
+      .eq('round', round)
+      .then(({ error }) => {
+        if (error) showToast(`Sync timeline : ${error.message}`)
+      })
+  }, [isScrumMaster, mean, consensus, round, roomId, currentStory, showToast])
 
   async function reopenVote(playerId: string) {
     if (!isScrumMaster || pendingId) return

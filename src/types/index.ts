@@ -8,7 +8,20 @@ export interface Room {
   round: number
   scale_id: string
   scale_values: (number | string)[] | null
+  ended_at: string | null
   created_at: string
+  updated_at: string
+}
+
+export type ConsensusLevel = 'perfect' | 'aligned' | 'discuss' | 'divergent' | 'empty'
+
+export interface Story {
+  room_id: string
+  round: number
+  title: string
+  final_mean: number | null
+  consensus: ConsensusLevel | null
+  revealed_at: string
   updated_at: string
 }
 
@@ -29,4 +42,7 @@ export interface Vote {
   round: number
   value: string
   created_at: string
+  /** Optional — present once migration 20260521020000 is applied. Used to
+   *  compute response times in the session recap (= last vote change). */
+  updated_at?: string
 }

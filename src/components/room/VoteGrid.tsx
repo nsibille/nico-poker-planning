@@ -22,6 +22,13 @@ export function VoteGrid({ roomId, round, phase, reopened = false, myPlayerId, m
   const { setSelectedVote } = useGameStore()
   const { toast, showToast, clearToast } = useToast()
   const [confirmedVote, setConfirmedVote] = useState<string | null>(null)
+  // Reset le toast "Vote enregistré : X" au changement de round (pattern React
+  // "store previous & compare during render" pour éviter setState-in-effect).
+  const [prevRound, setPrevRound] = useState(round)
+  if (prevRound !== round) {
+    setPrevRound(round)
+    setConfirmedVote(null)
+  }
 
   // Vote is open if: classic 'voting' phase, OR the SM re-opened this player
   // individually while the room is still in 'revealed' phase.
