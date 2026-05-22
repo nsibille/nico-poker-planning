@@ -306,12 +306,6 @@ function HistoryBanner({
 
   async function reopenForAll() {
     if (busy) return
-    if (!confirm(
-      `Rouvrir le vote du round ${viewingRound} pour tout le monde ?\n\n`
-      + `Le round live (#${liveRound}) reviendra à #${viewingRound} en phase de vote. `
-      + `Les votes de ce round seront effacés. Les rounds suivants restent en base mais `
-      + `seront ré-écrasés au fur et à mesure que l'équipe re-vote.`,
-    )) return
     setBusy('reopen')
     const supabase = createClient()
     const { error: roomErr } = await supabase
