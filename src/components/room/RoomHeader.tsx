@@ -24,7 +24,7 @@ export function RoomHeader({ room, connected, displayRound, displayPhase, isHist
     setLeaving(true)
     if (myPlayerId) {
       const supabase = createClient()
-      // Best-effort delete — even if it fails (offline, RLS), we still clear the
+      // Best-effort delete, even if it fails (offline, RLS), we still clear the
       // local session so the user lands on a fresh lobby.
       await supabase.from('players').delete().eq('id', myPlayerId).then(() => {}, () => {})
     }

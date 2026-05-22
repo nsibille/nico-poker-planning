@@ -43,7 +43,7 @@ export function VoteGrid({ roomId, round, phase, reopened = false, myPlayerId, m
       setSelectedVote(null)
       setConfirmedVote(null)
       // Annulation = UPDATE de la value vers '' (sentinel "pas voté"). On évite
-      // ainsi de dépendre d'une policy RLS DELETE — la policy UPDATE existante
+      // ainsi de dépendre d'une policy RLS DELETE, la policy UPDATE existante
       // suffit.
       const { error } = await supabase
         .from('votes')
@@ -88,7 +88,7 @@ export function VoteGrid({ roomId, round, phase, reopened = false, myPlayerId, m
       {reopened && (
         <div className="vote-grid__reopen-banner">
           <span aria-hidden>↺</span>
-          <span>Le Scrum Master t&apos;a rouvert le vote — choisis ta nouvelle estimation, elle est prise en compte immédiatement.</span>
+          <span>Le Scrum Master t&apos;a rouvert le vote, choisis ta nouvelle estimation, elle est prise en compte immédiatement.</span>
         </div>
       )}
       <h3 style={{ fontSize: 'var(--text-md)', fontWeight: 'var(--fw-bold)', color: 'var(--color-text-primary)', fontFamily: 'var(--font-primary)' }}>
@@ -110,7 +110,7 @@ export function VoteGrid({ roomId, round, phase, reopened = false, myPlayerId, m
       </div>
       {canVote && displayConfirmed && (
         <p style={{ textAlign: 'center', fontSize: 'var(--text-sm)', color: 'var(--color-success)', fontFamily: 'var(--font-primary)', fontWeight: 'var(--fw-medium)' }}>
-          ✓ Vote enregistré : {displayConfirmed} <span style={{ color: 'var(--color-text-muted)' }}>— reclique la carte pour annuler</span>
+          ✓ Vote enregistré : {displayConfirmed} <span style={{ color: 'var(--color-text-muted)' }}>, reclique la carte pour annuler</span>
         </p>
       )}
       {toast && <Toast message={toast.message} type={toast.type} onClose={clearToast} />}

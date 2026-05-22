@@ -23,7 +23,7 @@ export function SessionRecap({ roomId, players, stories, endedAt, scale }: Sessi
   const { myPlayerId, myRole, reset } = useGameStore()
   const [allVotes, setAllVotes] = useState<Vote[] | null>(null)
 
-  // Fetch every vote ever cast in this room (frozen data — fetch once).
+  // Fetch every vote ever cast in this room (frozen data, fetch once).
   useEffect(() => {
     let cancelled = false
     const supabase = createClient()
@@ -37,7 +37,7 @@ export function SessionRecap({ roomId, players, stories, endedAt, scale }: Sessi
     return () => { cancelled = true }
   }, [roomId])
 
-  // Big celebratory confetti burst on mount — orchestrated to land just as the
+  // Big celebratory confetti burst on mount, orchestrated to land just as the
   // "Session terminée" title appears.
   useEffect(() => {
     const t1 = setTimeout(() => {
@@ -90,7 +90,7 @@ export function SessionRecap({ roomId, players, stories, endedAt, scale }: Sessi
     divergentCount, mostContested, mostUnanimous, awards } = stats
   const isScrumMaster = myRole === 'scrum-master'
 
-  // Sort players by alignment (ascending — most aligned first) for the leaderboard.
+  // Sort players by alignment (ascending, most aligned first) for the leaderboard.
   const ranked = [...perPlayer]
     .filter(p => p.numericVotes > 0)
     .sort((a, b) => {
@@ -133,7 +133,7 @@ export function SessionRecap({ roomId, players, stories, endedAt, scale }: Sessi
         <BigStat
           delay={1.0}
           label="Complexité moy."
-          value={globalMean !== null ? formatMean(globalMean) : '—'}
+          value={globalMean !== null ? formatMean(globalMean) : '-'}
           accent="indigo"
           hint="par story"
         />
@@ -218,7 +218,7 @@ export function SessionRecap({ roomId, players, stories, endedAt, scale }: Sessi
                 </div>
                 <div className="player-row__metric">
                   <div className="player-row__metric-value">
-                    {p.averageGiven !== null ? formatMean(p.averageGiven) : '—'}
+                    {p.averageGiven !== null ? formatMean(p.averageGiven) : '-'}
                   </div>
                   <div className="player-row__metric-label">moy. donnée</div>
                 </div>
@@ -226,7 +226,7 @@ export function SessionRecap({ roomId, players, stories, endedAt, scale }: Sessi
                   <div className="player-row__metric-value">
                     {p.alignmentScore !== null
                       ? (p.alignmentScore === 0 ? '🎯' : `Δ${p.alignmentScore.toFixed(2)}`)
-                      : '—'}
+                      : '-'}
                   </div>
                   <div className="player-row__metric-label">alignement</div>
                 </div>
@@ -285,7 +285,7 @@ export function SessionRecap({ roomId, players, stories, endedAt, scale }: Sessi
               <span className="recap-story__mean">
                 {s.final_mean !== null && s.final_mean !== undefined
                   ? formatMean(s.final_mean)
-                  : '—'}
+                  : '-'}
               </span>
             </li>
           ))}
@@ -319,7 +319,7 @@ function HighlightCard({ icon, label, story, tone, delay }: { icon: string; labe
     <div className="highlight-card" data-tone={tone} style={{ animationDelay: `${delay}s` }}>
       <div className="highlight-card__icon">{icon}</div>
       <div className="highlight-card__label">{label}</div>
-      <div className="highlight-card__title">#{story.round} — {story.title || '(titre perdu)'}</div>
+      <div className="highlight-card__title">#{story.round}, {story.title || '(titre perdu)'}</div>
       <div className="highlight-card__meta">
         Consensus : <strong>{consensusLabel((story.consensus ?? 'empty') as ConsensusLevel)}</strong>
         {story.final_mean !== null && story.final_mean !== undefined && <> · moy. <strong>{formatMean(story.final_mean)}</strong></>}

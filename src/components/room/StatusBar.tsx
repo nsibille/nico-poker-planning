@@ -90,7 +90,7 @@ export function StatusBar({ roomId, phase, round, liveRound, isHistoryMode, stor
     setLoading(false)
   }
 
-  // En mode historique, on cache les contrôles de workflow live — le SM
+  // En mode historique, on cache les contrôles de workflow live, le SM
   // consulte un round passé en local. Les CTA "Retour" et "Rouvrir pour tout
   // le monde" vivent dans HistoryBanner. Le mode historique est strictement
   // local au SM : les devs ne passent jamais par ici.
@@ -98,7 +98,7 @@ export function StatusBar({ roomId, phase, round, liveRound, isHistoryMode, stor
     return (
       <div className="card-surface flex flex-col gap-2">
         <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)', fontFamily: 'var(--font-primary)' }}>
-          Tu consultes le round {round} — vue locale. Clique « Re-voter » sous un participant pour rouvrir son vote, ou « Rouvrir pour tout le monde » dans le bandeau pour forcer un nouveau vote sur ce round. Round live actuel : {liveRound}.
+          Tu consultes le round {round}, vue locale. Clique « Re-voter » sous un participant pour rouvrir son vote, ou « Rouvrir pour tout le monde » dans le bandeau pour forcer un nouveau vote sur ce round. Round live actuel : {liveRound}.
         </span>
         {toast && <Toast message={toast.message} type={toast.type} onClose={clearToast} />}
       </div>
@@ -122,7 +122,7 @@ export function StatusBar({ roomId, phase, round, liveRound, isHistoryMode, stor
                   onClick={handleReveal}
                   disabled={!hasDevs}
                   loading={loading}
-                  title={allVoted ? undefined : 'Tous les devs n\'ont pas voté — révéler quand même ?'}
+                  title={allVoted ? undefined : 'Tous les devs n\'ont pas voté, révéler quand même ?'}
                 >
                   Révéler les votes
                 </Button>

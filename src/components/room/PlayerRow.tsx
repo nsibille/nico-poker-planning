@@ -9,7 +9,7 @@ interface PlayerRowProps {
 }
 
 export function PlayerRow({ player, vote, phase, isMe }: PlayerRowProps) {
-  // No role badge here — the section header ("SCRUM MASTERS" / "DÉVELOPPEURS")
+  // No role badge here, the section header ("SCRUM MASTERS" / "DÉVELOPPEURS")
   // in PlayersList already disambiguates, and dropping the chip gives much
   // more room for the name in the narrow sidebar.
   return (

@@ -40,7 +40,7 @@ export function Hero({ locale, dict }: Props) {
 }
 
 function HeroPreview() {
-  // Mini-mockup of a reveal scoreboard — pure CSS, no screenshot dependency.
+  // Mini-mockup of a reveal scoreboard, pure CSS, no screenshot dependency.
   return (
     <div className="marketing-hero__preview" aria-hidden>
       <div className="hero-preview-card">

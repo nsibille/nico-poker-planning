@@ -83,7 +83,7 @@ export function LobbyForm() {
     const supabase = createClient()
 
     try {
-      // Upsert room — scale_id / scale_values ne sont appliqués qu'à la
+      // Upsert room, scale_id / scale_values ne sont appliqués qu'à la
       // création (ignoreDuplicates → no-op si la room existe déjà).
       const { error: roomError } = await supabase
         .from('rooms')
@@ -101,7 +101,7 @@ export function LobbyForm() {
         .single()
       if (!roomData) { showToast('Room introuvable'); setLoading(false); return }
 
-      // Check limits — devs are capped, Scrum Masters have no hard limit.
+      // Check limits, devs are capped, Scrum Masters have no hard limit.
       if (role === 'developer') {
         const { count: devCount } = await supabase
           .from('players')
@@ -109,7 +109,7 @@ export function LobbyForm() {
           .eq('room_id', roomId)
           .eq('role', 'developer')
         if ((devCount ?? 0) >= MAX_DEV) {
-          showToast(`Équipe complète — max ${MAX_DEV} développeurs par room`)
+          showToast(`Équipe complète, max ${MAX_DEV} développeurs par room`)
           setLoading(false)
           return
         }

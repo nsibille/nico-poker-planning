@@ -213,7 +213,7 @@ html, body {
   box-shadow: 0 4px 12px rgba(73,112,255,0.35);
 }
 
-/* Selected — Scrum Master (brand blue) */
+/* Selected, Scrum Master (brand blue) */
 .role-card[data-role="scrum-master"].role-card--selected {
   border-color: var(--color-brand-primary);
   background: var(--color-brand-primary-50);
@@ -234,7 +234,7 @@ html, body {
   transform: scale(1);
 }
 
-/* Selected — Developer (warm orange/amber) */
+/* Selected, Developer (warm orange/amber) */
 .role-card[data-role="developer"].role-card--selected {
   border-color: var(--color-role-dev);
   background: var(--color-role-dev-light);
@@ -501,7 +501,7 @@ html, body {
   color: var(--color-text-muted);
 }
 /* Keep the right-side decorations (badge + vote indicator) at their natural
-   width — only the name truncates. */
+   width, only the name truncates. */
 .card-player-row > .badge-role-sm,
 .card-player-row > .badge-role-dev,
 .card-player-row > .vote-card-revealed,
@@ -723,7 +723,7 @@ html, body {
   .layout-room-grid--with-timeline { grid-template-columns: 1fr; }
 }
 
-/* ── Story Timeline (SM only — right rail) ── */
+/* ── Story Timeline (SM only, right rail) ── */
 .story-timeline {
   position: sticky;
   top: var(--space-4);
@@ -1416,7 +1416,7 @@ html, body {
   animation: revealFadeUp 0.5s ease-out 0.9s forwards;
   z-index: 1;
 }
-/* Marqueur compact "M" sur la ligne de moyenne — ancré sur l'axe à gauche.
+/* Marqueur compact "M" sur la ligne de moyenne, ancré sur l'axe à gauche.
    La valeur exacte de la moyenne est déjà affichée en hero ; le tooltip
    natif (title="Moyenne : X JH") la redonne au survol pour confirmation. */
 .reveal-chart__mean-marker {
@@ -1755,7 +1755,7 @@ html, body {
   margin-bottom: 60px;
 }
 
-/* Hint shown to SM when no divergence — to surface the per-bar action. */
+/* Hint shown to SM when no divergence, to surface the per-bar action. */
 .reveal-reopen-hint {
   margin: 0;
   padding: 10px 14px;
@@ -1847,7 +1847,7 @@ html, body {
   font-weight: var(--fw-bold);
 }
 /* ════════════════════════════════════════════════════════════════ */
-/* ── Session Recap — final scoreboard "video-game" ───────────── */
+/* ── Session Recap, final scoreboard "video-game" ───────────── */
 /* ════════════════════════════════════════════════════════════════ */
 .session-recap {
   max-width: 1100px;
@@ -2094,7 +2094,7 @@ html, body {
   background: rgba(255,255,255,0.7);
   border-radius: var(--radius-full);
   border: 1px solid var(--color-border);
-  /* Don't let the chip overflow the card and clip its value — instead, let
+  /* Don't let the chip overflow the card and clip its value, instead, let
      the name take a single ellipsised line and keep the value pinned right. */
   max-width: 100%;
   min-width: 0;
@@ -2362,7 +2362,7 @@ html, body {
 }
 
 /* ──────────────────────────────────────────────────────────────────────
-   MARKETING SITE — slug: site-marketing
+   MARKETING SITE, slug: site-marketing
    Source de vérité visuelle : BRAND.md (palette, typo, voix)
    ────────────────────────────────────────────────────────────────────── */
 

@@ -1,4 +1,4 @@
-# Scrumbler — Brand Guidelines
+# Scrumbler, Brand Guidelines
 
 > Single source of truth for the Scrumbler visual identity. Use this alongside the asset pack in `brand-assets/`. If something isn't documented here, ask design before improvising.
 
@@ -9,17 +9,17 @@
 ## 0 · Brand snapshot
 
 - **Name** Scrumbler
-- **Tagline** *Planning poker pour équipes agiles — estime, révèle, recommence.*
+- **Tagline** *Planning poker pour équipes agiles, estime, révèle, recommence.*
 - **What it is** A lightweight, anonymous-by-default planning-poker app for agile teams.
-- **Voice** Tutoiement, verbe d'abord, em dash comme respiration, jamais accusateur.
+- **Voice** Tutoiement, verbe d'abord, jamais accusateur. **Em dash interdit** (voir `CLAUDE.md`).
 - **Language** French, with a few untranslated English game terms (Scrum Master, EPIC).
-- **Mascot glyph** 🃏 (used sparingly — the logo carries the brand)
+- **Mascot glyph** 🃏 (used sparingly, the logo carries the brand)
 
 ---
 
 ## 1 · Logo
 
-The mark is a single planning-poker card, tilted **-8°**, carrying a bold `?` and two miniature `?` pips in opposite corners. The `?` is the Fibonacci wildcard — the shared doubt a round of planning poker is meant to resolve.
+The mark is a single planning-poker card, tilted **-8°**, carrying a bold `?` and two miniature `?` pips in opposite corners. The `?` is the Fibonacci wildcard, the shared doubt a round of planning poker is meant to resolve.
 
 ### 1.1 Variants
 
@@ -28,18 +28,18 @@ The mark is a single planning-poker card, tilted **-8°**, carrying a bold `?` a
 | `logo/logo-horizontal.svg`        | **Default**. App header, marketing, email signatures. |
 | `logo/logo-horizontal-dark.svg`   | On dark surfaces (ink, photography). |
 | `logo/logo-vertical.svg`          | Square-ish layouts: social previews, footer, print. |
-| `logo/logo-mark.svg`              | Standalone mark — favicon source, app icon, small chrome. |
+| `logo/logo-mark.svg`              | Standalone mark, favicon source, app icon, small chrome. |
 | `logo/logo-mark-ink.svg`          | Dark-mode card (ink fill, white `?`). |
-| `logo/logo-mark-paper.svg`        | White card with blue `?` — for use on a brand-blue background. |
-| `logo/logo-mark-amber.svg`        | Reserved alt — holiday / "Developer team" comms only. Ask design. |
-| `logo/logo-monogram.svg`          | Mark with **tilt = 0°** — required inside square masks (iOS, Android adaptive). |
-| `logo/logo-wordmark.svg`          | Type only — extremely rare; only when paired with another mark adjacency makes the lockup redundant. |
+| `logo/logo-mark-paper.svg`        | White card with blue `?`, for use on a brand-blue background. |
+| `logo/logo-mark-amber.svg`        | Reserved alt, holiday / "Developer team" comms only. Ask design. |
+| `logo/logo-monogram.svg`          | Mark with **tilt = 0°**, required inside square masks (iOS, Android adaptive). |
+| `logo/logo-wordmark.svg`          | Type only, extremely rare; only when paired with another mark adjacency makes the lockup redundant. |
 
 ### 1.2 Construction
 
 - **Tilt** = `-8°` exactly. Inside square masks (favicons, app icons), tilt = `0°`. **No other angle is allowed.**
 - **Aspect ratio** of the card = 56:72 (≈ 7:9). Never stretch.
-- **Inner hairline** = `0.8px` white stroke at `0.18` opacity, inset by `3.5px`. It's intentional — don't remove it.
+- **Inner hairline** = `0.8px` white stroke at `0.18` opacity, inset by `3.5px`. It's intentional, don't remove it.
 - **Corner pips** = miniature `?` glyphs at top-left and bottom-right. Hide them under **24px** rendered size.
 
 ### 1.3 Clear space
@@ -73,7 +73,7 @@ All tokens live in `tokens/tokens.css` (CSS custom properties) and `tokens/token
 
 ### 2.2 Neutrals
 
-Never pure grey — always a touch of blue.
+Never pure grey, always a touch of blue.
 
 | Token | Hex | Use |
 |---|---|---|
@@ -113,7 +113,7 @@ Reserved for **reveal scoreboard**, **role differentiation**, and **semantic sta
 
 ### 2.5 Gradient palette (reveal only)
 
-Used **only** on the reveal scoreboard bars — never as a UI surface.
+Used **only** on the reveal scoreboard bars, never as a UI surface.
 
 | Tier | Gradient |
 |---|---|
@@ -135,7 +135,7 @@ Used **only** on the reveal scoreboard bars — never as a UI surface.
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap"/>
 ```
 
-If/when Neuwelt licenses arrive, drop `Neuwelt-{Light,Regular,Medium,Bold}.woff2` into your fonts folder — the `@font-face` block in `tokens.css` picks them up automatically.
+If/when Neuwelt licenses arrive, drop `Neuwelt-{Light,Regular,Medium,Bold}.woff2` into your fonts folder, the `@font-face` block in `tokens.css` picks them up automatically.
 
 ### 3.2 Scale
 
@@ -162,7 +162,7 @@ Use `--font-mono` in **`--color-coral`** for: room codes (`abc-123-xyz`), URLs, 
 
 ## 4 · Iconography
 
-**Two systems coexist — do not introduce a third (no Lucide, Heroicons, Material Icons).**
+**Two systems coexist, do not introduce a third (no Lucide, Heroicons, Material Icons).**
 
 ### 4.1 Native emoji
 
@@ -181,7 +181,7 @@ Used for **avatars**, **roles**, and **emotional states**. Always rendered at OS
 
 ### 4.2 Stroke icons
 
-For chrome (buttons, navigation, status bars) where an emoji would feel too playful. **32×32 grid · 1.75px stroke · round caps and joins.** Built into the brand-page mockups — extract paths there to extend the set.
+For chrome (buttons, navigation, status bars) where an emoji would feel too playful. **32×32 grid · 1.75px stroke · round caps and joins.** Built into the brand-page mockups, extract paths there to extend the set.
 
 ### 4.3 Functional glyphs (Unicode)
 
@@ -217,8 +217,8 @@ The brand palette (blue · amber · coral · teal · violet · sky) burst, used 
 <meta name="theme-color" content="#4970FF"/>
 
 <!-- Social preview -->
-<meta property="og:title" content="Scrumbler — Planning poker pour équipes agiles"/>
-<meta property="og:description" content="Estime, révèle, recommence. Aucun compte requis — connexion anonyme."/>
+<meta property="og:title" content="Scrumbler, Planning poker pour équipes agiles"/>
+<meta property="og:description" content="Estime, révèle, recommence. Aucun compte requis, connexion anonyme."/>
 <meta property="og:image" content="/social/og-image.png"/>
 <meta property="og:image:width" content="1200"/>
 <meta property="og:image:height" content="630"/>
@@ -262,12 +262,12 @@ export function Lockup({ size = 40 }) {
 ✅ Maintain the clear space of `x` (one pip height) around the mark.
 ✅ Lead with brand blue; reach for amber for warmth, coral for warnings.
 
-❌ **Don't recolour** the mark outside the four approved variants — no holiday palettes, no UGC tints.
+❌ **Don't recolour** the mark outside the four approved variants, no holiday palettes, no UGC tints.
 ❌ **Don't rotate** the mark to any angle other than `-8°` / `0°`.
-❌ **Don't stretch** or skew the card — aspect is fixed.
+❌ **Don't stretch** or skew the card, aspect is fixed.
 ❌ **Don't apply free-form drop shadows.** Only `--shadow-card` is permitted on the mark.
 ❌ **Don't introduce a new icon library** alongside emoji + the stroke pack.
-❌ **Don't translate** the wordmark "scrumbler" — it's a proper noun.
+❌ **Don't translate** the wordmark "scrumbler", it's a proper noun.
 
 ---
 
@@ -275,32 +275,33 @@ export function Lockup({ size = 40 }) {
 
 Four rules. Hold the line on these and the product sounds like Scrumbler without having to sign it.
 
-### Règle 01 — Tutoie.
-L'app est anonyme et collégiale — on ne « vous » pas l'utilisateur.
-- ✓ *Ton avatar est prêt — choisis un rôle.*
+### Règle 01, Tutoie.
+L'app est anonyme et collégiale, on ne « vous » pas l'utilisateur.
+- ✓ *Ton avatar est prêt, choisis un rôle.*
 - ✗ *Veuillez sélectionner votre rôle.*
 
-### Règle 02 — Verbe d'abord, sur les boutons.
+### Règle 02, Verbe d'abord, sur les boutons.
 Impérative. Pas de bouton « OK » ni « Suivant » nu.
 - ✓ *Lancer le vote · Révéler les votes · Prochain round →*
 - ✗ *OK · Soumettre · Confirmer*
 
-### Règle 03 — Em dash pour lier l'idée et son contexte.
-Le ton est direct, mais jamais sec — l'em dash sert de respiration.
-- ✓ *Aucun compte requis — connexion anonyme.*
-- ✗ *Aucun compte requis. Connexion anonyme.*
+### Règle 03 (REMPLACÉE) Pas d'em dash, jamais.
+**Override projet (voir `CLAUDE.md`)** : le caractère em dash (U+2014) est interdit dans toute copy Scrumbler.
+On garde un ton direct sans être sec, avec virgule, point, parenthèses, ou deux-points.
+- ✓ *Aucun compte requis, connexion anonyme.*
+- ✗ Toute phrase contenant un em dash (le glyphe U+2014). Pas d'exception.
 
-### Règle 04 — Reste neutre quand ça diverge.
+### Règle 04 Reste neutre quand ça diverge.
 Les outliers ne sont pas une faute. On invite, on n'accuse pas.
-- ✓ *Discussion nécessaire — quelqu'un a estimé très différemment du groupe.*
-- ✗ *Erreur de vote — un développeur s'est trompé.*
+- ✓ *Discussion nécessaire : quelqu'un a estimé très différemment du groupe.*
+- ✗ *Erreur de vote : un développeur s'est trompé.*
 
 ### Microcopy patterns
 
-- **Loading**: `Reprise de ta session…`, `Enregistrement…` — always the `…` glyph, never three dots.
-- **Confirmation**: `✓ Vote enregistré : 5 — reclique la carte pour annuler.`
-- **Empty state**: `Aucune story définie — renseigne-la pour lancer le vote.`
-- **Errors**: blunt but not blaming — `Réouverture échouée : {reason}`.
+- **Loading**: `Reprise de ta session…`, `Enregistrement…`. Toujours le glyphe `…`, jamais trois points.
+- **Confirmation**: `✓ Vote enregistré : 5. Reclique la carte pour annuler.`
+- **Empty state**: `Aucune story définie. Renseigne-la pour lancer le vote.`
+- **Errors**: blunt but not blaming, `Réouverture échouée : {reason}`.
 
 ---
 
@@ -317,7 +318,7 @@ brand-assets/
 │   ├── logo-mark-ink.svg
 │   ├── logo-mark-paper.svg
 │   ├── logo-mark-amber.svg
-│   ├── logo-monogram.svg             ← tilt 0, no pips — for masks
+│   ├── logo-monogram.svg             ← tilt 0, no pips, for masks
 │   └── logo-wordmark.svg
 ├── favicon/
 │   ├── favicon.svg                   ← link rel="icon" SVG

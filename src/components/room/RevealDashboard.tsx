@@ -96,7 +96,7 @@ function Bar({ entry, index, totalActive, isScrumMaster, reopening, onReopen }: 
             <Avatar name={entry.player.name} role="developer" emoji={entry.player.emoji} size="lg" />
           </div>
           <div className="reveal-bar__value">
-            {isMissing ? '—' : entry.value}
+            {isMissing ? '-' : entry.value}
           </div>
           {tier && <div className="reveal-bar__tier" data-tier={tier.toLowerCase()}>{tier}</div>}
           {entry.isOutlier && <div className="reveal-bar__outlier-flag">⚠️</div>}
@@ -146,8 +146,8 @@ export function RevealDashboard({ players, votes, round, roomId, isScrumMaster, 
   const unit = unitLabel(scale.unit)
   // Stat principale : la moyenne si l'échelle est numérique, sinon le mode.
   const heroValue: string = isNum
-    ? (mean !== null ? formatMean(mean) : '—')
-    : (mode !== null ? String(mode) : '—')
+    ? (mean !== null ? formatMean(mean) : '-')
+    : (mode !== null ? String(mode) : '-')
   const heroLabel = isNum ? 'Moyenne' : 'Vote majoritaire'
   // JH : carte supérieure de l'échelle pour donner une estimation prudente
   const daysRoundUp = scale.unit === 'days' && mean !== null
@@ -155,7 +155,7 @@ export function RevealDashboard({ players, votes, round, roomId, isScrumMaster, 
     : null
 
   // SM keeps the stories snapshot's mean/consensus in sync. We only write when
-  // the stored row's values actually differ from what we just computed — that
+  // the stored row's values actually differ from what we just computed, that
   // way we never overwrite a freshly-set value (race with handleReveal) and
   // we still catch up after a re-vote.
   useEffect(() => {
@@ -229,7 +229,7 @@ export function RevealDashboard({ players, votes, round, roomId, isScrumMaster, 
   return (
     <div key={`round-${round}`} className="reveal-dashboard">
       <header className="reveal-dashboard__header">
-        <span className="reveal-dashboard__eyebrow">Résultats — Round {round}</span>
+        <span className="reveal-dashboard__eyebrow">Résultats, Round {round}</span>
         <h2 className="reveal-dashboard__title">Scoreboard</h2>
       </header>
 
@@ -237,7 +237,7 @@ export function RevealDashboard({ players, votes, round, roomId, isScrumMaster, 
         <div className="reveal-mean-hero" data-consensus={consensus}>
           <div className="reveal-mean-hero__value">
             {heroValue}
-            {unit && heroValue !== '—' && <span className="reveal-mean-hero__unit"> {unit}</span>}
+            {unit && heroValue !== '-' && <span className="reveal-mean-hero__unit"> {unit}</span>}
           </div>
           <div className="reveal-mean-hero__label">{heroLabel}</div>
           {daysRoundUp !== null && (

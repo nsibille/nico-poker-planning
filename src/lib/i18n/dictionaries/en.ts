@@ -1,10 +1,10 @@
-// English mirrors the French dictionary structure. Same shape — different copy.
-// The English voice keeps the same "verb-first, em dash, direct but never sharp" rules.
+// English mirrors the French dictionary structure.
+// Em dash forbidden (see CLAUDE.md, non-negotiable rule).
 export const en = {
   meta: {
-    title: 'Scrumbler — Planning poker for agile teams',
+    title: 'Scrumbler, planning poker for agile teams',
     description:
-      'Estimate, reveal, repeat. No account required — anonymous by default.',
+      'Estimate, reveal, repeat. No account required, anonymous by default.',
   },
   nav: {
     product: 'Product',
@@ -15,13 +15,13 @@ export const en = {
     closeMenu: 'Close menu',
   },
   hero: {
-    eyebrow: 'Planning poker — next generation',
+    eyebrow: 'Planning poker, next generation',
     title: 'Estimate your stories,\nreveal in one beat,\nrepeat.',
     lead:
-      'Scrumbler is an anonymous-by-default, no-account, real-time planning poker — built for the pace of an actual sprint, not for looking good in a meeting.',
+      'Scrumbler is an anonymous-by-default, no-account, real-time planning poker. Built for the pace of an actual sprint, not for looking good in a meeting.',
     ctaPrimary: 'Start a game',
     ctaSecondary: 'See the product',
-    proof: 'No account — share a room code, that’s it.',
+    proof: 'No account. Share a room code, that’s it.',
   },
   problem: {
     eyebrow: 'Why Scrumbler',
@@ -31,15 +31,15 @@ export const en = {
       {
         title: 'No account, no friction',
         body:
-          'No email, no password — pick an emoji avatar and a nickname, you’re in. A room spins up in under five seconds.',
+          'No email, no password. Pick an emoji avatar and a nickname, you’re in. A room spins up in under five seconds.',
       },
       {
         title: 'Anonymous by default',
         body:
-          'Votes stay hidden until reveal. Nobody anchors on the first card down — divergence becomes a discussion, not a confession.',
+          'Votes stay hidden until reveal. Nobody anchors on the first card down, and divergence becomes a discussion rather than a confession.',
       },
       {
-        title: 'Real-time — truly',
+        title: 'Real-time, truly',
         body:
           'Supabase Realtime sync, sub-second latency. When a teammate votes, you see it in the same heartbeat.',
       },
@@ -47,31 +47,31 @@ export const en = {
   },
   features: {
     eyebrow: 'What you’ll love',
-    title: 'Everything you need to estimate fast — and nothing more.',
+    title: 'Everything you need to estimate fast, and nothing more.',
     items: [
       {
         emoji: '🎯',
         title: 'Dedicated roles',
         body:
-          'Scrum Master or Developer — each role gets its own surface, palette and gestures.',
+          'Scrum Master or Developer: each role gets its own surface, palette and gestures.',
       },
       {
         emoji: '🎲',
         title: 'Fibonacci cards',
         body:
-          'The agile classic — 1, 2, 3, 5, 8, 13, 21, ?, ☕. A ☕ card to call a break, a ? to call out missing info.',
+          'The agile classic: 1, 2, 3, 5, 8, 13, 21, ?, ☕. A ☕ card to call a break, a ? to call out missing info.',
       },
       {
         emoji: '🎉',
         title: 'Theatrical reveal',
         body:
-          'Reveal scoreboard with tier gradients, confetti, and stats — mean, median, deviation, consensus.',
+          'Reveal scoreboard with tier gradients, confetti, and stats: mean, median, deviation, consensus.',
       },
       {
         emoji: '💬',
         title: 'Targeted discussion',
         body:
-          'When one vote diverges, Scrumbler invites a discussion — neutral, never blaming.',
+          'When one vote diverges, Scrumbler invites a discussion. Neutral, never blaming.',
       },
       {
         emoji: '↺',
@@ -83,39 +83,39 @@ export const en = {
         emoji: '📊',
         title: 'Session recap',
         body:
-          'Timeline of stories, markdown export, shareable summary — so next refinement starts with full context.',
+          'Timeline of stories, markdown export, shareable summary. Next refinement starts with full context.',
       },
     ],
   },
   how: {
     eyebrow: 'How it works',
-    title: 'Three steps — not one more.',
+    title: 'Three steps, not one more.',
     steps: [
       {
         n: '01',
         title: 'Create the room',
         body:
-          'Pick a nickname, an emoji avatar, a role. You get a code to share — no email invites.',
+          'Pick a nickname, an emoji avatar, a role. You get a code to share, no email invites.',
       },
       {
         n: '02',
         title: 'Share the link',
         body:
-          'Teammates join by pasting the code. Avatar, role, done — they’re at the virtual table.',
+          'Teammates join by pasting the code. Avatar, role, done. They’re at the virtual table.',
       },
       {
         n: '03',
         title: 'Estimate, reveal, repeat',
         body:
-          'The Scrum Master enters a story and opens the vote. Everyone plays a card. Reveal — discuss if needed — next round.',
+          'The Scrum Master enters a story and opens the vote. Everyone plays a card. Reveal, discuss if needed, next round.',
       },
     ],
   },
   pricingTeaser: {
     eyebrow: 'Pricing',
-    title: 'Free — plain and simple.',
+    title: 'Free, plain and simple.',
     body:
-      'Scrumbler is free for teams — unlimited rooms, players, rounds. Premium tiers will land when we have something genuinely worth charging for, not before.',
+      'Scrumbler is free for teams: unlimited rooms, players, rounds. Premium tiers will land when we have something genuinely worth charging for, not before.',
     cta: 'See the full pricing',
   },
   faq: {
@@ -124,11 +124,11 @@ export const en = {
     items: [
       {
         q: 'Do I need an account?',
-        a: 'No — fully anonymous. You pick a nickname and an emoji avatar, the session stays on your device.',
+        a: 'No, fully anonymous. You pick a nickname and an emoji avatar, the session stays on your device.',
       },
       {
         q: 'How many players per room?',
-        a: 'No hard limit — comfortable sessions usually cap around 10 players. Beyond that, it depends on your connection.',
+        a: 'No hard limit. Comfortable sessions usually cap around 10 players. Beyond that, it depends on your connection.',
       },
       {
         q: 'Is my data shared?',
@@ -136,16 +136,16 @@ export const en = {
       },
       {
         q: 'Can I use something other than Fibonacci?',
-        a: 'Not yet — that’s the next big step. T-shirt sizes (XS → XXL) and custom scales are coming soon.',
+        a: 'Not yet, that’s the next big step. T-shirt sizes (XS to XXL) and custom scales are coming soon.',
       },
       {
         q: 'Open source?',
-        a: 'Not yet — the codebase is private during stabilization. We’ll revisit once V1 is solid.',
+        a: 'Not yet. The codebase is private during stabilization. We’ll revisit once V1 is solid.',
       },
     ],
   },
   finalCta: {
-    title: 'Ready to estimate as a team — no account, no friction?',
+    title: 'Ready to estimate as a team, no account, no friction?',
     body: 'A room spins up in five seconds. Nothing to install.',
     cta: 'Start a game',
   },
@@ -168,12 +168,12 @@ export const en = {
         ],
       },
     },
-    rights: '© 2026 Scrumbler — All rights reserved.',
+    rights: '© 2026 Scrumbler. All rights reserved.',
     langSwitch: 'FR',
   },
   pricing: {
     eyebrow: 'Pricing',
-    title: 'Free today — sustainable tomorrow.',
+    title: 'Free today, sustainable tomorrow.',
     lead:
       'We’d rather start clean and simple. Scrumbler stays free until we have something worth charging for.',
     plans: [
@@ -181,7 +181,7 @@ export const en = {
         name: 'Crew',
         price: '€0',
         cadence: 'forever',
-        description: 'For teams that just want to estimate — fast, cleanly, no friction.',
+        description: 'For teams that just want to estimate fast, cleanly, with no friction.',
         features: [
           'Unlimited rooms',
           'Unlimited players',
@@ -211,20 +211,20 @@ export const en = {
         highlight: false,
       },
     ],
-    note: 'No credit card — no trial period. You use Scrumbler, or you don’t.',
+    note: 'No credit card, no trial period. You use Scrumbler, or you don’t.',
   },
   changelog: {
     eyebrow: 'Changelog',
     title: 'What we shipped recently.',
-    lead: 'Most recent first — versioned at every meaningful milestone.',
+    lead: 'Most recent first, versioned at every meaningful milestone.',
     entries: [
       {
         version: '0.4.0',
         date: '2026-05-22',
         title: 'Brand pack & marketing site',
         items: [
-          'Visual identity locked — logo, palette, typography, official voice.',
-          'Marketing site shipped — landing, pricing, changelog, legal.',
+          'Visual identity locked: logo, palette, typography, official voice.',
+          'Marketing site shipped: landing, pricing, changelog, legal.',
           'Favicons, OpenGraph, PWA manifest.',
         ],
       },
@@ -244,7 +244,7 @@ export const en = {
         title: 'Reveal Dashboard',
         items: [
           'Tiered scoreboard (Easy / Medium / Hard / Epic).',
-          'Automatic outlier detection — discussion suggested, never imposed.',
+          'Automatic outlier detection: discussion suggested, never imposed.',
           'Reveal confetti.',
         ],
       },
@@ -255,7 +255,7 @@ export const en = {
         items: [
           'Real-time rooms via Supabase Realtime.',
           'Scrum Master and Developer roles.',
-          'Full Fibonacci card set (1 → 21, ?, ☕).',
+          'Full Fibonacci card set (1 to 21, ?, ☕).',
         ],
       },
     ],
@@ -268,7 +268,7 @@ export const en = {
         { h: 'In short', p: 'Scrumbler is anonymous by default. We don’t ask for an email, a legal name, or a phone number. No ad cookies, no third-party trackers.' },
         { h: 'What we collect', p: 'A nickname and an emoji avatar you pick yourself. Your votes during the session. A technical player ID stored locally in your browser.' },
         { h: 'Where it lives', p: 'On Supabase, in Europe. Idle rooms are purged automatically.' },
-        { h: 'Your rights', p: 'You can leave a room at any time — your player record is deleted. For anything else, reach out at hello@scrumbler.app.' },
+        { h: 'Your rights', p: 'You can leave a room at any time, your player record is deleted. For anything else, reach out at hello@scrumbler.app.' },
       ],
     },
     terms: {
@@ -276,18 +276,18 @@ export const en = {
       updated: 'Updated 22 May 2026.',
       body: [
         { h: 'Service', p: 'Scrumbler is a planning poker provided "as is". No SLA is attached to the free tier.' },
-        { h: 'Behaviour', p: 'Respectful nicknames and messages — no harassment, no illegal content. Abuse leads to a room block.' },
+        { h: 'Behaviour', p: 'Respectful nicknames and messages. No harassment, no illegal content. Abuse leads to a room block.' },
         { h: 'Liability', p: 'You use Scrumbler to estimate, not to store critical data. No long-term backup is guaranteed in V1.' },
-        { h: 'Changes', p: 'These terms may evolve — the current version applies from the date shown above.' },
+        { h: 'Changes', p: 'These terms may evolve. The current version applies from the date shown above.' },
       ],
     },
     cookies: {
       title: 'Cookies',
       updated: 'Updated 22 May 2026.',
       body: [
-        { h: 'What we use', p: 'Strict minimum — a local session identifier so a page refresh doesn’t boot you out of your room.' },
+        { h: 'What we use', p: 'Strict minimum: a local session identifier so a page refresh doesn’t boot you out of your room.' },
         { h: 'No ads', p: 'No advertising cookies. No Google Analytics. No cross-site tracking.' },
-        { h: 'Opt out', p: 'You can clear your browser’s local storage at any time — that just signs you out of the current room.' },
+        { h: 'Opt out', p: 'You can clear your browser’s local storage at any time, that just signs you out of the current room.' },
       ],
     },
   },

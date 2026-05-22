@@ -81,7 +81,7 @@ export default function RoomPage() {
   // Backfill SM-side : pour les rounds qui ont des votes mais pas de ligne
   // stories (rounds révélés avant la migration timeline), on crée le snapshot
   // depuis les votes existants. Titre perdu (rooms.story est resetté au round
-  // suivant) — laissé vide, la timeline affichera '(titre perdu)'.
+  // suivant), laissé vide, la timeline affichera '(titre perdu)'.
   const backfilledRef = useRef(false)
   useEffect(() => {
     if (backfilledRef.current) return
@@ -192,7 +192,7 @@ export default function RoomPage() {
       />
 
       <div className={isScrumMaster ? 'layout-room-grid layout-room-grid--with-timeline' : 'layout-room-grid'}>
-        {/* Colonne gauche — participants */}
+        {/* Colonne gauche, participants */}
         <div className="flex flex-col gap-4">
           <PlayersList
             players={players}
@@ -202,7 +202,7 @@ export default function RoomPage() {
           />
         </div>
 
-        {/* Colonne centre — story + vote + status */}
+        {/* Colonne centre, story + vote + status */}
         <div className="flex flex-col gap-4">
           {isHistoryMode && (
             <HistoryBanner
@@ -264,7 +264,7 @@ export default function RoomPage() {
           />
         </div>
 
-        {/* Colonne droite — timeline SM uniquement */}
+        {/* Colonne droite, timeline SM uniquement */}
         {isScrumMaster && (
           <StoryTimeline
             stories={stories}
@@ -318,7 +318,7 @@ function HistoryBanner({
       return
     }
     // Vide les votes du round ré-ouvert pour repartir d'une grille fraîche.
-    // value='' (pas un DELETE) — c'est le pattern déjà utilisé par la
+    // value='' (pas un DELETE), c'est le pattern déjà utilisé par la
     // ré-ouverture per-player et la RLS UPDATE le permet.
     const { error: votesErr } = await supabase
       .from('votes')
@@ -341,7 +341,7 @@ function HistoryBanner({
     <div className="history-banner">
       <span className="history-banner__icon" aria-hidden>📜</span>
       <div className="history-banner__body">
-        <strong>Vue historique — Round {viewingRound}</strong>
+        <strong>Vue historique, Round {viewingRound}</strong>
         <p>
           Vue locale, les autres participants ne voient rien.
           Round live actuel : <strong>{liveRound}</strong>.

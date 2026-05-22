@@ -1,9 +1,10 @@
-// Tone of voice : BRAND.md §8 — tutoiement, verbe d'abord, em dash.
+// Tone of voice : BRAND.md §8 (tutoiement, verbe d'abord).
+// Em dash interdit (cf. CLAUDE.md, règle non négociable).
 export const fr = {
   meta: {
-    title: 'Scrumbler — Planning poker pour équipes agiles',
+    title: 'Scrumbler, planning poker pour équipes agiles',
     description:
-      'Estime, révèle, recommence. Aucun compte requis — connexion anonyme.',
+      'Estime, révèle, recommence. Aucun compte requis, connexion anonyme.',
   },
   nav: {
     product: 'Produit',
@@ -14,13 +15,13 @@ export const fr = {
     closeMenu: 'Fermer le menu',
   },
   hero: {
-    eyebrow: 'Planning poker — nouvelle génération',
+    eyebrow: 'Planning poker, nouvelle génération',
     title: 'Estime tes stories,\nrévèle d’un coup,\nrecommence.',
     lead:
-      'Scrumbler est un planning poker anonyme par défaut, sans compte, en temps réel — pensé pour le rythme d’un vrai sprint, pas pour faire joli en réunion.',
+      'Scrumbler est un planning poker anonyme par défaut, sans compte, en temps réel. Pensé pour le rythme d’un vrai sprint, pas pour faire joli en réunion.',
     ctaPrimary: 'Lance une partie',
     ctaSecondary: 'Découvre le produit',
-    proof: 'Aucun compte — code de salle partagé, c’est tout.',
+    proof: 'Aucun compte. Un code de salle partagé, c’est tout.',
   },
   problem: {
     eyebrow: 'Pourquoi Scrumbler',
@@ -30,15 +31,15 @@ export const fr = {
       {
         title: 'Sans compte, sans friction',
         body:
-          'Aucun email, aucun mot de passe — un avatar emoji, un pseudo, et c’est parti. La salle se crée en moins de cinq secondes.',
+          'Aucun email, aucun mot de passe. Un avatar emoji, un pseudo, et c’est parti. La salle se crée en moins de cinq secondes.',
       },
       {
         title: 'Anonyme par défaut',
         body:
-          'Les votes restent cachés jusqu’à la révélation. Personne ne s’aligne sur le premier qui pose une carte — la divergence devient une discussion, pas une honte.',
+          'Les votes restent cachés jusqu’à la révélation. Personne ne s’aligne sur le premier qui pose une carte, et la divergence devient une discussion plutôt qu’une honte.',
       },
       {
-        title: 'Temps réel — vraiment',
+        title: 'Temps réel, vraiment',
         body:
           'Synchronisation Supabase Realtime, latence sous-seconde. Quand un coéquipier vote, tu le sais dans la foulée.',
       },
@@ -46,31 +47,31 @@ export const fr = {
   },
   features: {
     eyebrow: 'Ce que tu vas aimer',
-    title: 'Tout ce qu’il faut pour estimer vite — rien de plus.',
+    title: 'Tout ce qu’il faut pour estimer vite, rien de plus.',
     items: [
       {
         emoji: '🎯',
         title: 'Rôles dédiés',
         body:
-          'Scrum Master ou Developer — chaque rôle a son interface, sa palette, ses gestes.',
+          'Scrum Master ou Developer : chaque rôle a son interface, sa palette, ses gestes.',
       },
       {
         emoji: '🎲',
         title: 'Cartes Fibonacci',
         body:
-          'La suite agile classique — 1, 2, 3, 5, 8, 13, 21, ?, ☕. Une carte ☕ pour dire « pause », un ? pour dire « j’ai pas assez d’infos ».',
+          'La suite agile classique : 1, 2, 3, 5, 8, 13, 21, ?, ☕. Une carte ☕ pour dire « pause », un ? pour dire « j’ai pas assez d’infos ».',
       },
       {
         emoji: '🎉',
         title: 'Révélation théâtrale',
         body:
-          'Reveal scoreboard avec gradient de tier, confetti, et stats — moyenne, médiane, écart-type, consensus.',
+          'Reveal scoreboard avec gradient de tier, confetti, et stats : moyenne, médiane, écart-type, consensus.',
       },
       {
         emoji: '💬',
         title: 'Discussion ciblée',
         body:
-          'Quand un vote s’écarte du groupe, l’app propose une discussion — neutre, sans pointer du doigt.',
+          'Quand un vote s’écarte du groupe, l’app propose une discussion neutre, sans pointer du doigt.',
       },
       {
         emoji: '↺',
@@ -82,31 +83,31 @@ export const fr = {
         emoji: '📊',
         title: 'Récap de session',
         body:
-          'Timeline des stories, export markdown, partage du résumé — pour retrouver le contexte au prochain refinement.',
+          'Timeline des stories, export markdown, partage du résumé. Tout pour retrouver le contexte au prochain refinement.',
       },
     ],
   },
   how: {
     eyebrow: 'Comment ça marche',
-    title: 'Trois étapes — pas une de plus.',
+    title: 'Trois étapes, pas une de plus.',
     steps: [
       {
         n: '01',
         title: 'Crée la salle',
         body:
-          'Choisis un pseudo, un avatar emoji, un rôle. Tu obtiens un code à partager — pas d’invitations par email.',
+          'Choisis un pseudo, un avatar emoji, un rôle. Tu obtiens un code à partager, sans invitation par email.',
       },
       {
         n: '02',
         title: 'Partage le lien',
         body:
-          'Les coéquipiers rejoignent en collant le code. Avatar, rôle, et hop — autour de la table virtuelle.',
+          'Les coéquipiers rejoignent en collant le code. Avatar, rôle, et hop, autour de la table virtuelle.',
       },
       {
         n: '03',
         title: 'Estime, révèle, recommence',
         body:
-          'Le Scrum Master saisit la story, lance le vote. Tout le monde joue sa carte. Révélation — discussion si besoin — round suivant.',
+          'Le Scrum Master saisit la story, lance le vote. Tout le monde joue sa carte. Révélation, discussion si besoin, round suivant.',
       },
     ],
   },
@@ -114,7 +115,7 @@ export const fr = {
     eyebrow: 'Tarifs',
     title: 'Gratuit, tout simplement.',
     body:
-      'Scrumbler est gratuit pour les équipes — autant de salles, autant de joueurs, autant de rounds que tu veux. Les fonctionnalités premium arrivent quand on aura quelque chose de vraiment utile à proposer, pas avant.',
+      'Scrumbler est gratuit pour les équipes : autant de salles, autant de joueurs, autant de rounds que tu veux. Les fonctionnalités premium arrivent quand on aura quelque chose de vraiment utile à proposer, pas avant.',
     cta: 'Voir les tarifs en détail',
   },
   faq: {
@@ -123,11 +124,11 @@ export const fr = {
     items: [
       {
         q: 'Il faut créer un compte ?',
-        a: 'Non — connexion anonyme. Tu choisis un pseudo et un avatar emoji, ta session reste sur ton appareil.',
+        a: 'Non, connexion anonyme. Tu choisis un pseudo et un avatar emoji, ta session reste sur ton appareil.',
       },
       {
         q: 'Combien de joueurs par salle ?',
-        a: 'Aucune limite stricte — les sessions confortables tiennent en général à 10 joueurs. Au-delà, le ressenti dépend de ta connexion.',
+        a: 'Aucune limite stricte. Les sessions confortables tiennent en général à 10 joueurs. Au-delà, le ressenti dépend de ta connexion.',
       },
       {
         q: 'Mes données sont-elles partagées ?',
@@ -135,16 +136,16 @@ export const fr = {
       },
       {
         q: 'Je peux utiliser autre chose que Fibonacci ?',
-        a: 'Pas encore — c’est la prochaine grosse étape. T-shirt sizes (XS → XXL) et suites custom arrivent bientôt.',
+        a: 'Pas encore, c’est la prochaine grosse étape. T-shirt sizes (XS à XXL) et suites custom arrivent bientôt.',
       },
       {
         q: 'Open source ?',
-        a: 'Pas encore — le code est privé pendant la phase de stabilisation. On ré-évaluera dès qu’on aura un V1 propre.',
+        a: 'Pas encore. Le code est privé pendant la phase de stabilisation. On ré-évaluera dès qu’on aura un V1 propre.',
       },
     ],
   },
   finalCta: {
-    title: 'Prêt à estimer en équipe — sans compte, sans friction ?',
+    title: 'Prêt à estimer en équipe, sans compte, sans friction ?',
     body: 'Une salle se crée en cinq secondes. Tu n’as rien à installer.',
     cta: 'Lance une partie',
   },
@@ -167,12 +168,12 @@ export const fr = {
         ],
       },
     },
-    rights: '© 2026 Scrumbler — Tous droits réservés.',
+    rights: '© 2026 Scrumbler. Tous droits réservés.',
     langSwitch: 'EN',
   },
   pricing: {
     eyebrow: 'Tarifs',
-    title: 'Gratuit aujourd’hui — durable demain.',
+    title: 'Gratuit aujourd’hui, durable demain.',
     lead:
       'On préfère commencer simple et clair. Scrumbler reste gratuit tant qu’on ne propose pas quelque chose de vraiment payant.',
     plans: [
@@ -180,7 +181,7 @@ export const fr = {
         name: 'Crew',
         price: '0 €',
         cadence: 'pour toujours',
-        description: 'Pour les équipes qui veulent juste estimer — vite, bien, sans friction.',
+        description: 'Pour les équipes qui veulent juste estimer vite, bien, sans friction.',
         features: [
           'Salles illimitées',
           'Joueurs illimités',
@@ -210,20 +211,20 @@ export const fr = {
         highlight: false,
       },
     ],
-    note: 'Pas de carte bancaire — pas de période d’essai. Tu utilises Scrumbler, ou tu ne l’utilises pas.',
+    note: 'Pas de carte bancaire, pas de période d’essai. Tu utilises Scrumbler, ou tu ne l’utilises pas.',
   },
   changelog: {
     eyebrow: 'Changelog',
     title: 'Ce qu’on a livré récemment.',
-    lead: 'Mises à jour ordonnées de la plus récente à la plus ancienne — version annotée à chaque palier.',
+    lead: 'Mises à jour ordonnées de la plus récente à la plus ancienne, version annotée à chaque palier.',
     entries: [
       {
         version: '0.4.0',
         date: '2026-05-22',
         title: 'Brand pack & site marketing',
         items: [
-          'Identité visuelle finalisée — logo, palette, typo, voix officielle.',
-          'Site marketing déployé — landing, pricing, changelog, mentions légales.',
+          'Identité visuelle finalisée : logo, palette, typo, voix officielle.',
+          'Site marketing déployé : landing, pricing, changelog, mentions légales.',
           'Favicons, OpenGraph et manifest PWA.',
         ],
       },
@@ -243,7 +244,7 @@ export const fr = {
         title: 'Reveal Dashboard',
         items: [
           'Scoreboard tiered (Easy / Medium / Hard / Epic).',
-          'Détection automatique d’outliers — discussion proposée, jamais imposée.',
+          'Détection automatique d’outliers : discussion proposée, jamais imposée.',
           'Confetti à la révélation.',
         ],
       },
@@ -254,7 +255,7 @@ export const fr = {
         items: [
           'Salles temps réel via Supabase Realtime.',
           'Rôles Scrum Master et Developer.',
-          'Carte Fibonacci complète (1 → 21, ?, ☕).',
+          'Carte Fibonacci complète (1 à 21, ?, ☕).',
         ],
       },
     ],
@@ -267,7 +268,7 @@ export const fr = {
         { h: 'En résumé', p: 'Scrumbler est anonyme par défaut. On ne te demande ni email, ni nom légal, ni téléphone. Aucun cookie publicitaire, aucun tracker tiers.' },
         { h: 'Ce qu’on collecte', p: 'Un pseudo et un avatar emoji que tu choisis. Tes votes pendant la session. Un identifiant technique de joueur, stocké localement dans ton navigateur.' },
         { h: 'Où ça vit', p: 'Sur Supabase, en Europe. Les salles inactives sont purgées automatiquement.' },
-        { h: 'Tes droits', p: 'Tu peux quitter une salle à tout moment — ta donnée joueur est supprimée. Pour toute question, écris à hello@scrumbler.app.' },
+        { h: 'Tes droits', p: 'Tu peux quitter une salle à tout moment, ta donnée joueur est supprimée. Pour toute question, écris à hello@scrumbler.app.' },
       ],
     },
     terms: {
@@ -275,18 +276,18 @@ export const fr = {
       updated: 'Mis à jour le 22 mai 2026.',
       body: [
         { h: 'Service', p: 'Scrumbler est un planning poker fourni « tel quel ». Aucun engagement de disponibilité n’est associé à la version gratuite.' },
-        { h: 'Comportement', p: 'Pseudos et messages respectueux — pas de harcèlement, pas de contenu illégal. Les abus mènent à un blocage du salon.' },
+        { h: 'Comportement', p: 'Pseudos et messages respectueux, pas de harcèlement, pas de contenu illégal. Les abus mènent à un blocage du salon.' },
         { h: 'Responsabilité', p: 'Tu utilises Scrumbler pour estimer, pas pour stocker des données critiques. Aucune sauvegarde longue durée n’est garantie en V1.' },
-        { h: 'Évolutions', p: 'Les conditions peuvent changer — la version courante fait foi à compter de la date affichée ci-dessus.' },
+        { h: 'Évolutions', p: 'Les conditions peuvent changer : la version courante fait foi à compter de la date affichée ci-dessus.' },
       ],
     },
     cookies: {
       title: 'Cookies',
       updated: 'Mis à jour le 22 mai 2026.',
       body: [
-        { h: 'Ce qu’on utilise', p: 'Strict minimum — un identifiant de session local pour te garder dans ta salle si tu rafraîchis la page.' },
+        { h: 'Ce qu’on utilise', p: 'Strict minimum : un identifiant de session local pour te garder dans ta salle si tu rafraîchis la page.' },
         { h: 'Pas d’ads', p: 'Aucun cookie publicitaire. Pas de Google Analytics. Pas de tracking inter-sites.' },
-        { h: 'Désactiver', p: 'Tu peux vider le stockage local de ton navigateur à tout moment — ça te déconnectera juste de la salle en cours.' },
+        { h: 'Désactiver', p: 'Tu peux vider le stockage local de ton navigateur à tout moment, ça te déconnectera juste de la salle en cours.' },
       ],
     },
   },

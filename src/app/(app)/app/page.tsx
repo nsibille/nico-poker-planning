@@ -83,7 +83,7 @@ export default function HomePage() {
           color: 'var(--color-text-muted)',
           fontFamily: 'var(--font-primary)',
         }}>
-          Aucun compte requis — connexion anonyme
+          Aucun compte requis, connexion anonyme
         </p>
       </div>
     </div>

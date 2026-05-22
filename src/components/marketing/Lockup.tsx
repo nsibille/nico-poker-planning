@@ -9,7 +9,7 @@ type Props = {
   className?: string
 }
 
-// BRAND.md §6.2 — official lockup. Tilt is baked into the SVG, do not rotate.
+// BRAND.md §6.2 official lockup. Tilt is baked into the SVG, do not rotate.
 export function Lockup({ locale, size = 40, variant = 'horizontal', className }: Props) {
   const src =
     variant === 'mark'
