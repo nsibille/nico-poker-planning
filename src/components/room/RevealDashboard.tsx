@@ -281,8 +281,12 @@ export function RevealDashboard({ players, votes, round, roomId, isScrumMaster, 
         <div className="reveal-chart__bars">
           {meanPercent !== null && mean !== null && (
             <div className="reveal-chart__mean-line" style={{ bottom: `${meanPercent}%` }}>
-              <span className="reveal-chart__mean-label">
-                Moy. {formatMean(mean)}{unit ? ` ${unit}` : ''}
+              <span
+                className="reveal-chart__mean-marker"
+                title={`Moyenne : ${formatMean(mean)}${unit ? ` ${unit}` : ''}`}
+                aria-label={`Moyenne : ${formatMean(mean)}${unit ? ` ${unit}` : ''}`}
+              >
+                M
               </span>
             </div>
           )}

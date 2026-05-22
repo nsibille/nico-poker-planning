@@ -1415,19 +1415,30 @@ html, body {
   animation: revealFadeUp 0.5s ease-out 0.9s forwards;
   z-index: 1;
 }
-.reveal-chart__mean-label {
+/* Marqueur compact "M" sur la ligne de moyenne — ancré sur l'axe à gauche.
+   La valeur exacte de la moyenne est déjà affichée en hero ; le tooltip
+   natif (title="Moyenne : X JH") la redonne au survol pour confirmation. */
+.reveal-chart__mean-marker {
   position: absolute;
-  left: 0;
-  top: -12px;
+  left: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background: var(--color-brand-primary);
   color: white;
-  font-size: var(--text-xs);
+  font-size: 11px;
   font-weight: var(--fw-bold);
   font-family: var(--font-primary);
-  padding: 2px 10px;
-  border-radius: var(--radius-full);
-  box-shadow: 0 2px 8px rgba(73,112,255,0.30);
-  letter-spacing: 0.02em;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(73,112,255,0.35);
+  letter-spacing: 0;
+  cursor: help;
+  pointer-events: auto;
+  z-index: 2;
 }
 
 .reveal-bar {

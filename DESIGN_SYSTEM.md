@@ -939,6 +939,7 @@ Variantes  : sm, md, lg | success, warning, danger, info, neutral
 | `reveal-bar__token` | Reveal | Token au-dessus de la barre (avatar + pill valeur + tier badge) |
 | `reveal-bar__tier` | Reveal | Mini badge EASY/MEDIUM/HARD/EPIC façon free-to-play |
 | `reveal-chart__mean-line` | Reveal | Ligne pointillée de la moyenne tracée sur le chart |
+| `reveal-chart__mean-marker` | Reveal | Pastille "M" sur l'axe (à gauche de la ligne moyenne) — valeur exacte au hover (title) |
 | `emoji-picker` | Lobby | Sélecteur d'emoji avatar — preview + dé re-roll + grille |
 | `role-card-group` | Lobby | Grille 2 col du sélecteur de rôle |
 | `role-card` | Lobby | Carte rôle (icône + titre + subtitle + check badge) — variants developer (amber) / scrum-master (brand) |
