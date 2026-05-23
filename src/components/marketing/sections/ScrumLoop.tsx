@@ -30,36 +30,56 @@ const PLAYERS = [
 // (lib/game/reveal-stats.ts): perfect = identical, aligned ≤ 1 step, discuss ≤ 2,
 // divergent beyond. discuss/divergent trigger debate + reopen → convergence.
 const STORY_VOTES: number[][] = [
-  [3, 8, 21, 5, 13],   // divergent (story 0 = premiere vue, gros ecart)
-  [5, 13, 40, 8, 21],  // divergent
-  [1, 1, 1, 1, 1],     // perfect
-  [2, 3, 2, 3, 2],     // aligned
-  [2, 2, 2, 2, 2],     // perfect
-  [2, 8, 21, 5, 13],   // divergent
-  [1, 2, 1, 2, 3],     // discuss
-  [3, 5, 5, 3, 5],     // aligned
-  [13, 40, 100, 8, 21], // divergent
-  [8, 13, 8, 13, 8],   // aligned
-  [2, 2, 3, 2, 2],     // aligned
-  [1, 1, 1, 1, 1],     // perfect
-  [8, 13, 21, 13, 8],  // discuss
-  [2, 5, 13, 21, 8],   // divergent
-  [3, 5, 3, 5, 3],     // aligned
-  [5, 8, 5, 5, 8],     // aligned
-  [5, 8, 13, 8, 5],    // discuss
-  [1, 3, 13, 2, 21],   // divergent
-  [3, 5, 8, 3, 5],     // discuss
-  [2, 2, 2, 2, 2],     // perfect
-  [8, 13, 8, 21, 13],  // discuss
-  [1, 1, 1, 1, 1],     // perfect
-  [3, 5, 8, 5, 5],     // discuss
-  [2, 3, 3, 3, 2],     // aligned
-  [5, 8, 5, 13, 8],    // discuss
-  [5, 5, 5, 5, 5],     // perfect
-  [2, 8, 21, 40, 5],   // divergent
-  [8, 5, 13, 8, 8],    // discuss
-  [5, 13, 40, 8, 21],  // divergent
-  [3, 3, 3, 3, 3],     // perfect
+  // SaaS / B2B / cloud (0-8)
+  [3, 8, 21, 5, 13],   // 0  divergent (premiere vue, gros ecart)
+  [2, 3, 2, 3, 2],     // 1  aligned
+  [5, 8, 13, 8, 5],    // 2  discuss
+  [5, 13, 40, 8, 21],  // 3  divergent
+  [2, 2, 3, 2, 2],     // 4  aligned
+  [8, 13, 8, 13, 8],   // 5  aligned
+  [3, 3, 3, 3, 3],     // 6  perfect
+  [5, 8, 5, 8, 13],    // 7  discuss
+  [13, 21, 8, 40, 13], // 8  divergent
+  // Finance / fintech / assurance (9-13)
+  [2, 8, 21, 5, 13],   // 9  divergent
+  [1, 1, 1, 1, 1],     // 10 perfect
+  [3, 5, 8, 5, 5],     // 11 discuss
+  [8, 13, 21, 13, 8],  // 12 discuss
+  [5, 5, 5, 5, 5],     // 13 perfect
+  // E-commerce / retail / marketplaces (14-18)
+  [3, 5, 3, 5, 3],     // 14 aligned
+  [2, 3, 8, 13, 5],    // 15 divergent
+  [8, 8, 13, 8, 8],    // 16 aligned
+  [1, 2, 1, 2, 3],     // 17 discuss
+  [5, 8, 5, 13, 8],    // 18 discuss
+  // Big Tech / consumer (19-22)
+  [2, 2, 2, 2, 2],     // 19 perfect
+  [13, 40, 100, 8, 21], // 20 divergent
+  [3, 5, 5, 3, 5],     // 21 aligned
+  [8, 13, 8, 21, 13],  // 22 discuss
+  // Industrie / IoT / hardware (23-26)
+  [1, 3, 13, 2, 21],   // 23 divergent
+  [5, 5, 8, 5, 5],     // 24 aligned
+  [2, 5, 13, 21, 8],   // 25 divergent
+  [3, 3, 3, 3, 3],     // 26 perfect
+  // Sante / medtech (27-29)
+  [8, 5, 13, 8, 8],    // 27 discuss
+  [2, 3, 2, 3, 3],     // 28 aligned
+  [5, 8, 13, 8, 5],    // 29 discuss
+  // Public / defense / education (30-32)
+  [1, 1, 1, 1, 1],     // 30 perfect
+  [3, 8, 21, 5, 13],   // 31 divergent
+  [13, 13, 13, 13, 13], // 32 perfect
+  // Telecom / infra / cyber (33-35)
+  [5, 8, 5, 5, 8],     // 33 aligned
+  [2, 8, 21, 40, 5],   // 34 divergent
+  [3, 5, 8, 5, 5],     // 35 discuss
+  // Media / gaming (36-37)
+  [8, 8, 8, 8, 8],     // 36 perfect
+  [5, 13, 8, 21, 13],  // 37 divergent
+  // Transport / mobilite / logistique (38-39)
+  [2, 3, 3, 3, 2],     // 38 aligned
+  [3, 5, 8, 13, 5],    // 39 divergent
 ]
 
 const FIB = [0, 1, 2, 3, 5, 8, 13, 21, 40, 100]
@@ -71,35 +91,45 @@ const fibIdx = (v: number) => FIB.indexOf(v)
 // the rest just shrink the gap (still discuss/aligned).
 const STORY_SETTLE: (number[] | null)[] = [
   [5, 8, 13, 5, 13],   // 0  divergent → discuss
-  [8, 13, 13, 8, 13],  // 1  divergent → aligned
-  null,                // 2
-  null,                // 3
+  null,                // 1
+  [8, 8, 8, 8, 8],     // 2  discuss → perfect
+  [8, 13, 13, 8, 13],  // 3  divergent → aligned
   null,                // 4
-  [5, 8, 13, 5, 13],   // 5  divergent → discuss
-  [2, 2, 2, 2, 2],     // 6  discuss → perfect
-  null,                // 7
-  [13, 21, 21, 13, 21], // 8 divergent → aligned
-  null,                // 9
+  null,                // 5
+  null,                // 6
+  [8, 8, 8, 8, 8],     // 7  discuss → perfect
+  [13, 21, 13, 21, 13], // 8  divergent → aligned
+  [5, 8, 13, 5, 13],   // 9  divergent → discuss
   null,                // 10
-  null,                // 11
+  [5, 5, 5, 5, 5],     // 11 discuss → perfect
   [13, 13, 13, 13, 13], // 12 discuss → perfect
-  [5, 5, 13, 13, 8],   // 13 divergent → discuss
+  null,                // 13
   null,                // 14
-  null,                // 15
-  [8, 8, 8, 8, 8],     // 16 discuss → perfect
-  [1, 3, 3, 2, 3],     // 17 divergent → discuss
-  [3, 5, 5, 3, 5],     // 18 discuss → aligned
+  [3, 5, 8, 5, 5],     // 15 divergent → discuss
+  null,                // 16
+  [2, 2, 2, 2, 2],     // 17 discuss → perfect
+  [5, 8, 5, 8, 8],     // 18 discuss → aligned
   null,                // 19
-  [8, 13, 8, 13, 13],  // 20 discuss → aligned
+  [13, 21, 21, 13, 21], // 20 divergent → aligned
   null,                // 21
-  [5, 5, 5, 5, 5],     // 22 discuss → perfect
-  null,                // 23
-  [5, 8, 5, 8, 8],     // 24 discuss → aligned
-  null,                // 25
-  [5, 8, 13, 13, 5],   // 26 divergent → discuss
+  [8, 13, 8, 13, 13],  // 22 discuss → aligned
+  [1, 3, 3, 2, 3],     // 23 divergent → discuss
+  null,                // 24
+  [5, 5, 13, 13, 8],   // 25 divergent → discuss
+  null,                // 26
   [8, 8, 8, 8, 8],     // 27 discuss → perfect
-  [13, 13, 13, 13, 13], // 28 divergent → perfect
-  null,                // 29
+  null,                // 28
+  [8, 8, 8, 8, 8],     // 29 discuss → perfect
+  null,                // 30
+  [5, 8, 13, 8, 13],   // 31 divergent → discuss
+  null,                // 32
+  null,                // 33
+  [5, 8, 13, 13, 5],   // 34 divergent → discuss
+  [5, 5, 8, 5, 5],     // 35 discuss → aligned
+  null,                // 36
+  [8, 13, 8, 13, 13],  // 37 divergent → aligned
+  null,                // 38
+  [5, 5, 8, 8, 5],     // 39 divergent → aligned
 ]
 
 function levelOf(votes: number[]): Level {
