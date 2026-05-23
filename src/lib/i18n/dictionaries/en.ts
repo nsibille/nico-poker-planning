@@ -23,6 +23,25 @@ export const en = {
     ctaSecondary: 'See the product',
     proof: 'No account. Share a room code, that’s it.',
   },
+  heroLoop: {
+    room: 'scrumbler.app/room/',
+    code: 'abc-123',
+    role: 'Scrum Master',
+    story: 'Refactor the authentication module',
+    joined: 'joined the room',
+    discussTitle: 'Discussion needed',
+    discussBody:
+      'Someone estimated higher than the group, worth a quick chat before you settle.',
+    stats: { median: 'Median', consensus: 'Consensus', tier: 'Tier' },
+    tier: 'MEDIUM',
+    scenes: {
+      onboard: { label: 'The team joins', caption: 'Anonymous avatars, no account.' },
+      voting: { label: 'Voting', caption: 'Everyone lays a card, in silence.' },
+      reveal: { label: 'Revealed', caption: 'It all drops at once, divergence stands out.' },
+      debate: { label: 'Discussion', caption: 'Divergence turns into a conversation.' },
+      consensus: { label: 'Consensus', caption: 'Aligned. Story estimated, next up.' },
+    },
+  },
   problem: {
     eyebrow: 'Why Scrumbler',
     title:

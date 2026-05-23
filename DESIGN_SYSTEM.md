@@ -1005,8 +1005,25 @@ Slug `bg-card-pattern` appliqué pour la texture.
 
 ### `marketing-hero`
 **Hero landing.** Titre `var(--text-display)` (64px, clamp responsive),
-deco-blobs/circles en pastel, mockup reveal `hero-preview-card` en aplomb 2 colonnes
+deco-blobs/circles en pastel, animation `marketing-hero-loop` en aplomb 2 colonnes
 sous 720px.
+
+---
+
+### `marketing-hero-loop`
+**Animation hero en boucle (composant `ScrumLoop`, `src/components/marketing/sections/ScrumLoop.tsx`).**
+Met en scène le cycle complet d'un round de planning poker, **on repeat** :
+
+1. `onboard` : l'équipe arrive, avatars emoji qui pop un par un (BRAND §4.1).
+2. `voting` : cartes face cachée bleues avec le `?` wildcard (logo mark, BRAND §1), tampon `✓` (teal) en cascade.
+3. `reveal` : scoreboard à barres (langage `reveal-bar`) qui révèle la dissonance, un outlier `13` en gradient hot + flag `⚠️`, confetti contenu dans la carte (BRAND §5.2, reveal only).
+4. `debate` : banner `💬` neutre (BRAND voix §04, on invite sans accuser) appelant à la discussion.
+5. `consensus` : toutes les barres convergent vers `8`, gradient teal (consensus), confetti, glow vert.
+
+Pilotage React (state machine + `setTimeout`), pur CSS pour les transitions. Réutilise le wrapper
+`marketing-hero__preview`. Gradients de tier alignés sur BRAND §2.5. Respecte
+`prefers-reduced-motion` (fige sur le scoreboard `reveal`, coupe confetti et boucle).
+Décoratif : `aria-hidden`. Gradients hot/mid/cool, palette confetti = couleurs de marque.
 
 ---
 
@@ -1145,6 +1162,7 @@ en overlay, contenu blanc, bouton pill blanc/brand inversé.
 | `marketing-header` | Marketing | Header sticky backdrop-blur, lockup + nav + CTA + lang switch |
 | `marketing-footer` | Marketing | Footer brand-dark avec card pattern, 2 cols liens |
 | `marketing-hero` | Marketing | Hero landing avec titre display 64px + mockup reveal |
+| `marketing-hero-loop` | Marketing | Animation hero en boucle : onboard → vote → reveal → débat → consensus, puis recommence |
 | `marketing-section` | Marketing | Primitive section (padding 96px, max-width 1120px) |
 | `marketing-final-cta__card` | Marketing | Encart brand-gradient + card pattern, CTA fin de landing |
 | `marketing-feature-card` | Marketing | Carte feature avec emoji 32px, hover lift |

@@ -23,6 +23,25 @@ export const fr = {
     ctaSecondary: 'Découvre le produit',
     proof: 'Aucun compte. Un code de salle partagé, c’est tout.',
   },
+  heroLoop: {
+    room: 'scrumbler.app/room/',
+    code: 'abc-123',
+    role: 'Scrum Master',
+    story: 'Refactor du module d’authentification',
+    joined: 'rejoint la salle',
+    discussTitle: 'Discussion nécessaire',
+    discussBody:
+      'Quelqu’un a estimé plus haut que le groupe, ça vaut une discussion avant de trancher.',
+    stats: { median: 'Médiane', consensus: 'Consensus', tier: 'Tier' },
+    tier: 'MEDIUM',
+    scenes: {
+      onboard: { label: 'L’équipe arrive', caption: 'Avatars anonymes, aucun compte.' },
+      voting: { label: 'Vote en cours', caption: 'Chacun pose sa carte, en silence.' },
+      reveal: { label: 'Révélé', caption: 'Tout tombe d’un coup, la divergence saute aux yeux.' },
+      debate: { label: 'Discussion', caption: 'La divergence devient une conversation.' },
+      consensus: { label: 'Consensus', caption: 'Alignés. Story estimée, au suivant.' },
+    },
+  },
   problem: {
     eyebrow: 'Pourquoi Scrumbler',
     title:

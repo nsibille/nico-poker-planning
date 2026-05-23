@@ -53,7 +53,7 @@ export default async function LandingPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <Hero locale={locale} dict={dict.hero} />
+      <Hero locale={locale} dict={dict.hero} loop={dict.heroLoop} />
       <ProblemSolution dict={dict.problem} />
       <FeatureGrid dict={dict.features} />
       <HowItWorks dict={dict.how} />
