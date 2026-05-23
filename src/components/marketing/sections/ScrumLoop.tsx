@@ -30,36 +30,36 @@ const PLAYERS = [
 // (lib/game/reveal-stats.ts): perfect = identical, aligned ≤ 1 step, discuss ≤ 2,
 // divergent beyond. discuss/divergent trigger debate + reopen → convergence.
 const STORY_VOTES: number[][] = [
-  [5, 8, 5, 8, 13],   // discuss
-  [8, 13, 21, 40, 13], // divergent
-  [1, 1, 1, 1, 1],    // perfect
-  [2, 3, 2, 3, 2],    // aligned
-  [1, 1, 1, 1, 1],    // perfect
-  [3, 8, 13, 5, 8],   // divergent
-  [1, 2, 1, 2, 3],    // discuss
-  [2, 3, 3, 2, 3],    // aligned
-  [13, 21, 40, 8, 100], // divergent
-  [8, 13, 8, 13, 8],  // aligned
-  [2, 2, 3, 2, 2],    // aligned
-  [1, 1, 2, 1, 1],    // aligned
-  [8, 13, 21, 13, 8], // discuss
-  [3, 5, 8, 13, 5],   // divergent
-  [3, 3, 3, 3, 3],    // perfect
-  [3, 5, 5, 3, 5],    // aligned
-  [5, 8, 13, 8, 5],   // discuss
-  [2, 3, 8, 2, 13],   // divergent
-  [8, 8, 8, 8, 8],    // perfect
-  [1, 2, 2, 1, 2],    // aligned
-  [13, 21, 13, 21, 13], // aligned
-  [1, 1, 1, 2, 1],    // aligned
-  [3, 5, 8, 5, 5],    // discuss
-  [2, 3, 3, 3, 2],    // aligned
-  [5, 8, 5, 13, 8],   // discuss
-  [5, 5, 5, 5, 5],    // perfect
-  [8, 21, 3, 13, 5],  // divergent
-  [8, 13, 8, 8, 13],  // aligned
-  [13, 8, 21, 13, 8], // discuss
-  [2, 2, 2, 2, 2],    // perfect
+  [3, 8, 21, 5, 13],   // divergent (story 0 = premiere vue, gros ecart)
+  [5, 13, 40, 8, 21],  // divergent
+  [1, 1, 1, 1, 1],     // perfect
+  [2, 3, 2, 3, 2],     // aligned
+  [2, 2, 2, 2, 2],     // perfect
+  [2, 8, 21, 5, 13],   // divergent
+  [1, 2, 1, 2, 3],     // discuss
+  [3, 5, 5, 3, 5],     // aligned
+  [13, 40, 100, 8, 21], // divergent
+  [8, 13, 8, 13, 8],   // aligned
+  [2, 2, 3, 2, 2],     // aligned
+  [1, 1, 1, 1, 1],     // perfect
+  [8, 13, 21, 13, 8],  // discuss
+  [2, 5, 13, 21, 8],   // divergent
+  [3, 5, 3, 5, 3],     // aligned
+  [5, 8, 5, 5, 8],     // aligned
+  [5, 8, 13, 8, 5],    // discuss
+  [1, 3, 13, 2, 21],   // divergent
+  [3, 5, 8, 3, 5],     // discuss
+  [2, 2, 2, 2, 2],     // perfect
+  [8, 13, 8, 21, 13],  // discuss
+  [1, 1, 1, 1, 1],     // perfect
+  [3, 5, 8, 5, 5],     // discuss
+  [2, 3, 3, 3, 2],     // aligned
+  [5, 8, 5, 13, 8],    // discuss
+  [5, 5, 5, 5, 5],     // perfect
+  [2, 8, 21, 40, 5],   // divergent
+  [8, 5, 13, 8, 8],    // discuss
+  [5, 13, 40, 8, 21],  // divergent
+  [3, 3, 3, 3, 3],     // perfect
 ]
 
 const FIB = [0, 1, 2, 3, 5, 8, 13, 21, 40, 100]
@@ -129,6 +129,24 @@ function useReducedMotion() {
     subscribeReduced,
     () => window.matchMedia(REDUCED_QUERY).matches,
     () => false,
+  )
+}
+
+// Typewriter effect for the story title. Remounted per story via `key`, so the
+// initial count comes from the state initializer (no synchronous setState in an
+// effect). The interval only ever schedules functional updates.
+function TypedStory({ text }: { text: string }) {
+  const [n, setN] = useState(0)
+  useEffect(() => {
+    const id = setInterval(() => setN((p) => Math.min(p + 1, text.length)), 42)
+    return () => clearInterval(id)
+  }, [text])
+  const done = n >= text.length
+  return (
+    <h3>
+      {text.slice(0, n)}
+      <span className={`scrum-loop__caret${done ? ' is-done' : ''}`} />
+    </h3>
   )
 }
 
@@ -214,9 +232,15 @@ export function ScrumLoop({ dict }: Props) {
 
           <div className="scrum-loop__story">
             <span className="eyebrow eyebrow--mini">Story</span>
-            <h3 className={storyReady ? '' : 'is-pending'}>
-              {storyReady ? dict.stories[storyIdx] : '…'}
-            </h3>
+            {storyReady ? (
+              reduced ? (
+                <h3>{dict.stories[storyIdx]}</h3>
+              ) : (
+                <TypedStory key={cycle} text={dict.stories[storyIdx]} />
+              )
+            ) : (
+              <h3 className="is-pending">…</h3>
+            )}
           </div>
 
           <div className="scrum-loop__stage">

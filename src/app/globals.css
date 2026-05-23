@@ -2737,8 +2737,22 @@ html, body {
   color: var(--color-text-muted);
   letter-spacing: 0.2em;
 }
+.scrum-loop__caret {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 2px;
+  vertical-align: -0.12em;
+  background: var(--color-brand-primary);
+  animation: scrumLoopCaret 0.8s step-end infinite;
+}
+.scrum-loop__caret.is-done { animation: none; opacity: 0; }
+@keyframes scrumLoopCaret {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0; }
+}
 
-/* Stage — fixed height so panels swap without layout shift */
+/* Stage : fixed height so panels swap without layout shift */
 .scrum-loop__stage {
   position: relative;
   min-height: 286px;
