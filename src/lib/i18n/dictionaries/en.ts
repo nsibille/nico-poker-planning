@@ -23,6 +23,78 @@ export const en = {
     ctaSecondary: 'See the product',
     proof: 'No account. Share a room code, that’s it.',
   },
+  heroLoop: {
+    room: 'scrumbler.app/room/',
+    code: 'abc-123',
+    role: 'Scrum Master',
+    joined: 'joined the room',
+    discussTitle: 'Discussion needed',
+    discussBody:
+      'Someone strayed from the group, worth a chat before you reopen the vote.',
+    validated: 'Estimates are close, ship it.',
+    reduced: 'Re-vote: the extremes come back, the gap shrinks.',
+    stats: { mean: 'Average', consensus: 'Consensus', median: 'Median' },
+    consensus: { perfect: 'Perfect', aligned: 'Coherent', discuss: 'Discuss', divergent: 'Divergent' },
+    scenes: {
+      onboard: { label: 'The team joins', caption: 'Anonymous avatars, no account.' },
+      voting: { label: 'Voting', caption: 'Everyone lays a card, in silence.' },
+      reveal: { label: 'Revealed', caption: 'It all drops at once.' },
+      debate: { label: 'Discussion', caption: 'Divergence turns into a conversation.' },
+      consensus: { label: 'Consensus', caption: 'Re-vote, and everyone converges.' },
+    },
+    stories: [
+      // SaaS / B2B / cloud
+      'Add yet another required field to onboarding',
+      'Let users export the report as CSV (again)',
+      'Handle time zones without breaking everything',
+      'Migrate customers to the new billing',
+      'Add a read-only role nobody asked for',
+      'Wire up SSO for the enterprise client',
+      'Show a New badge on a 2021 feature',
+      'Rate-limit the API for the clients who abuse it',
+      'Sync permissions between two microservices',
+      // Finance / fintech / insurance
+      'Add an instant transfer that takes three days',
+      'Compute interest without a rounding error',
+      'Block suspicious payments without blocking real ones',
+      'Generate the KYC statement the regulator wants',
+      'Estimate an insurance quote in under a second',
+      // E-commerce / retail / marketplaces
+      'Show only 2 left in stock (there are 4000)',
+      'Stop the cart from emptying itself',
+      'Recompute shipping on every single click',
+      'Survive Black Friday without falling over',
+      'Recommend products already bought',
+      // Big Tech / consumer
+      'Add a Like button to the Like button',
+      'Change an icon color (a 3-hour meeting)',
+      'Hide the timeline people actually preferred',
+      'Insert an ad every two posts',
+      // Industry / IoT / hardware
+      'Make two sensors that ignore each other talk',
+      'Update the firmware without unplugging the factory',
+      'Show the oven temperature in real time',
+      'Stop the robot before it hits the wall',
+      // Health / medtech
+      'Merge two patient records with the same name',
+      'Load medical imaging in under a minute',
+      'Remind about meds without spamming',
+      // Public / defense / education
+      'Fit the tax form on a single page',
+      'Enroll 30,000 students at the same time',
+      'Keep the public system up on launch day',
+      // Telecom / infra / cyber
+      'Renew the certificate before it expires (this time)',
+      'Revoke access for the employee who finally left',
+      'Hold the load when the whole region logs in',
+      // Media / gaming
+      'Nerf the weapon everyone loves',
+      'Start the live stream without buffering',
+      // Transport / mobility / logistics
+      'Recompute the route when the driver misses the exit',
+      'Find the parcel lost between two warehouses',
+    ],
+  },
   problem: {
     eyebrow: 'Why Scrumbler',
     title:

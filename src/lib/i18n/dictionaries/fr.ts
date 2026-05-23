@@ -23,6 +23,78 @@ export const fr = {
     ctaSecondary: 'Découvre le produit',
     proof: 'Aucun compte. Un code de salle partagé, c’est tout.',
   },
+  heroLoop: {
+    room: 'scrumbler.app/room/',
+    code: 'abc-123',
+    role: 'Scrum Master',
+    joined: 'rejoint la salle',
+    discussTitle: 'Discussion nécessaire',
+    discussBody:
+      'Quelqu’un s’écarte du groupe, on en parle avant de rouvrir le vote.',
+    validated: 'Estimations proches, on valide direct.',
+    reduced: 'Re-vote : les extrêmes reviennent, l’écart se réduit.',
+    stats: { mean: 'Moyenne', consensus: 'Consensus', median: 'Médiane' },
+    consensus: { perfect: 'Parfait', aligned: 'Cohérent', discuss: 'À discuter', divergent: 'Divergent' },
+    scenes: {
+      onboard: { label: 'L’équipe arrive', caption: 'Avatars anonymes, aucun compte.' },
+      voting: { label: 'Vote en cours', caption: 'Chacun pose sa carte, en silence.' },
+      reveal: { label: 'Révélé', caption: 'Tout tombe d’un coup.' },
+      debate: { label: 'Discussion', caption: 'La divergence devient une conversation.' },
+      consensus: { label: 'Consensus', caption: 'Re-vote, et tout le monde converge.' },
+    },
+    stories: [
+      // SaaS / B2B / cloud
+      'Ajouter un énième champ obligatoire à l’onboarding',
+      'Permettre d’exporter le rapport en CSV (encore)',
+      'Gérer les fuseaux horaires sans tout casser',
+      'Migrer les clients vers la nouvelle facturation',
+      'Ajouter un rôle lecture seule que personne ne demandait',
+      'Brancher le SSO du client grand compte',
+      'Afficher un badge Nouveau sur une feature de 2021',
+      'Limiter l’API pour les clients qui en abusent',
+      'Synchroniser les permissions entre deux microservices',
+      // Finance / fintech / assurance
+      'Ajouter un virement instantané qui prend trois jours',
+      'Calculer les intérêts sans erreur d’arrondi',
+      'Bloquer les paiements suspects sans bloquer les vrais',
+      'Générer le relevé KYC conforme au régulateur',
+      'Estimer une prime d’assurance en moins d’une seconde',
+      // E-commerce / retail / marketplaces
+      'Afficher plus que 2 en stock (il y en a 4000)',
+      'Empêcher le panier de se vider tout seul',
+      'Recalculer les frais de port à chaque clic',
+      'Tenir le Black Friday sans tomber',
+      'Recommander des produits déjà achetés',
+      // Big Tech / consumer
+      'Ajouter un bouton J’aime au bouton J’aime',
+      'Changer la couleur d’une icône (réunion de 3h)',
+      'Cacher le fil chronologique que les gens préféraient',
+      'Insérer une pub tous les deux contenus',
+      // Industrie / IoT / hardware
+      'Faire parler deux capteurs qui s’ignorent',
+      'Mettre à jour le firmware sans débrancher l’usine',
+      'Afficher la température du four en temps réel',
+      'Arrêter le robot avant qu’il touche le mur',
+      // Santé / medtech
+      'Fusionner deux dossiers patients du même nom',
+      'Charger l’imagerie médicale en moins d’une minute',
+      'Rappeler la prise de médicament sans spammer',
+      // Public / défense / éducation
+      'Faire tenir le formulaire des impôts sur une page',
+      'Inscrire 30 000 étudiants en même temps',
+      'Garder le SI public en ligne le jour J',
+      // Télécoms / infra / cyber
+      'Renouveler le certificat avant qu’il expire (cette fois)',
+      'Couper l’accès de l’employé enfin parti',
+      'Tenir la charge quand toute la région se connecte',
+      // Media / gaming
+      'Nerf l’arme que tout le monde adore',
+      'Lancer le live sans que ça bufferise',
+      // Transport / mobilité / logistique
+      'Recalculer l’itinéraire quand le conducteur rate la sortie',
+      'Retrouver le colis perdu entre deux entrepôts',
+    ],
+  },
   problem: {
     eyebrow: 'Pourquoi Scrumbler',
     title:
