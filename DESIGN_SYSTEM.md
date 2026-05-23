@@ -1012,7 +1012,11 @@ sous 720px.
 
 ### `marketing-hero-loop`
 **Animation hero en boucle (composant `ScrumLoop`, `src/components/marketing/sections/ScrumLoop.tsx`).**
-Met en scène le cycle complet d'un round de planning poker, **on repeat** :
+Pioche une story au hasard parmi une trentaine (titres dans `heroLoop.stories`, votes dans le composant)
+et joue le cycle complet d'un round de planning poker, **on repeat, en ordre aléatoire**. Le niveau de
+consensus (`perfect` / `aligned` / `discuss` / `divergent`) est dérivé du spread des votes selon la même
+règle que l'app (`lib/game/reveal-stats.ts`) : `discuss` / `divergent` déclenchent débat + réouverture
+des votes (convergence vers le mode), `perfect` / `aligned` valident direct. Les phases :
 
 1. `onboard` : l'équipe arrive, avatars emoji qui pop un par un (BRAND §4.1).
 2. `voting` : cartes face cachée bleues avec le `?` wildcard (logo mark, BRAND §1), tampon `✓` (teal) en cascade.
