@@ -9,10 +9,10 @@ export default function HomePage() {
           <Image
             src="/brand/logo/logo-horizontal-dark.svg"
             alt="Scrumbler"
-            width={196}
-            height={48}
+            width={357}
+            height={94}
             priority
-            style={{ height: 44, width: 'auto' }}
+            style={{ height: 72, width: 'auto' }}
           />
           <span className="lobby-hero__eyebrow">Planning poker</span>
           <p className="lobby-hero__tagline">
