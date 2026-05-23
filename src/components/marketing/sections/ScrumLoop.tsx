@@ -65,6 +65,43 @@ const STORY_VOTES: number[][] = [
 const FIB = [0, 1, 2, 3, 5, 8, 13, 21, 40, 100]
 const fibIdx = (v: number) => FIB.indexOf(v)
 
+// Post-revote outcome per debate story, aligned by index with STORY_VOTES.
+// null = no debate (perfect/aligned reveal). For debate stories the extremes
+// come back toward the median: roughly one in three reaches full consensus,
+// the rest just shrink the gap (still discuss/aligned).
+const STORY_SETTLE: (number[] | null)[] = [
+  [5, 8, 13, 5, 13],   // 0  divergent → discuss
+  [8, 13, 13, 8, 13],  // 1  divergent → aligned
+  null,                // 2
+  null,                // 3
+  null,                // 4
+  [5, 8, 13, 5, 13],   // 5  divergent → discuss
+  [2, 2, 2, 2, 2],     // 6  discuss → perfect
+  null,                // 7
+  [13, 21, 21, 13, 21], // 8 divergent → aligned
+  null,                // 9
+  null,                // 10
+  null,                // 11
+  [13, 13, 13, 13, 13], // 12 discuss → perfect
+  [5, 5, 13, 13, 8],   // 13 divergent → discuss
+  null,                // 14
+  null,                // 15
+  [8, 8, 8, 8, 8],     // 16 discuss → perfect
+  [1, 3, 3, 2, 3],     // 17 divergent → discuss
+  [3, 5, 5, 3, 5],     // 18 discuss → aligned
+  null,                // 19
+  [8, 13, 8, 13, 13],  // 20 discuss → aligned
+  null,                // 21
+  [5, 5, 5, 5, 5],     // 22 discuss → perfect
+  null,                // 23
+  [5, 8, 5, 8, 8],     // 24 discuss → aligned
+  null,                // 25
+  [5, 8, 13, 13, 5],   // 26 divergent → discuss
+  [8, 8, 8, 8, 8],     // 27 discuss → perfect
+  [13, 13, 13, 13, 13], // 28 divergent → perfect
+  null,                // 29
+]
+
 function levelOf(votes: number[]): Level {
   const ix = votes.map(fibIdx)
   const spread = Math.max(...ix) - Math.min(...ix)
@@ -73,18 +110,9 @@ function levelOf(votes: number[]): Level {
   if (spread <= 2) return 'discuss'
   return 'divergent'
 }
-function modeOf(votes: number[]): number {
-  const counts = new Map<number, number>()
-  votes.forEach((v) => counts.set(v, (counts.get(v) ?? 0) + 1))
-  let best = votes[0]
-  let bestCount = 0
-  for (const [v, c] of counts) {
-    if (c > bestCount || (c === bestCount && fibIdx(v) > fibIdx(best))) {
-      best = v
-      bestCount = c
-    }
-  }
-  return best
+function medianValue(votes: number[]): number {
+  const sorted = votes.slice().sort((a, b) => a - b)
+  return sorted[Math.floor(sorted.length / 2)]
 }
 function meanOf(votes: number[]): string {
   const m = votes.reduce((a, b) => a + b, 0) / votes.length
@@ -179,23 +207,29 @@ export function ScrumLoop({ dict }: Props) {
   const votes = STORY_VOTES[storyIdx]
   const level = levelOf(votes)
   const needsDebate = level === 'discuss' || level === 'divergent'
-  const mode = modeOf(votes)
-  const modeIndex = fibIdx(mode)
+  const medianIndex = fibIdx(medianValue(votes))
+  // Post-revote votes: extremes drift back toward the median, not always to a
+  // flat consensus (see STORY_SETTLE).
+  const settleVotes = (needsDebate && STORY_SETTLE[storyIdx]) || votes
 
   const storyReady = phase !== 'onboard'
   const isResults = phase === 'reveal' || phase === 'debate' || phase === 'consensus'
   const settled = phase === 'consensus'
-  const converged = settled && needsDebate
-  const values = converged ? PLAYERS.map(() => mode) : votes
-  const celebrate = settled || (phase === 'reveal' && level === 'perfect')
+  const values = settled ? settleVotes : votes
+  const displayLevel: Level = settled ? levelOf(settleVotes) : level
+  const resolved = displayLevel === 'perfect' || displayLevel === 'aligned'
+  const celebrate = (settled && resolved) || (phase === 'reveal' && level === 'perfect')
   const showBanner = phase === 'debate' && needsDebate
-  const displayLevel: Level = converged ? 'perfect' : level
 
   const caption =
     phase === 'debate' || phase === 'consensus'
-      ? needsDebate
-        ? scene.caption
-        : dict.validated
+      ? !needsDebate
+        ? dict.validated
+        : phase === 'consensus'
+          ? displayLevel === 'perfect'
+            ? scene.caption
+            : dict.reduced
+          : scene.caption
       : scene.caption
 
   return (
@@ -283,8 +317,8 @@ export function ScrumLoop({ dict }: Props) {
                 <div className="scrum-loop__chart">
                   {PLAYERS.map((p, i) => {
                     const value = values[i]
-                    const isOutlier = !settled && Math.abs(fibIdx(value) - modeIndex) > 1
-                    const tier = settled ? 'cool' : isOutlier ? 'hot' : 'mid'
+                    const isOutlier = !settled && Math.abs(fibIdx(value) - medianIndex) > 1
+                    const tier = settled ? (resolved ? 'cool' : 'mid') : isOutlier ? 'hot' : 'mid'
                     return (
                       <div className="scrum-loop__bar" key={p.name}>
                         <span className="scrum-loop__bar-token">
@@ -313,13 +347,13 @@ export function ScrumLoop({ dict }: Props) {
                   </div>
                   <div>
                     <span className="eyebrow eyebrow--mini">{dict.stats.consensus}</span>
-                    <strong className={displayLevel === 'perfect' || displayLevel === 'aligned' ? 'scrum-loop__consensus-ok' : ''}>
+                    <strong className={resolved ? 'scrum-loop__consensus-ok' : ''}>
                       {dict.consensus[displayLevel]}
                     </strong>
                   </div>
                   <div>
-                    <span className="eyebrow eyebrow--mini">{dict.stats.mode}</span>
-                    <strong className="scrum-loop__tier">{mode}</strong>
+                    <span className="eyebrow eyebrow--mini">{dict.stats.median}</span>
+                    <strong className="scrum-loop__tier">{medianValue(values)}</strong>
                   </div>
                 </div>
               </div>

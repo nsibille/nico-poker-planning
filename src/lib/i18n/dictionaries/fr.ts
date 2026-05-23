@@ -32,7 +32,8 @@ export const fr = {
     discussBody:
       'Quelqu’un s’écarte du groupe, on en parle avant de rouvrir le vote.',
     validated: 'Estimations proches, on valide direct.',
-    stats: { mean: 'Moyenne', consensus: 'Consensus', mode: 'Mode' },
+    reduced: 'Re-vote : les extrêmes reviennent, l’écart se réduit.',
+    stats: { mean: 'Moyenne', consensus: 'Consensus', median: 'Médiane' },
     consensus: { perfect: 'Parfait', aligned: 'Cohérent', discuss: 'À discuter', divergent: 'Divergent' },
     scenes: {
       onboard: { label: 'L’équipe arrive', caption: 'Avatars anonymes, aucun compte.' },

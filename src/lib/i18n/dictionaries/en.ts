@@ -32,7 +32,8 @@ export const en = {
     discussBody:
       'Someone strayed from the group, worth a chat before you reopen the vote.',
     validated: 'Estimates are close, ship it.',
-    stats: { mean: 'Average', consensus: 'Consensus', mode: 'Mode' },
+    reduced: 'Re-vote: the extremes come back, the gap shrinks.',
+    stats: { mean: 'Average', consensus: 'Consensus', median: 'Median' },
     consensus: { perfect: 'Perfect', aligned: 'Coherent', discuss: 'Discuss', divergent: 'Divergent' },
     scenes: {
       onboard: { label: 'The team joins', caption: 'Anonymous avatars, no account.' },
