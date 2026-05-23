@@ -2,7 +2,7 @@
 
 > Single source of truth for the Scrumbler visual identity. Use this alongside the asset pack in `brand-assets/`. If something isn't documented here, ask design before improvising.
 
-**Version** 1.0.0 · **Date** 22 mai 2026
+**Version** 1.1.0 · **Date** 23 mai 2026
 
 ---
 
@@ -11,7 +11,8 @@
 - **Name** Scrumbler
 - **Tagline** *Planning poker pour équipes agiles, estime, révèle, recommence.*
 - **What it is** A lightweight, anonymous-by-default planning-poker app for agile teams.
-- **Voice** Tutoiement, verbe d'abord, jamais accusateur. **Em dash interdit** (voir `CLAUDE.md`).
+- **Why (raison d'être)** Le sprint planning est un rituel d'équipe, pas une corvée. Scrumbler le rend vivant et agréable : il fait circuler la parole (souvent monopolisée par une ou deux personnes), révèle les hypothèses cachées, crée un espace safe où chacun ose son estimation, et ajoute ce qu'il faut de jeu et de fun pour souder l'équipe. La tech reste invisible, au service de l'expérience.
+- **Voice** Tutoiement, verbe d'abord, positif et bienveillant. **Em dash interdit** (voir `CLAUDE.md`).
 - **Language** French, with a few untranslated English game terms (Scrum Master, EPIC).
 - **Mascot glyph** 🃏 (used sparingly, the logo carries the brand)
 
@@ -273,7 +274,7 @@ export function Lockup({ size = 40 }) {
 
 ## 8 · Voice & tone
 
-Four rules. Hold the line on these and the product sounds like Scrumbler without having to sign it.
+Five rules. Hold the line on these and the product sounds like Scrumbler without having to sign it.
 
 ### Règle 01, Tutoie.
 L'app est anonyme et collégiale, on ne « vous » pas l'utilisateur.
@@ -291,10 +292,15 @@ On garde un ton direct sans être sec, avec virgule, point, parenthèses, ou deu
 - ✓ *Aucun compte requis, connexion anonyme.*
 - ✗ Toute phrase contenant un em dash (le glyphe U+2014). Pas d'exception.
 
-### Règle 04 Reste neutre quand ça diverge.
-Les outliers ne sont pas une faute. On invite, on n'accuse pas.
-- ✓ *Discussion nécessaire : quelqu'un a estimé très différemment du groupe.*
+### Règle 04 Reste bienveillant quand ça diverge.
+Un écart d'estimation est une info précieuse, pas un problème. On ouvre la parole pour comprendre un point de vue.
+- ✓ *Discussion nécessaire : prenez un instant pour comprendre les hypothèses avant de re-voter.*
 - ✗ *Erreur de vote : un développeur s'est trompé.*
+
+### Règle 05 Dis ce qu'on fait, pas ce qu'on ne fait pas.
+Formule au positif. Évite même de citer un terme négatif pour le nier (« sans pointer du doigt », « pas une honte », « pas pour faire joli ») : nommer l'anxiété la convoque. On décrit l'expérience qu'on offre, pas celle qu'on évite.
+- ✓ *Chaque point de vue est une info précieuse pour mieux estimer.*
+- ✗ *On ne pointe personne du doigt.*
 
 ### Microcopy patterns
 
@@ -343,6 +349,7 @@ brand-assets/
 
 | Version | Date | Notes |
 |---|---|---|
+| 1.1.0   | 2026-05-23 | Ajout de la raison d'être (why). Voix : règle 05 (positivité), règle 04 recadrée sur la bienveillance. |
 | 1.0.0   | 2026-05-22 | Initial brand book. Question-card mark, full token set, 4 voice rules. |
 
 ---

@@ -18,7 +18,7 @@ export const fr = {
     eyebrow: 'Planning poker, nouvelle génération',
     title: 'Estime tes stories,\nrévèle d’un coup,\nrecommence.',
     lead:
-      'Scrumbler est un planning poker anonyme par défaut, sans compte, en temps réel. Pensé pour le rythme d’un vrai sprint, pas pour faire joli en réunion.',
+      'Scrumbler est un planning poker anonyme par défaut, sans compte, en temps réel. Il rend le sprint planning vivant : la parole circule, les hypothèses cachées remontent, et estimer redevient un moment qui soude l’équipe.',
     ctaPrimary: 'Lance une partie',
     ctaSecondary: 'Découvre le produit',
     proof: 'Aucun compte. Un code de salle partagé, c’est tout.',
@@ -36,12 +36,12 @@ export const fr = {
       {
         title: 'Anonyme par défaut',
         body:
-          'Les votes restent cachés jusqu’à la révélation. Personne ne s’aligne sur le premier qui pose une carte, et la divergence devient une discussion plutôt qu’une honte.',
+          'Les votes restent cachés jusqu’à la révélation. Personne ne s’aligne sur le premier qui pose une carte : chacun joue son vrai chiffre, et les écarts deviennent le point de départ d’un vrai débat.',
       },
       {
         title: 'Temps réel, vraiment',
         body:
-          'Synchronisation Supabase Realtime, latence sous-seconde. Quand un coéquipier vote, tu le sais dans la foulée.',
+          'Synchronisation en temps réel, latence sous-seconde. Quand un coéquipier vote, tu le vois dans la foulée. La technique reste invisible, au service du rituel.',
       },
     ],
   },
@@ -53,7 +53,7 @@ export const fr = {
         emoji: '🎯',
         title: 'Rôles dédiés',
         body:
-          'Scrum Master ou Developer : chaque rôle a son interface, sa palette, ses gestes.',
+          'Scrum Master ou Developer, chacun voit l’écran adapté à son job : l’un anime la session, l’autre se concentre sur son vote.',
       },
       {
         emoji: '🎲',
@@ -65,13 +65,13 @@ export const fr = {
         emoji: '🎉',
         title: 'Révélation théâtrale',
         body:
-          'Reveal scoreboard avec gradient de tier, confetti, et stats : moyenne, médiane, écart-type, consensus.',
+          'La révélation des votes devient un petit spectacle : confettis, scoreboard animé, et ce frisson juste avant de retourner les cartes.',
       },
       {
         emoji: '💬',
         title: 'Discussion ciblée',
         body:
-          'Quand un vote s’écarte du groupe, l’app propose une discussion neutre, sans pointer du doigt.',
+          'Quand un vote sort du lot, Scrumbler invite à en parler avec bienveillance : chaque point de vue est une info précieuse pour mieux estimer.',
       },
       {
         emoji: '↺',
@@ -115,7 +115,7 @@ export const fr = {
     eyebrow: 'Tarifs',
     title: 'Gratuit, tout simplement.',
     body:
-      'Scrumbler est gratuit pour les équipes : autant de salles, autant de joueurs, autant de rounds que tu veux. Les fonctionnalités premium arrivent quand on aura quelque chose de vraiment utile à proposer, pas avant.',
+      'Scrumbler est gratuit pour les équipes : autant de salles, autant de joueurs, autant de rounds que tu veux. Des fonctionnalités premium arriveront, mais la version de base restera toujours gratuite et sans compte.',
     cta: 'Voir les tarifs en détail',
   },
   faq: {
@@ -136,7 +136,7 @@ export const fr = {
       },
       {
         q: 'Je peux utiliser autre chose que Fibonacci ?',
-        a: 'Pas encore, c’est la prochaine grosse étape. T-shirt sizes (XS à XXL) et suites custom arrivent bientôt.',
+        a: 'Oui. À la création de la salle tu choisis ton échelle : Fibonacci, jours-homme, T-shirt (XS à XXL), puissances de 2, ou une suite 100 % personnalisée.',
       },
       {
         q: 'Open source ?',
@@ -173,9 +173,9 @@ export const fr = {
   },
   pricing: {
     eyebrow: 'Tarifs',
-    title: 'Gratuit aujourd’hui, durable demain.',
+    title: 'Gratuit aujourd’hui, et aussi demain.',
     lead:
-      'On préfère commencer simple et clair. Scrumbler reste gratuit tant qu’on ne propose pas quelque chose de vraiment payant.',
+      'Scrumbler est et restera gratuit. En parallèle, on prépare une version Studio qui proposera quelque chose de vraiment fou.',
     plans: [
       {
         name: 'Crew',
@@ -185,6 +185,7 @@ export const fr = {
         features: [
           'Salles illimitées',
           'Joueurs illimités',
+          'Échelles multiples (Fibonacci, T-shirt, custom…)',
           'Reveal scoreboard complet',
           'Récap de session exportable',
           'Connexion anonyme',
@@ -202,7 +203,7 @@ export const fr = {
         features: [
           'Historique persistant des sessions',
           'Intégrations Jira / Linear / GitHub',
-          'Suites d’estimation custom (t-shirt, puissances de 2…)',
+          'Tableaux de bord et tendances par équipe',
           'SSO et workspaces',
           'Support prioritaire',
         ],

@@ -18,7 +18,7 @@ export const en = {
     eyebrow: 'Planning poker, next generation',
     title: 'Estimate your stories,\nreveal in one beat,\nrepeat.',
     lead:
-      'Scrumbler is an anonymous-by-default, no-account, real-time planning poker. Built for the pace of an actual sprint, not for looking good in a meeting.',
+      'Scrumbler is an anonymous-by-default, no-account, real-time planning poker. It makes sprint planning come alive: everyone speaks up, hidden assumptions surface, and estimating becomes a moment that brings the team together.',
     ctaPrimary: 'Start a game',
     ctaSecondary: 'See the product',
     proof: 'No account. Share a room code, that’s it.',
@@ -36,12 +36,12 @@ export const en = {
       {
         title: 'Anonymous by default',
         body:
-          'Votes stay hidden until reveal. Nobody anchors on the first card down, and divergence becomes a discussion rather than a confession.',
+          'Votes stay hidden until reveal. Nobody anchors on the first card down: everyone plays their real number, and the gaps become the starting point for a real conversation.',
       },
       {
         title: 'Real-time, truly',
         body:
-          'Supabase Realtime sync, sub-second latency. When a teammate votes, you see it in the same heartbeat.',
+          'Real-time sync, sub-second latency. When a teammate votes, you see it in the same heartbeat. The tech stays invisible, in service of the ritual.',
       },
     ],
   },
@@ -53,7 +53,7 @@ export const en = {
         emoji: '🎯',
         title: 'Dedicated roles',
         body:
-          'Scrum Master or Developer: each role gets its own surface, palette and gestures.',
+          'Scrum Master or Developer, each sees the screen built for the job: one runs the session, the other focuses on the vote.',
       },
       {
         emoji: '🎲',
@@ -65,13 +65,13 @@ export const en = {
         emoji: '🎉',
         title: 'Theatrical reveal',
         body:
-          'Reveal scoreboard with tier gradients, confetti, and stats: mean, median, deviation, consensus.',
+          'Revealing the votes turns into a little show: confetti, an animated scoreboard, and that rush right before the cards flip.',
       },
       {
         emoji: '💬',
         title: 'Targeted discussion',
         body:
-          'When one vote diverges, Scrumbler invites a discussion. Neutral, never blaming.',
+          'When a vote stands out, Scrumbler opens the floor with kindness: every point of view is valuable info for a better estimate.',
       },
       {
         emoji: '↺',
@@ -115,7 +115,7 @@ export const en = {
     eyebrow: 'Pricing',
     title: 'Free, plain and simple.',
     body:
-      'Scrumbler is free for teams: unlimited rooms, players, rounds. Premium tiers will land when we have something genuinely worth charging for, not before.',
+      'Scrumbler is free for teams: unlimited rooms, players, rounds. Premium features will come, but the core version will always stay free and account-free.',
     cta: 'See the full pricing',
   },
   faq: {
@@ -136,7 +136,7 @@ export const en = {
       },
       {
         q: 'Can I use something other than Fibonacci?',
-        a: 'Not yet, that’s the next big step. T-shirt sizes (XS to XXL) and custom scales are coming soon.',
+        a: 'Yes. When you create the room you pick your scale: Fibonacci, man-days, T-shirt (XS to XXL), powers of 2, or a fully custom set.',
       },
       {
         q: 'Open source?',
@@ -173,9 +173,9 @@ export const en = {
   },
   pricing: {
     eyebrow: 'Pricing',
-    title: 'Free today, sustainable tomorrow.',
+    title: 'Free today, free tomorrow.',
     lead:
-      'We’d rather start clean and simple. Scrumbler stays free until we have something worth charging for.',
+      'Scrumbler is free and will stay free. Alongside it, we’re building a Studio version that brings something genuinely wild.',
     plans: [
       {
         name: 'Crew',
@@ -185,6 +185,7 @@ export const en = {
         features: [
           'Unlimited rooms',
           'Unlimited players',
+          'Multiple scales (Fibonacci, T-shirt, custom…)',
           'Full reveal scoreboard',
           'Exportable session recap',
           'Anonymous sign-in',
@@ -202,7 +203,7 @@ export const en = {
         features: [
           'Persistent session history',
           'Jira / Linear / GitHub integrations',
-          'Custom estimation scales (t-shirt, powers of 2…)',
+          'Team dashboards and velocity trends',
           'SSO and workspaces',
           'Priority support',
         ],
