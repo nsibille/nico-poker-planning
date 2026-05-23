@@ -724,7 +724,7 @@ html, body {
   position: absolute;
   inset: 0;
   background-image: url('/brand/patterns/card-pattern-light.svg');
-  background-size: 320px 320px;
+  background-size: 168px 168px;
   background-repeat: repeat;
   opacity: 0.12;
   pointer-events: none;

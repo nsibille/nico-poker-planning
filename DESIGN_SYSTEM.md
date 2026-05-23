@@ -897,19 +897,19 @@ Variantes  : sm, md, lg | success, warning, danger, info, neutral
 
 ### `bg-card-pattern`
 **Texture brand : silhouettes de cartes répétées sur surfaces sombres.**
-Source SVG : `/brand/patterns/card-pattern.svg`. Appliqué via pseudo-élément `::before`
-positionné absolu, `mix-blend-mode: screen` pour éclaircir uniquement les zones sombres.
-Modifiers : `--soft` (opacity 0.06), default (0.10), `--bold` (0.16).
+Source SVG : `/brand/patterns/card-pattern-light.svg` (silhouettes blanches, pensées pour
+les fonds sombres). Appliqué via pseudo-élément `::before` positionné absolu, blend normal.
+Tuile dense (168px) pour de petites cartes conformes au brand book (BRAND §5.1).
+Modifiers : `--soft` (opacity 0.07), default (0.12), `--bold` (0.18).
 
 ```css
 .bg-card-pattern { position: relative; isolation: isolate; }
 .bg-card-pattern::before {
   content: '';
   position: absolute; inset: 0;
-  background: url('/brand/patterns/card-pattern.svg') repeat;
-  background-size: 320px 320px;
-  mix-blend-mode: screen;
-  opacity: 0.10;
+  background: url('/brand/patterns/card-pattern-light.svg') repeat;
+  background-size: 168px 168px;
+  opacity: 0.12;
   pointer-events: none;
   z-index: 0;
 }
