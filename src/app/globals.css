@@ -712,6 +712,30 @@ html, body {
   color: var(--color-text-secondary);
 }
 
+/* ── Alternatives sous le formulaire join (créer / rejoindre une autre room) ── */
+.join-form-alts {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-border);
+}
+.join-form-alts__sep {
+  font-family: var(--font-primary);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.join-form-alts__row {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
 /* ── Layouts ── */
 .layout-lobby {
   min-height: 100vh;

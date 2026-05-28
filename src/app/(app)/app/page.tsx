@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import Image from 'next/image'
 import { LobbyForm } from '@/components/lobby/LobbyForm'
 
@@ -27,7 +28,9 @@ export default function HomePage() {
         <div className="deco-circle" style={{ width: 90, height: 90, color: 'var(--color-amber)', bottom: 60, right: 40 }} />
 
         <div className="card-surface card-surface--elevated">
-          <LobbyForm />
+          <Suspense fallback={null}>
+            <LobbyForm />
+          </Suspense>
         </div>
 
         <p className="lobby-footnote">

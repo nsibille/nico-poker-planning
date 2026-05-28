@@ -11,6 +11,7 @@ export const en = {
     pricing: 'Pricing',
     changelog: 'Changelog',
     cta: 'Start a game',
+    ctaJoin: 'Join a game',
     openMenu: 'Open menu',
     closeMenu: 'Close menu',
   },

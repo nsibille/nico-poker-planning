@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { Toast, useToast } from '@/components/ui/Toast'
@@ -17,6 +18,7 @@ interface JoinRoomFormProps {
 }
 
 export function JoinRoomForm({ roomId }: JoinRoomFormProps) {
+  const router = useRouter()
   const { userId, loading: sessionLoading } = useSession()
   const { toast, showToast, clearToast } = useToast()
   const { setMyName, setMyRole, setMyPlayerId, setMyRoomId, setMyEmoji, reset } = useGameStore()
@@ -142,6 +144,26 @@ export function JoinRoomForm({ roomId }: JoinRoomFormProps) {
           Rejoindre
         </Button>
       </form>
+
+      <div className="join-form-alts">
+        <span className="join-form-alts__sep" aria-hidden>ou</span>
+        <div className="join-form-alts__row">
+          <button
+            type="button"
+            className="btn-ghost-sm"
+            onClick={() => { reset(); router.push('/app') }}
+          >
+            Rejoindre une autre Room
+          </button>
+          <button
+            type="button"
+            className="btn-ghost-sm"
+            onClick={() => { reset(); router.push('/app?new=1') }}
+          >
+            Créer une Room
+          </button>
+        </div>
+      </div>
 
       {toast && (
         <Toast message={toast.message} type={toast.type} onClose={clearToast} />

@@ -11,6 +11,7 @@ export const fr = {
     pricing: 'Tarifs',
     changelog: 'Changelog',
     cta: 'Lance une partie',
+    ctaJoin: 'Rejoins une partie',
     openMenu: 'Ouvrir le menu',
     closeMenu: 'Fermer le menu',
   },

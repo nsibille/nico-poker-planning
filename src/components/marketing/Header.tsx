@@ -40,7 +40,10 @@ export function Header({ locale, dict, otherLocale }: Props) {
           >
             {otherLocale.toUpperCase()}
           </Link>
-          <Link href="/app" className="btn-primary-md marketing-cta-pill">
+          <Link href="/app" className="btn-secondary-md marketing-cta-pill">
+            {dict.ctaJoin}
+          </Link>
+          <Link href="/app?new=1" className="btn-primary-md marketing-cta-pill">
             {dict.cta} →
           </Link>
         </div>
@@ -72,7 +75,10 @@ export function Header({ locale, dict, otherLocale }: Props) {
           <Link href={`/${otherLocale}`} className="marketing-nav-link" onClick={() => setOpen(false)}>
             {otherLocale.toUpperCase()}
           </Link>
-          <Link href="/app" className="btn-primary-md marketing-cta-pill" onClick={() => setOpen(false)}>
+          <Link href="/app" className="btn-secondary-md marketing-cta-pill" onClick={() => setOpen(false)}>
+            {dict.ctaJoin}
+          </Link>
+          <Link href="/app?new=1" className="btn-primary-md marketing-cta-pill" onClick={() => setOpen(false)}>
             {dict.cta} →
           </Link>
         </div>

@@ -1,6 +1,6 @@
 'use client'
 import { useState, useCallback, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Spinner } from '@/components/ui/Spinner'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
@@ -23,9 +23,14 @@ import type { Role } from '@/types'
 
 export function LobbyForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { userId, loading: sessionLoading } = useSession()
   const { toast, showToast, clearToast } = useToast()
   const { myPlayerId, myRoomId, setMyName, setMyRole, setMyPlayerId, setMyRoomId, setMyEmoji, reset } = useGameStore()
+
+  // ?new=1 (depuis le header marketing ou le JoinRoomForm) déclenche
+  // l'auto-génération d'un ID pour bien marquer l'intention "création".
+  const shouldCreate = searchParams.get('new') === '1'
 
   const [name, setName] = useState('')
   const [role, setRole] = useState<Role | null>(null)
@@ -65,6 +70,17 @@ export function LobbyForm() {
   const handleGenerate = useCallback(() => {
     setRoomId(generateRoomId())
   }, [])
+
+  // Auto-génération en mode "création" : on le fait dans un effet plutôt que
+  // dans l'initializer de useState pour éviter un mismatch SSR/hydratation
+  // (generateRoomId utilise Math.random, le serveur et le client ne tomberaient
+  // pas sur la même valeur). One-shot client-side, donc setState dans effect
+  // est ici intentionnel.
+  useEffect(() => {
+    if (!shouldCreate) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setRoomId(prev => prev || generateRoomId())
+  }, [shouldCreate])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
