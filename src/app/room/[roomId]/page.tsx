@@ -12,6 +12,7 @@ import { SessionRecap } from '@/components/room/SessionRecap'
 import { StoryTimeline } from '@/components/room/StoryTimeline'
 import { Toast, useToast } from '@/components/ui/Toast'
 import { Spinner } from '@/components/ui/Spinner'
+import { JoinRoomForm } from '@/components/lobby/JoinRoomForm'
 import { useRoom } from '@/hooks/useRoom'
 import { usePlayers } from '@/hooks/usePlayers'
 import { useVotes } from '@/hooks/useVotes'
@@ -62,21 +63,19 @@ export default function RoomPage() {
     }
   }, [room, roomLoading, router, showToast])
 
-  useEffect(() => {
-    if (!hydrated) return
-    if (!myPlayerId || (myRoomId && myRoomId !== roomId)) {
-      router.push('/app')
-    }
-  }, [hydrated, myPlayerId, myRoomId, roomId, router])
+  // Session manquante ou attachée à une autre room : on ne redirige plus vers
+  // /app, on affiche un formulaire d'identification dans la room courante
+  // (cf. rendu plus bas).
+  const needsJoin = hydrated && (!myPlayerId || (!!myRoomId && myRoomId !== roomId))
 
   useEffect(() => {
     if (!hydrated || !myPlayerId || !players.length) return
     const stillExists = players.some(p => p.id === myPlayerId)
     if (!stillExists) {
+      // Player supprimé en DB : on reset le store, le formulaire join réapparaît.
       reset()
-      router.push('/app')
     }
-  }, [hydrated, myPlayerId, players, reset, router])
+  }, [hydrated, myPlayerId, players, reset])
 
   // Backfill SM-side : pour les rounds qui ont des votes mais pas de ligne
   // stories (rounds révélés avant la migration timeline), on crée le snapshot
@@ -147,6 +146,25 @@ export default function RoomPage() {
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg-page)' }}>
         <p style={{ fontFamily: 'var(--font-primary)', color: 'var(--color-text-muted)' }}>Redirection…</p>
         {toast && <Toast message={toast.message} type={toast.type} onClose={clearToast} />}
+      </div>
+    )
+  }
+
+  if (needsJoin) {
+    return (
+      <div
+        style={{
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'var(--color-bg-page)',
+          padding: 'var(--space-4)',
+        }}
+      >
+        <div className="card-surface card-surface--elevated" style={{ width: '100%', maxWidth: 460 }}>
+          <JoinRoomForm roomId={roomId} />
+        </div>
       </div>
     )
   }
