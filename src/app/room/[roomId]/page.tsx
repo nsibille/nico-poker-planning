@@ -163,7 +163,7 @@ export default function RoomPage() {
         }}
       >
         <div className="card-surface card-surface--elevated" style={{ width: '100%', maxWidth: 460 }}>
-          <JoinRoomForm roomId={roomId} />
+          <JoinRoomForm roomId={roomId} room={room} players={players} />
         </div>
       </div>
     )

@@ -28,9 +28,12 @@ export function LobbyForm() {
   const { toast, showToast, clearToast } = useToast()
   const { myPlayerId, myRoomId, setMyName, setMyRole, setMyPlayerId, setMyRoomId, setMyEmoji, reset } = useGameStore()
 
-  // ?new=1 (depuis le header marketing ou le JoinRoomForm) déclenche
-  // l'auto-génération d'un ID pour bien marquer l'intention "création".
-  const shouldCreate = searchParams.get('new') === '1'
+  // ?new=1 (depuis le header marketing ou le JoinRoomForm) déclenche le mode
+  // "création" : auto-génération d'un ID + ScalePicker visible. Par défaut on
+  // est en mode "join" : on demande juste l'ID d'une room existante, pas
+  // d'échelle, et l'absence en DB est traitée comme une erreur (pas d'auto-
+  // create silencieux qui camouflerait une faute de frappe).
+  const isCreateMode = searchParams.get('new') === '1'
 
   const [name, setName] = useState('')
   const [role, setRole] = useState<Role | null>(null)
@@ -77,10 +80,10 @@ export function LobbyForm() {
   // pas sur la même valeur). One-shot client-side, donc setState dans effect
   // est ici intentionnel.
   useEffect(() => {
-    if (!shouldCreate) return
+    if (!isCreateMode) return
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setRoomId(prev => prev || generateRoomId())
-  }, [shouldCreate])
+  }, [isCreateMode])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -89,8 +92,8 @@ export function LobbyForm() {
     if (!roomId.trim()) { showToast('L\'ID de room est requis'); return }
     if (!userId) { showToast('Session non prête, réessaie'); return }
 
-    const customValues = scaleId === 'custom' ? parseCustomValues(customRaw) : null
-    if (scaleId === 'custom' && (!customValues || customValues.length === 0)) {
+    const customValues = isCreateMode && scaleId === 'custom' ? parseCustomValues(customRaw) : null
+    if (isCreateMode && scaleId === 'custom' && (!customValues || customValues.length === 0)) {
       showToast('Échelle perso : ajoute au moins une valeur')
       return
     }
@@ -99,23 +102,31 @@ export function LobbyForm() {
     const supabase = createClient()
 
     try {
-      // Upsert room, scale_id / scale_values ne sont appliqués qu'à la
-      // création (ignoreDuplicates → no-op si la room existe déjà).
-      const { error: roomError } = await supabase
-        .from('rooms')
-        .upsert(
-          { id: roomId, scale_id: scaleId, scale_values: customValues },
-          { onConflict: 'id', ignoreDuplicates: true },
-        )
-      if (roomError) throw roomError
+      if (isCreateMode) {
+        // Création de la room avec son échelle (no-op si l'ID est déjà pris).
+        const { error: roomError } = await supabase
+          .from('rooms')
+          .upsert(
+            { id: roomId, scale_id: scaleId, scale_values: customValues },
+            { onConflict: 'id', ignoreDuplicates: true },
+          )
+        if (roomError) throw roomError
+      }
 
-      // Verify room exists
+      // En mode join, la room DOIT déjà exister : pas d'auto-create silencieux
+      // qui camouflerait une faute de frappe sur l'ID.
       const { data: roomData } = await supabase
         .from('rooms')
         .select('id')
         .eq('id', roomId)
-        .single()
-      if (!roomData) { showToast('Room introuvable'); setLoading(false); return }
+        .maybeSingle()
+      if (!roomData) {
+        showToast(isCreateMode
+          ? 'Room introuvable'
+          : 'Aucune room avec cet ID. Vérifie le code ou clique sur Lance une partie.')
+        setLoading(false)
+        return
+      }
 
       // Check limits, devs are capped, Scrum Masters have no hard limit.
       if (role === 'developer') {
@@ -211,22 +222,26 @@ export function LobbyForm() {
               onChange={e => setRoomId(e.target.value.toLowerCase())}
               pattern="[a-z]+-[0-9]{3}"
             />
-            <button
-              type="button"
-              onClick={handleGenerate}
-              className="btn-secondary-md whitespace-nowrap"
-            >
-              Générer
-            </button>
+            {isCreateMode && (
+              <button
+                type="button"
+                onClick={handleGenerate}
+                className="btn-secondary-md whitespace-nowrap"
+              >
+                Générer
+              </button>
+            )}
           </div>
         </div>
 
-        <ScalePicker
-          scaleId={scaleId}
-          onScaleChange={setScaleId}
-          customRaw={customRaw}
-          onCustomChange={setCustomRaw}
-        />
+        {isCreateMode && (
+          <ScalePicker
+            scaleId={scaleId}
+            onScaleChange={setScaleId}
+            customRaw={customRaw}
+            onCustomChange={setCustomRaw}
+          />
+        )}
 
         <Button
           type="submit"
@@ -235,7 +250,7 @@ export function LobbyForm() {
           disabled={loading || sessionLoading}
           className="w-full mt-2"
         >
-          Rejoindre la room
+          {isCreateMode ? 'Lancer la partie' : 'Rejoindre la room'}
         </Button>
       </form>
 

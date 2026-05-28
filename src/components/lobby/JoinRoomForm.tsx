@@ -11,13 +11,17 @@ import { useGameStore } from '@/store/gameStore'
 import { createClient } from '@/lib/supabase/client'
 import { randomPlayerEmoji } from '@/lib/game/emojis'
 import { MAX_DEV } from '@/lib/game/constants'
-import type { Role } from '@/types'
+import type { Player, Role, Room } from '@/types'
 
 interface JoinRoomFormProps {
   roomId: string
+  /** Realtime-synced room (réutilise la souscription du parent pour éviter un double channel). */
+  room: Room
+  /** Realtime-synced players (idem). */
+  players: Player[]
 }
 
-export function JoinRoomForm({ roomId }: JoinRoomFormProps) {
+export function JoinRoomForm({ roomId, room, players }: JoinRoomFormProps) {
   const router = useRouter()
   const { userId, loading: sessionLoading } = useSession()
   const { toast, showToast, clearToast } = useToast()
@@ -100,25 +104,56 @@ export function JoinRoomForm({ roomId }: JoinRoomFormProps) {
     }
   }
 
+  const smCount = players.filter(p => p.role === 'scrum-master').length
+  const devCount = players.filter(p => p.role === 'developer').length
+  const total = smCount + devCount
+  const ended = !!room.ended_at
+
+  let bannerEmoji = '👋'
+  let bannerTitle: string
+  if (ended) {
+    bannerEmoji = '🏁'
+    bannerTitle = 'Session terminée'
+  } else if (total === 0) {
+    bannerEmoji = '✨'
+    bannerTitle = 'Tu lances la session, prends les commandes !'
+  } else if (smCount === 0) {
+    bannerEmoji = '🧑‍💻'
+    bannerTitle = devCount === 1
+      ? '1 dev attend un Scrum Master, ça pourrait être toi ?'
+      : `${devCount} devs attendent un Scrum Master, ça pourrait être toi ?`
+  } else if (devCount === 0) {
+    bannerEmoji = '🎯'
+    bannerTitle = smCount === 1
+      ? 'Un Scrum Master est déjà là, viens compléter la team !'
+      : `${smCount} Scrum Masters sont déjà là, viens compléter la team !`
+  } else {
+    bannerEmoji = '🎉'
+    bannerTitle = total === 1
+      ? 'L\'équipe t\'attend, saute dans la partie !'
+      : `${total} personnes t'attendent déjà, saute dans la partie !`
+  }
+
   return (
     <>
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-        <div className="flex flex-col gap-1">
-          <span
-            className="text-sm font-medium"
-            style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-primary)' }}
-          >
-            Rejoindre la room
+        <div className="room-preview-banner" aria-live="polite">
+          <span className="room-preview-banner__title">
+            <span aria-hidden>{bannerEmoji}</span> {bannerTitle}
           </span>
-          <strong
-            style={{
-              fontFamily: 'var(--font-primary)',
-              fontSize: 'var(--text-lg)',
-              color: 'var(--color-text-primary)',
-            }}
-          >
-            {roomId}
-          </strong>
+          <span className="room-preview-banner__room">
+            Room <strong>{roomId}</strong>
+          </span>
+          {!ended && total > 0 && (
+            <div className="room-preview-banner__stats">
+              <span className="room-preview-banner__chip" title="Scrum Master(s) déjà connecté(s)">
+                <span aria-hidden>🎯</span> {smCount} {smCount === 1 ? 'Scrum Master' : 'Scrum Masters'}
+              </span>
+              <span className="room-preview-banner__chip" title="Développeur·s déjà connecté·s">
+                <span aria-hidden>🧑‍💻</span> {devCount} {devCount === 1 ? 'développeur' : 'développeurs'}
+              </span>
+            </div>
+          )}
         </div>
 
         <Input

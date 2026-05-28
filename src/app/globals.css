@@ -712,6 +712,56 @@ html, body {
   color: var(--color-text-secondary);
 }
 
+/* ── Banner preview de la room (JoinRoomForm) : décompte SM/dev + copy engageante ── */
+.room-preview-banner {
+  background: var(--color-brand-primary-50);
+  border: 1.5px solid var(--color-brand-primary-100);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.room-preview-banner__title {
+  font-family: var(--font-primary);
+  font-size: var(--text-md);
+  font-weight: var(--fw-bold);
+  color: var(--color-brand-primary-600);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1.35;
+}
+.room-preview-banner__room {
+  font-family: var(--font-primary);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+.room-preview-banner__room strong {
+  color: var(--color-text-primary);
+  font-weight: var(--fw-bold);
+  letter-spacing: 0.02em;
+}
+.room-preview-banner__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+.room-preview-banner__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-brand-primary-100);
+  border-radius: var(--radius-full);
+  font-family: var(--font-primary);
+  font-size: var(--text-xs);
+  font-weight: var(--fw-medium);
+  color: var(--color-text-primary);
+}
+
 /* ── Alternatives sous le formulaire join (créer / rejoindre une autre room) ── */
 .join-form-alts {
   display: flex;
