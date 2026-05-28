@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { Textarea } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
+import { Toast, useToast } from '@/components/ui/Toast'
 import { createClient } from '@/lib/supabase/client'
 import type { Phase } from '@/types'
 
@@ -10,14 +11,18 @@ interface StoryPanelProps {
   story: string
   phase: Phase
   isScrumMaster: boolean
+  /** Live round number (= rooms.round). */
+  round: number
   /** When set, edits target stories[round].title instead of rooms.story (history mode). */
   historyRound?: number | null
 }
 
-export function StoryPanel({ roomId, story, phase, isScrumMaster, historyRound }: StoryPanelProps) {
+export function StoryPanel({ roomId, story, phase, isScrumMaster, round, historyRound }: StoryPanelProps) {
   const [draft, setDraft] = useState(story)
   const [lastSyncedStory, setLastSyncedStory] = useState(story)
   const [saving, setSaving] = useState(false)
+  const [advancing, setAdvancing] = useState(false)
+  const { toast, showToast, clearToast } = useToast()
 
   // Si la story change côté serveur (autre SM, nouveau round), on resynchronise
   // le brouillon local. Pattern "store previous & compare during render"
@@ -43,8 +48,25 @@ export function StoryPanel({ roomId, story, phase, isScrumMaster, historyRound }
   }
 
   const isWaiting = phase === 'waiting'
+  const isRevealed = phase === 'revealed'
+  const isLive = historyRound == null
+  const showNextRound = isRevealed && isLive
   const hasUnsavedChanges = draft !== story
   const trimmedEmpty = !draft.trim()
+
+  async function handleNextRound() {
+    if (advancing) return
+    setAdvancing(true)
+    const supabase = createClient()
+    const { error } = await supabase
+      .from('rooms')
+      .update({ phase: 'waiting', story: '', round: round + 1 })
+      .eq('id', roomId)
+    if (error) {
+      showToast(`Prochain round échoué : ${error.message}`, 'error')
+    }
+    setAdvancing(false)
+  }
 
   async function handleSave() {
     if (saving) return
@@ -68,29 +90,39 @@ export function StoryPanel({ roomId, story, phase, isScrumMaster, historyRound }
     setSaving(false)
   }
 
-  const buttonLabel = isWaiting
+  const saveButtonLabel = isWaiting
     ? 'Lancer le vote'
     : saving
       ? 'Enregistrement…'
-      : hasUnsavedChanges
-        ? 'Enregistrer la modification'
-        : 'À jour'
+      : 'Enregistrer la modification'
 
-  const buttonDisabled = trimmedEmpty || (!isWaiting && !hasUnsavedChanges) || saving
+  const saveButtonDisabled = trimmedEmpty || (!isWaiting && !hasUnsavedChanges) || saving
+  // En revealed/voting on n'affiche le bouton de sauvegarde que s'il y a une
+  // édition pending, sinon la card est encombrée d'un "À jour" inutile.
+  const showSaveButton = isWaiting || hasUnsavedChanges
 
   return (
     <div className="card-surface flex flex-col gap-3">
-      <div className="flex items-center justify-between gap-2 flex-wrap">
-        <h3 style={{ fontSize: 'var(--text-md)', fontWeight: 'var(--fw-bold)', color: 'var(--color-text-primary)', fontFamily: 'var(--font-primary)' }}>
-          User Story
-        </h3>
-        {!isWaiting && (
+      {isWaiting ? (
+        <div className="story-new-round-banner">
+          <span className="story-new-round-banner__title">
+            <span aria-hidden>✨</span> Nouveau round {round}
+          </span>
+          <span className="story-new-round-banner__subtitle">
+            Définis la story que ton équipe va estimer, puis lance le vote.
+          </span>
+        </div>
+      ) : (
+        <div className="flex items-center justify-between gap-2 flex-wrap">
+          <h3 style={{ fontSize: 'var(--text-md)', fontWeight: 'var(--fw-bold)', color: 'var(--color-text-primary)', fontFamily: 'var(--font-primary)' }}>
+            User Story
+          </h3>
           <span className={`story-status-pill story-status-pill--${phase}`}>
             {phase === 'voting' ? 'Vote en cours' : 'Révélé'}
             {hasUnsavedChanges && <span className="story-status-pill__dot" aria-label="modifications non sauvegardées" />}
           </span>
-        )}
-      </div>
+        </div>
+      )}
 
       <Textarea
         value={draft}
@@ -105,15 +137,30 @@ export function StoryPanel({ roomId, story, phase, isScrumMaster, historyRound }
         </p>
       )}
 
-      <Button
-        variant={isWaiting ? 'primary' : 'secondary'}
-        onClick={handleSave}
-        loading={saving && isWaiting}
-        disabled={buttonDisabled}
-        className="self-end"
-      >
-        {buttonLabel}
-      </Button>
+      <div className="flex items-center justify-end gap-2 flex-wrap">
+        {showSaveButton && (
+          <Button
+            variant={isWaiting ? 'primary' : 'secondary'}
+            onClick={handleSave}
+            loading={saving && isWaiting}
+            disabled={saveButtonDisabled}
+          >
+            {saveButtonLabel}
+          </Button>
+        )}
+        {showNextRound && (
+          <Button
+            variant="primary"
+            onClick={handleNextRound}
+            loading={advancing}
+            disabled={advancing}
+          >
+            Prochain round →
+          </Button>
+        )}
+      </div>
+
+      {toast && <Toast message={toast.message} type={toast.type} onClose={clearToast} />}
     </div>
   )
 }

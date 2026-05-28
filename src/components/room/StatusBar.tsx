@@ -3,7 +3,6 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Toast, useToast } from '@/components/ui/Toast'
 import { createClient } from '@/lib/supabase/client'
-import { useGameStore } from '@/store/gameStore'
 import { computeRevealStats } from '@/lib/game/reveal-stats'
 import type { EstimationScale } from '@/lib/game/scales'
 import type { Player, Vote, Phase } from '@/types'
@@ -24,7 +23,6 @@ interface StatusBarProps {
 }
 
 export function StatusBar({ roomId, phase, round, liveRound, isHistoryMode, story, players, votes, isScrumMaster, scale }: StatusBarProps) {
-  const { setSelectedVote } = useGameStore()
   const [loading, setLoading] = useState(false)
   const [endConfirm, setEndConfirm] = useState(false)
   const { toast, showToast, clearToast } = useToast()
@@ -71,22 +69,6 @@ export function StatusBar({ roomId, phase, round, liveRound, isHistoryMode, stor
     }
     const { error: roomError } = await supabase.from('rooms').update({ phase: 'revealed' }).eq('id', roomId)
     if (roomError) showToast(`Reveal échoué : ${roomError.message}`)
-    setLoading(false)
-  }
-
-  async function handleNextRound() {
-    setLoading(true)
-    const supabase = createClient()
-    const { error } = await supabase
-      .from('rooms')
-      .update({ phase: 'waiting', story: '', round: liveRound + 1 })
-      .eq('id', roomId)
-    if (error) {
-      showToast(`Prochain round échoué : ${error.message}`)
-      setLoading(false)
-      return
-    }
-    setSelectedVote(null)
     setLoading(false)
   }
 
@@ -139,9 +121,6 @@ export function StatusBar({ roomId, phase, round, liveRound, isHistoryMode, stor
                 >
                   🏁 Terminer la session
                 </button>
-                <Button variant="primary" onClick={handleNextRound} loading={loading}>
-                  Prochain round →
-                </Button>
               </div>
             )}
             {phase === 'revealed' && endConfirm && (

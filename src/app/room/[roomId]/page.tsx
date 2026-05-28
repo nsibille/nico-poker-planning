@@ -239,6 +239,7 @@ export default function RoomPage() {
             story={displayStory}
             phase={displayPhase}
             isScrumMaster={isScrumMaster}
+            round={room.round}
             historyRound={isHistoryMode ? viewingRound : null}
           />
 
