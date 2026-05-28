@@ -194,45 +194,59 @@ export function LobbyForm() {
     )
   }
 
+  const introTitle = isCreateMode ? 'Lance une partie' : 'Rejoins une room'
+  const introSubtitle = isCreateMode
+    ? 'Choisis un ID, partage-le à ta team, puis remplis ta carte de membre.'
+    : 'Saisis l\'ID que ta team t\'a partagé pour la rejoindre.'
+
   return (
     <>
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+        <div className="lobby-form-intro">
+          <span className="lobby-form-intro__title">
+            <span aria-hidden>{isCreateMode ? '✨' : '🎯'}</span> {introTitle}
+          </span>
+          <span className="lobby-form-intro__subtitle">{introSubtitle}</span>
+          <div className="lobby-form-intro__field">
+            <label
+              className="lobby-form-intro__label"
+              htmlFor="lobby-room-id"
+            >
+              ID de Room
+            </label>
+            <div className="flex gap-2">
+              <input
+                id="lobby-room-id"
+                className="input-text-md"
+                placeholder="Ex: alpha-421"
+                value={roomId}
+                onChange={e => setRoomId(e.target.value.toLowerCase())}
+                pattern="[a-z]+-[0-9]{3}"
+              />
+              {isCreateMode && (
+                <button
+                  type="button"
+                  onClick={handleGenerate}
+                  className="btn-secondary-md whitespace-nowrap"
+                >
+                  Générer
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+
         <Input
           label="Prénom"
           placeholder="Ex: Sophie"
           value={name}
           onChange={e => setName(e.target.value)}
           maxLength={32}
-          autoFocus
         />
 
         <EmojiPicker value={emoji} onChange={setEmoji} />
 
         <RoleSelector value={role} onChange={setRole} />
-
-        <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium" style={{ color: 'var(--color-text-primary)', fontFamily: 'var(--font-primary)' }}>
-            ID de Room
-          </label>
-          <div className="flex gap-2">
-            <input
-              className="input-text-md"
-              placeholder="Ex: alpha-421"
-              value={roomId}
-              onChange={e => setRoomId(e.target.value.toLowerCase())}
-              pattern="[a-z]+-[0-9]{3}"
-            />
-            {isCreateMode && (
-              <button
-                type="button"
-                onClick={handleGenerate}
-                className="btn-secondary-md whitespace-nowrap"
-              >
-                Générer
-              </button>
-            )}
-          </div>
-        </div>
 
         {isCreateMode && (
           <ScalePicker
@@ -253,6 +267,29 @@ export function LobbyForm() {
           {isCreateMode ? 'Lancer la partie' : 'Rejoindre la room'}
         </Button>
       </form>
+
+      <div className="join-form-alts">
+        <span className="join-form-alts__sep" aria-hidden>ou</span>
+        <div className="join-form-alts__row">
+          {isCreateMode ? (
+            <button
+              type="button"
+              className="btn-ghost-sm"
+              onClick={() => router.push('/app')}
+            >
+              Rejoindre une Room existante
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="btn-ghost-sm"
+              onClick={() => router.push('/app?new=1')}
+            >
+              Créer une Room
+            </button>
+          )}
+        </div>
+      </div>
 
       {toast && (
         <Toast message={toast.message} type={toast.type} onClose={clearToast} />

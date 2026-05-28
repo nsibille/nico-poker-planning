@@ -13,6 +13,7 @@ import { StoryTimeline } from '@/components/room/StoryTimeline'
 import { Toast, useToast } from '@/components/ui/Toast'
 import { Spinner } from '@/components/ui/Spinner'
 import { JoinRoomForm } from '@/components/lobby/JoinRoomForm'
+import { LobbyShell } from '@/components/lobby/LobbyShell'
 import { useRoom } from '@/hooks/useRoom'
 import { usePlayers } from '@/hooks/usePlayers'
 import { useVotes } from '@/hooks/useVotes'
@@ -152,20 +153,9 @@ export default function RoomPage() {
 
   if (needsJoin) {
     return (
-      <div
-        style={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: 'var(--color-bg-page)',
-          padding: 'var(--space-4)',
-        }}
-      >
-        <div className="card-surface card-surface--elevated" style={{ width: '100%', maxWidth: 460 }}>
-          <JoinRoomForm roomId={roomId} room={room} players={players} />
-        </div>
-      </div>
+      <LobbyShell>
+        <JoinRoomForm roomId={roomId} room={room} players={players} />
+      </LobbyShell>
     )
   }
 

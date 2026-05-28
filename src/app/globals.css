@@ -712,6 +712,46 @@ html, body {
   color: var(--color-text-secondary);
 }
 
+/* ── Intro contextuelle de la LobbyForm (/app) : titre + input ID room ── */
+.lobby-form-intro {
+  background: var(--color-brand-primary-50);
+  border: 1.5px solid var(--color-brand-primary-100);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.lobby-form-intro__title {
+  font-family: var(--font-primary);
+  font-size: var(--text-md);
+  font-weight: var(--fw-bold);
+  color: var(--color-brand-primary-600);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1.35;
+}
+.lobby-form-intro__subtitle {
+  font-family: var(--font-primary);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+.lobby-form-intro__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+.lobby-form-intro__label {
+  font-family: var(--font-primary);
+  font-size: var(--text-xs);
+  font-weight: var(--fw-medium);
+  color: var(--color-text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
 /* ── Banner preview de la room (JoinRoomForm) : décompte SM/dev + copy engageante ── */
 .room-preview-banner {
   background: var(--color-brand-primary-50);

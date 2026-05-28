@@ -1117,6 +1117,7 @@ en overlay, contenu blanc, bouton pill blanc/brand inversé.
 | `story-new-round-banner` | Story | Bandeau brand-primary "✨ Nouveau round N" + sous-titre, affiché en phase waiting à la place du titre "User Story" pour signaler clairement un round fraîchement démarré |
 | `room-preview-banner` | Lobby | Bandeau brand-primary "🎉 N personnes t'attendent…" en haut du JoinRoomForm (`/room/[id]` sans session) : copy engageante adaptée selon le décompte SM/dev (vide, SM-only, dev-only, mixte, session terminée), ID de room, chips stats |
 | `room-preview-banner__chip` | Lobby | Pill blanc avec icône + count + label rôle (Scrum Master / développeur), variants pluriels |
+| `lobby-form-intro` | Lobby | Pendant de `room-preview-banner` côté `/app` : bandeau brand-primary "🎯 Rejoins une room" / "✨ Lance une partie" avec titre, sous-titre, et input ID de Room (+ bouton Générer en mode create) |
 | `avatar-lg` | Avatar | Variante grande (56 px) pour le scoreboard |
 | `avatar-emoji` | Avatar | Span emoji intérieur quand l'avatar a un emoji |
 | `reveal-discussion-banner` | Reveal | Banner appelant à discuter quand divergence — souligne les outliers |
