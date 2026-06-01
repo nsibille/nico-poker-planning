@@ -59,8 +59,13 @@ export function StoryPanel({ roomId, story, phase, isScrumMaster, historyRound }
         .eq('room_id', roomId)
         .eq('round', historyRound)
     } else if (isWaiting) {
-      // Persist story AND launch the round → phase 'voting'.
-      await supabase.from('rooms').update({ story: draft, phase: 'voting' }).eq('id', roomId)
+      // Persist story AND launch the round → phase 'voting'. On pose le départ
+      // du chrono : le temps de vote court à partir de cet instant pour tout le
+      // monde (chaque client le calcule depuis ce timestamp).
+      await supabase
+        .from('rooms')
+        .update({ story: draft, phase: 'voting', timer_started_at: new Date().toISOString() })
+        .eq('id', roomId)
     } else {
       // Mid-round edit: persist the story only, don't touch phase or votes.
       await supabase.from('rooms').update({ story: draft }).eq('id', roomId)

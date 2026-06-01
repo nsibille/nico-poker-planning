@@ -57,6 +57,8 @@ export default function RoomPage() {
     ? 'revealed'
     : (room?.phase as 'waiting' | 'voting' | 'revealed' | undefined) ?? 'waiting'
   const displayStory = isHistoryMode ? (historyStory?.title ?? '') : (room?.story ?? '')
+  // Ligne stories du round affiché, source de la durée de vote enregistrée.
+  const displayStoryRow = stories.find(s => s.round === displayRound) ?? null
 
   const { votes } = useVotes(roomId, displayRound)
 
@@ -176,6 +178,7 @@ export default function RoomPage() {
           displayRound={displayRound}
           displayPhase="revealed"
           isHistoryMode={false}
+          votingSeconds={displayStoryRow?.voting_seconds ?? null}
         />
         <SessionRecap
           roomId={roomId}
@@ -197,6 +200,7 @@ export default function RoomPage() {
         displayRound={displayRound}
         displayPhase={displayPhase}
         isHistoryMode={isHistoryMode}
+        votingSeconds={displayStoryRow?.voting_seconds ?? null}
       />
 
       <div className={isScrumMaster ? 'layout-room-grid layout-room-grid--with-timeline' : 'layout-room-grid'}>
@@ -269,6 +273,7 @@ export default function RoomPage() {
             votes={votes}
             isScrumMaster={isScrumMaster}
             scale={scale}
+            timerStartedAt={room.timer_started_at}
           />
         </div>
 
@@ -318,7 +323,7 @@ function HistoryBanner({
     const supabase = createClient()
     const { error: roomErr } = await supabase
       .from('rooms')
-      .update({ phase: 'voting', round: viewingRound, story: storyTitle })
+      .update({ phase: 'voting', round: viewingRound, story: storyTitle, timer_started_at: new Date().toISOString() })
       .eq('id', roomId)
     if (roomErr) {
       showToast(`Échec : ${roomErr.message}`, 'error')

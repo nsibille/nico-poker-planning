@@ -5,7 +5,7 @@ import confetti from 'canvas-confetti'
 import { Avatar } from '@/components/ui/Avatar'
 import { createClient } from '@/lib/supabase/client'
 import { useGameStore, useRoomSession } from '@/store/gameStore'
-import { computeSessionStats } from '@/lib/game/session-stats'
+import { computeSessionStats, formatDuration } from '@/lib/game/session-stats'
 import { formatMean, consensusLabel, consensusIcon } from '@/lib/game/reveal-stats'
 import type { EstimationScale } from '@/lib/game/scales'
 import type { Player, Vote, Story, ConsensusLevel } from '@/types'
@@ -90,7 +90,8 @@ export function SessionRecap({ roomId, players, stories, endedAt, scale }: Sessi
 
   const stats = computeSessionStats(scale, players, allVotes, stories)
   const { perPlayer, globalMean, totalStoryPoints, storiesCount, perfectConsensusCount,
-    divergentCount, mostContested, mostUnanimous, awards } = stats
+    divergentCount, mostContested, mostUnanimous, awards,
+    totalVotingSeconds, averageVotingSeconds } = stats
   const isScrumMaster = myRole === 'scrum-master'
 
   // Sort players by alignment (ascending, most aligned first) for the leaderboard.
@@ -156,6 +157,17 @@ export function SessionRecap({ roomId, players, stories, endedAt, scale }: Sessi
           accent={divergentCount > 0 ? 'danger' : 'muted'}
           hint={divergentCount > 0 ? 'à débriefer' : 'aucun'}
         />
+        {totalVotingSeconds !== null && (
+          <BigStat
+            delay={1.6}
+            label="⏱ Temps de vote"
+            value={formatDuration(totalVotingSeconds)}
+            accent="indigo"
+            hint={averageVotingSeconds !== null
+              ? `${formatDuration(averageVotingSeconds)} / round`
+              : 'cumulé'}
+          />
+        )}
       </section>
 
       {awards.length > 0 && (
@@ -284,6 +296,11 @@ export function SessionRecap({ roomId, players, stories, endedAt, scale }: Sessi
               <span className="recap-story__consensus">
                 {consensusIcon((s.consensus ?? 'empty') as ConsensusLevel)}{' '}
                 {consensusLabel((s.consensus ?? 'empty') as ConsensusLevel)}
+                {s.voting_seconds !== null && s.voting_seconds !== undefined && (
+                  <span className="recap-story__time" title="Temps de vote du round">
+                    {' · ⏱ '}{formatDuration(s.voting_seconds)}
+                  </span>
+                )}
               </span>
               <span className="recap-story__mean">
                 {s.final_mean !== null && s.final_mean !== undefined
