@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import confetti from 'canvas-confetti'
 import { Avatar } from '@/components/ui/Avatar'
 import { createClient } from '@/lib/supabase/client'
-import { useGameStore } from '@/store/gameStore'
+import { useGameStore, useRoomSession } from '@/store/gameStore'
 import { computeSessionStats } from '@/lib/game/session-stats'
 import { formatMean, consensusLabel, consensusIcon } from '@/lib/game/reveal-stats'
 import type { EstimationScale } from '@/lib/game/scales'
@@ -20,7 +20,10 @@ interface SessionRecapProps {
 
 export function SessionRecap({ roomId, players, stories, endedAt, scale }: SessionRecapProps) {
   const router = useRouter()
-  const { myPlayerId, myRole, reset } = useGameStore()
+  const session = useRoomSession(roomId)
+  const myPlayerId = session?.playerId ?? null
+  const myRole = session?.role ?? null
+  const { leaveRoom } = useGameStore()
   const [allVotes, setAllVotes] = useState<Vote[] | null>(null)
 
   // Fetch every vote ever cast in this room (frozen data, fetch once).
@@ -73,7 +76,7 @@ export function SessionRecap({ roomId, players, stories, endedAt, scale }: Sessi
       const supabase = createClient()
       await supabase.from('players').delete().eq('id', myPlayerId).then(() => {}, () => {})
     }
-    reset()
+    leaveRoom(roomId)
     router.push('/app')
   }
 

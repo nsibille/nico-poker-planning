@@ -4,7 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { BadgeRoomId, BadgeRound, BadgePhase } from '@/components/ui/Badge'
-import { useGameStore } from '@/store/gameStore'
+import { useGameStore, useRoomSession } from '@/store/gameStore'
 import { createClient } from '@/lib/supabase/client'
 import type { Room } from '@/types'
 
@@ -18,19 +18,20 @@ interface RoomHeaderProps {
 
 export function RoomHeader({ room, connected, displayRound, displayPhase, isHistoryMode }: RoomHeaderProps) {
   const router = useRouter()
-  const { myPlayerId, reset } = useGameStore()
+  const session = useRoomSession(room.id)
+  const { leaveRoom } = useGameStore()
   const [leaving, setLeaving] = useState(false)
 
   const handleLeave = async () => {
     if (leaving) return
     setLeaving(true)
-    if (myPlayerId) {
+    if (session?.playerId) {
       const supabase = createClient()
       // Best-effort delete, even if it fails (offline, RLS), we still clear the
       // local session so the user lands on a fresh lobby.
-      await supabase.from('players').delete().eq('id', myPlayerId).then(() => {}, () => {})
+      await supabase.from('players').delete().eq('id', session.playerId).then(() => {}, () => {})
     }
-    reset()
+    leaveRoom(room.id)
     router.push('/app')
   }
 

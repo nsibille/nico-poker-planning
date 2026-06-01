@@ -18,7 +18,7 @@ import { useVotes } from '@/hooks/useVotes'
 import { useStories } from '@/hooks/useStories'
 import { createClient } from '@/lib/supabase/client'
 import { computeRevealStats } from '@/lib/game/reveal-stats'
-import { useGameStore } from '@/store/gameStore'
+import { useGameStore, useRoomSession } from '@/store/gameStore'
 import { getScale } from '@/lib/game/scales'
 
 export default function RoomPage() {
@@ -27,7 +27,12 @@ export default function RoomPage() {
   const roomId = params.roomId as string
   const { toast, showToast, clearToast } = useToast()
 
-  const { myPlayerId, myRoomId, myRole, selectedVote, setSelectedVote, reset } = useGameStore()
+  // L'URL fait foi : on lit la session de CETTE room précise, pas une session
+  // globale qui pourrait pointer vers une autre room en cache.
+  const session = useRoomSession(roomId)
+  const myPlayerId = session?.playerId ?? null
+  const myRole = session?.role ?? null
+  const { selectedVote, setSelectedVote, leaveRoom } = useGameStore()
   const hydrated = useSyncExternalStore(
     cb => useGameStore.persist.onFinishHydration(cb),
     () => useGameStore.persist.hasHydrated(),
@@ -64,19 +69,22 @@ export default function RoomPage() {
 
   useEffect(() => {
     if (!hydrated) return
-    if (!myPlayerId || (myRoomId && myRoomId !== roomId)) {
-      router.push('/app')
+    // Pas de session pour cette room : je dois la rejoindre. On envoie vers le
+    // lobby avec la room pré-remplie. On ne renvoie jamais vers une autre room
+    // déjà en cache, l'URL demandée prime.
+    if (!session) {
+      router.replace(`/app?room=${encodeURIComponent(roomId)}`)
     }
-  }, [hydrated, myPlayerId, myRoomId, roomId, router])
+  }, [hydrated, session, roomId, router])
 
   useEffect(() => {
-    if (!hydrated || !myPlayerId || !players.length) return
-    const stillExists = players.some(p => p.id === myPlayerId)
+    if (!hydrated || !session || !players.length) return
+    const stillExists = players.some(p => p.id === session.playerId)
     if (!stillExists) {
-      reset()
-      router.push('/app')
+      leaveRoom(roomId)
+      router.replace(`/app?room=${encodeURIComponent(roomId)}`)
     }
-  }, [hydrated, myPlayerId, players, reset, router])
+  }, [hydrated, session, players, leaveRoom, roomId, router])
 
   // Backfill SM-side : pour les rounds qui ont des votes mais pas de ligne
   // stories (rounds révélés avant la migration timeline), on crée le snapshot

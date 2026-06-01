@@ -1,5 +1,7 @@
+import { Suspense } from 'react'
 import Image from 'next/image'
 import { LobbyForm } from '@/components/lobby/LobbyForm'
+import { Spinner } from '@/components/ui/Spinner'
 
 export default function HomePage() {
   return (
@@ -27,7 +29,9 @@ export default function HomePage() {
         <div className="deco-circle" style={{ width: 90, height: 90, color: 'var(--color-amber)', bottom: 60, right: 40 }} />
 
         <div className="card-surface card-surface--elevated">
-          <LobbyForm />
+          <Suspense fallback={<div style={{ display: 'flex', justifyContent: 'center', padding: '32px 0' }}><Spinner /></div>}>
+            <LobbyForm />
+          </Suspense>
         </div>
 
         <p className="lobby-footnote">
