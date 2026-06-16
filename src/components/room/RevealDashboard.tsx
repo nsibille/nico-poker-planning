@@ -5,9 +5,7 @@ import { Toast, useToast } from '@/components/ui/Toast'
 import { createClient } from '@/lib/supabase/client'
 import {
   computeRevealStats,
-  consensusHint,
   consensusIcon,
-  consensusLabel,
   formatMean,
   type ConsensusLevel,
   type VoteEntry,
@@ -17,10 +15,20 @@ import {
   isNumericScale,
   numericValues,
   roundUpToScaleCard,
-  unitLabel,
   type EstimationScale,
 } from '@/lib/game/scales'
+import { useI18n } from '@/lib/i18n/I18nProvider'
+import { fmt } from '@/lib/i18n/interpolate'
+import type { Dictionary } from '@/lib/i18n/dict'
 import type { Player, Vote, Story } from '@/types'
+
+/** Unité d'estimation traduite (pts / JH / md), vide pour les échelles non
+ *  numériques. */
+function localizedUnit(unit: EstimationScale['unit'], dict: Dictionary): string {
+  if (unit === 'points') return dict.room.units.points
+  if (unit === 'days') return dict.room.units.days
+  return ''
+}
 
 interface RevealDashboardProps {
   players: Player[]
@@ -60,6 +68,8 @@ interface BarProps {
 }
 
 function Bar({ entry, index, totalActive, isScrumMaster, reopening, onReopen }: BarProps) {
+  const { dict } = useI18n()
+  const tr = dict.room.reveal
   const isMissing = entry.value === null
   const isUnknown = entry.value === '?' || entry.value === '☕'
   const ratio = totalActive <= 1
@@ -123,9 +133,9 @@ function Bar({ entry, index, totalActive, isScrumMaster, reopening, onReopen }: 
           className="reveal-bar__reopen"
           onClick={() => onReopen(entry.player.id)}
           disabled={reopening}
-          title={`Réouvrir le vote de ${entry.player.name}`}
+          title={fmt(tr.reopenAria, { name: entry.player.name })}
         >
-          {reopening ? '…' : '↺'} Re-voter
+          {reopening ? '…' : '↺'} {tr.reVote}
         </button>
       )}
     </div>
@@ -133,6 +143,8 @@ function Bar({ entry, index, totalActive, isScrumMaster, reopening, onReopen }: 
 }
 
 export function RevealDashboard({ players, votes, round, roomId, isScrumMaster, scale, currentStory }: RevealDashboardProps) {
+  const { dict } = useI18n()
+  const tr = dict.room.reveal
   const [pendingId, setPendingId] = useState<string | null>(null)
   const [, startTransition] = useTransition()
   const { toast, showToast, clearToast } = useToast()
@@ -143,12 +155,12 @@ export function RevealDashboard({ players, votes, round, roomId, isScrumMaster, 
 
   const active = activeValues(scale)
   const isNum = isNumericScale(scale)
-  const unit = unitLabel(scale.unit)
+  const unit = localizedUnit(scale.unit, dict)
   // Stat principale : la moyenne si l'échelle est numérique, sinon le mode.
   const heroValue: string = isNum
     ? (mean !== null ? formatMean(mean) : '-')
     : (mode !== null ? String(mode) : '-')
-  const heroLabel = isNum ? 'Moyenne' : 'Vote majoritaire'
+  const heroLabel = isNum ? tr.mean : tr.majorityVote
   // JH : carte supérieure de l'échelle pour donner une estimation prudente
   const daysRoundUp = scale.unit === 'days' && mean !== null
     ? roundUpToScaleCard(scale, mean)
@@ -172,9 +184,9 @@ export function RevealDashboard({ players, votes, round, roomId, isScrumMaster, 
       .eq('room_id', roomId)
       .eq('round', round)
       .then(({ error }) => {
-        if (error) showToast(`Sync timeline : ${error.message}`)
+        if (error) showToast(fmt(tr.syncTimeline, { msg: error.message }))
       })
-  }, [isScrumMaster, mean, consensus, round, roomId, currentStory, showToast])
+  }, [isScrumMaster, mean, consensus, round, roomId, currentStory, showToast, tr])
 
   async function reopenVote(playerId: string) {
     if (!isScrumMaster || pendingId) return
@@ -187,7 +199,7 @@ export function RevealDashboard({ players, votes, round, roomId, isScrumMaster, 
       .eq('player_id', playerId)
       .eq('round', round)
     if (error) {
-      showToast(`Réouverture échouée : ${error.message}`)
+      showToast(fmt(tr.reopenFailed, { msg: error.message }))
     }
     startTransition(() => setPendingId(null))
   }
@@ -196,7 +208,7 @@ export function RevealDashboard({ players, votes, round, roomId, isScrumMaster, 
     return (
       <div className="card-surface">
         <p style={{ fontFamily: 'var(--font-primary)', color: 'var(--color-text-muted)', textAlign: 'center' }}>
-          Aucun développeur pour ce round.
+          {tr.noDev}
         </p>
       </div>
     )
@@ -229,8 +241,8 @@ export function RevealDashboard({ players, votes, round, roomId, isScrumMaster, 
   return (
     <div key={`round-${round}`} className="reveal-dashboard">
       <header className="reveal-dashboard__header">
-        <span className="reveal-dashboard__eyebrow">Résultats, Round {round}</span>
-        <h2 className="reveal-dashboard__title">Scoreboard</h2>
+        <span className="reveal-dashboard__eyebrow">{fmt(tr.resultsEyebrow, { round })}</span>
+        <h2 className="reveal-dashboard__title">{tr.scoreboard}</h2>
       </header>
 
       <div className="reveal-hero">
@@ -242,7 +254,7 @@ export function RevealDashboard({ players, votes, round, roomId, isScrumMaster, 
           <div className="reveal-mean-hero__label">{heroLabel}</div>
           {daysRoundUp !== null && (
             <div className="reveal-mean-hero__hint">
-              Carte sup. : <strong>{daysRoundUp} {unit}</strong>
+              {tr.topCard} <strong>{daysRoundUp} {unit}</strong>
             </div>
           )}
         </div>
@@ -251,16 +263,16 @@ export function RevealDashboard({ players, votes, round, roomId, isScrumMaster, 
           <ConsensusBadge level={consensus} />
           {min !== null && max !== null && (
             <div className="reveal-stat-row">
-              <Stat label="Min" value={String(min)} />
+              <Stat label={tr.min} value={String(min)} />
               <span className="reveal-stat-divider">→</span>
-              <Stat label="Max" value={String(max)} />
+              <Stat label={tr.max} value={String(max)} />
             </div>
           )}
           <div className="reveal-stat-row reveal-stat-row--small">
-            <Stat label="Votants" value={String(activeCount)} />
-            {questionCount > 0 && <Stat label="Indécis (?)" value={String(questionCount)} />}
-            {coffeeCount > 0 && <Stat label="Pause (☕)" value={String(coffeeCount)} />}
-            {missingCount > 0 && <Stat label="Pas voté" value={String(missingCount)} />}
+            <Stat label={tr.voters} value={String(activeCount)} />
+            {questionCount > 0 && <Stat label={tr.undecided} value={String(questionCount)} />}
+            {coffeeCount > 0 && <Stat label={tr.coffee} value={String(coffeeCount)} />}
+            {missingCount > 0 && <Stat label={tr.notVoted} value={String(missingCount)} />}
           </div>
         </div>
       </div>
@@ -283,8 +295,8 @@ export function RevealDashboard({ players, votes, round, roomId, isScrumMaster, 
             <div className="reveal-chart__mean-line" style={{ bottom: `${meanPercent}%` }}>
               <span
                 className="reveal-chart__mean-marker"
-                title={`Moyenne : ${formatMean(mean)}${unit ? ` ${unit}` : ''}`}
-                aria-label={`Moyenne : ${formatMean(mean)}${unit ? ` ${unit}` : ''}`}
+                title={fmt(tr.meanTooltip, { value: `${formatMean(mean)}${unit ? ` ${unit}` : ''}` })}
+                aria-label={fmt(tr.meanTooltip, { value: `${formatMean(mean)}${unit ? ` ${unit}` : ''}` })}
               >
                 M
               </span>
@@ -308,24 +320,24 @@ export function RevealDashboard({ players, votes, round, roomId, isScrumMaster, 
         <div className="reveal-discussion-banner" data-level={consensus}>
           <div className="reveal-discussion-banner__icon">💬</div>
           <div className="reveal-discussion-banner__body">
-            <strong>{consensus === 'divergent' ? 'Discussion nécessaire' : 'Échange recommandé'}</strong>
+            <strong>{consensus === 'divergent' ? tr.discussNeeded : tr.exchangeRecommended}</strong>
             <p>
               {allOutliersTwoVoters ? (
                 <>
-                  Les deux estimations divergent :{' '}
+                  {tr.bothDivergeLead}{' '}
                   {outliers.map((o, i) => (
                     <span key={o.player.id}>
                       <span aria-hidden>{o.player.emoji ?? ''} </span>
                       <span className="reveal-discussion-banner__name">{o.player.name}</span> (<strong>{o.value}</strong>)
-                      {i < outliers.length - 1 ? ' et ' : ''}
+                      {i < outliers.length - 1 ? tr.and : ''}
                     </span>
                   ))}
-                  . Échangez pour aligner vos estimations.
+                  {tr.bothDivergeEnd}
                 </>
               ) : outliers.length === 1 ? (
                 <>
                   <span aria-hidden>{outliers[0].player.emoji ?? ''} </span>
-                  <span className="reveal-discussion-banner__name">{outliers[0].player.name}</span> a estimé <strong>{outliers[0].value}</strong> alors que {isNum ? 'la moyenne est' : 'le vote majoritaire est'} <strong>{heroValue}{unit ? ` ${unit}` : ''}</strong>. Prenez un instant pour comprendre les hypothèses avant de re-voter.
+                  <span className="reveal-discussion-banner__name">{outliers[0].player.name}</span> {tr.singleOutlierEstimated} <strong>{outliers[0].value}</strong> {isNum ? tr.singleOutlierMeanIs : tr.singleOutlierMajorityIs} <strong>{heroValue}{unit ? ` ${unit}` : ''}</strong>{tr.singleOutlierEnd}
                 </>
               ) : (
                 <>
@@ -334,7 +346,7 @@ export function RevealDashboard({ players, votes, round, roomId, isScrumMaster, 
                       <span aria-hidden>{o.player.emoji ?? ''} </span>
                       <span className="reveal-discussion-banner__name">{o.player.name}</span> ({o.value}){i < outliers.length - 1 ? ', ' : ''}
                     </span>
-                  ))} sortent du lot par rapport {isNum ? 'à la moyenne' : 'au vote majoritaire'} <strong>{heroValue}{unit ? ` ${unit}` : ''}</strong>. Prenez un instant pour comprendre les hypothèses avant de re-voter.
+                  ))} {isNum ? tr.multiOutlierMean : tr.multiOutlierMajority} <strong>{heroValue}{unit ? ` ${unit}` : ''}</strong>{tr.multiOutlierEnd}
                 </>
               )}
             </p>
@@ -342,9 +354,7 @@ export function RevealDashboard({ players, votes, round, roomId, isScrumMaster, 
             {isScrumMaster && (
               <div className="reveal-discussion-banner__actions">
                 <span className="reveal-discussion-banner__cta">
-                  {allOutliersTwoVoters
-                    ? 'Après échange, tu peux rouvrir le vote de l\'un ou des deux participants pour qu\'ils ré-estiment :'
-                    : 'Après échange, tu peux rouvrir le vote d\'un participant pour qu\'il ré-estime :'}
+                  {allOutliersTwoVoters ? tr.reopenCtaMulti : tr.reopenCtaSingle}
                 </span>
                 <div className="reveal-discussion-banner__chips">
                   {outliers.map(o => (
@@ -357,7 +367,7 @@ export function RevealDashboard({ players, votes, round, roomId, isScrumMaster, 
                       disabled={pendingId === o.player.id}
                     >
                       <span aria-hidden>{o.player.emoji ?? '↺'}</span>
-                      <span>Rouvrir le vote de <strong>{o.player.name}</strong></span>
+                      <span>{tr.reopenVoteOf} <strong>{o.player.name}</strong></span>
                       {pendingId === o.player.id && <span aria-hidden>…</span>}
                     </button>
                   ))}
@@ -372,15 +382,15 @@ export function RevealDashboard({ players, votes, round, roomId, isScrumMaster, 
         <div className="reveal-discussion-banner" data-level="perfect">
           <div className="reveal-discussion-banner__icon">🎯</div>
           <div className="reveal-discussion-banner__body">
-            <strong>Consensus parfait !</strong>
-            <p>Tout le monde est aligné. Direction le prochain ticket.</p>
+            <strong>{tr.perfectTitle}</strong>
+            <p>{tr.perfectBody}</p>
           </div>
         </div>
       )}
 
       {isScrumMaster && !needsDiscussion && entries.some(e => e.value !== null) && (
         <p className="reveal-reopen-hint">
-          ↺ Besoin d&apos;ajuster ? Clique « Re-voter » sous un participant pour lui rouvrir son vote.
+          {tr.reopenHint}
         </p>
       )}
 
@@ -390,11 +400,13 @@ export function RevealDashboard({ players, votes, round, roomId, isScrumMaster, 
 }
 
 function ConsensusBadge({ level }: { level: ConsensusLevel }) {
+  const { dict } = useI18n()
+  const c = dict.room.consensus[level]
   return (
     <div className="reveal-consensus-badge" data-level={level}>
       <span className="reveal-consensus-badge__icon">{consensusIcon(level)}</span>
-      <span className="reveal-consensus-badge__label">{consensusLabel(level)}</span>
-      <span className="reveal-consensus-badge__hint">{consensusHint(level)}</span>
+      <span className="reveal-consensus-badge__label">{c.label}</span>
+      <span className="reveal-consensus-badge__hint">{c.hint}</span>
     </div>
   )
 }

@@ -9,12 +9,13 @@ import { RoleSelector } from './RoleSelector'
 import { EmojiPicker } from './EmojiPicker'
 import { useSession } from '@/hooks/useSession'
 import { useGameStore } from '@/store/gameStore'
+import { useI18n } from '@/lib/i18n/I18nProvider'
+import { fmt } from '@/lib/i18n/interpolate'
 import { createClient } from '@/lib/supabase/client'
 import { generateRoomId } from '@/lib/game/utils'
 import { randomPlayerEmoji } from '@/lib/game/emojis'
 import { MAX_DEV } from '@/lib/game/constants'
 import {
-  PREDEFINED_SCALES,
   PREDEFINED_SCALE_IDS,
   parseCustomValues,
   getScale,
@@ -23,6 +24,9 @@ import type { Role } from '@/types'
 
 export function LobbyForm() {
   const router = useRouter()
+  const { dict } = useI18n()
+  const tf = dict.app.form
+  const tt = dict.app.toasts
   const searchParams = useSearchParams()
   // Room ciblée par l'URL (ex: /app?room=alpha-421, posé par RoomPage quand on
   // arrive sur une room sans session). Quand elle est présente, elle prime :
@@ -78,14 +82,14 @@ export function LobbyForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!name.trim()) { showToast('Le prénom est requis'); return }
-    if (!role) { showToast('Choisir un rôle'); return }
-    if (!roomId.trim()) { showToast('L\'ID de room est requis'); return }
-    if (!userId) { showToast('Session non prête, réessaie'); return }
+    if (!name.trim()) { showToast(tt.firstNameRequired); return }
+    if (!role) { showToast(tt.roleRequired); return }
+    if (!roomId.trim()) { showToast(tt.roomIdRequired); return }
+    if (!userId) { showToast(tt.sessionNotReady); return }
 
     const customValues = scaleId === 'custom' ? parseCustomValues(customRaw) : null
     if (scaleId === 'custom' && (!customValues || customValues.length === 0)) {
-      showToast('Échelle perso : ajoute au moins une valeur')
+      showToast(tt.customScaleEmpty)
       return
     }
 
@@ -109,7 +113,7 @@ export function LobbyForm() {
         .select('id')
         .eq('id', roomId)
         .single()
-      if (!roomData) { showToast('Room introuvable'); setLoading(false); return }
+      if (!roomData) { showToast(tt.roomNotFound); setLoading(false); return }
 
       // Check limits, devs are capped, Scrum Masters have no hard limit.
       if (role === 'developer') {
@@ -119,7 +123,7 @@ export function LobbyForm() {
           .eq('room_id', roomId)
           .eq('role', 'developer')
         if ((devCount ?? 0) >= MAX_DEV) {
-          showToast(`Équipe complète, max ${MAX_DEV} développeurs par room`)
+          showToast(fmt(tt.teamFull, { max: MAX_DEV }))
           setLoading(false)
           return
         }
@@ -133,7 +137,7 @@ export function LobbyForm() {
         .eq('name', name.trim())
         .single()
       if (existing) {
-        showToast('Ce prénom est déjà utilisé dans cette room')
+        showToast(tt.nameTaken)
         setLoading(false)
         return
       }
@@ -146,9 +150,9 @@ export function LobbyForm() {
         .single()
       if (playerError) {
         if (playerError.code === '23505') {
-          showToast('Ce prénom est déjà utilisé dans cette room')
+          showToast(tt.nameTaken)
         } else {
-          showToast('Erreur lors de la connexion')
+          showToast(tt.connectionError)
         }
         setLoading(false)
         return
@@ -157,7 +161,7 @@ export function LobbyForm() {
       joinRoom(roomId, { playerId: player.id, name: name.trim(), role, emoji })
       router.push(`/room/${roomId}`)
     } catch {
-      showToast('Une erreur est survenue')
+      showToast(tt.genericError)
       setLoading(false)
     }
   }
@@ -167,7 +171,7 @@ export function LobbyForm() {
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 0', gap: '12px' }}>
         <Spinner />
         <p style={{ fontFamily: 'var(--font-primary)', color: 'var(--color-text-muted)', fontSize: 'var(--text-sm)' }}>
-          Reprise de ta session…
+          {tf.resuming}
         </p>
       </div>
     )
@@ -177,8 +181,8 @@ export function LobbyForm() {
     <>
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
         <Input
-          label="Prénom"
-          placeholder="Ex: Sophie"
+          label={tf.firstName}
+          placeholder={tf.firstNamePlaceholder}
           value={name}
           onChange={e => setName(e.target.value)}
           maxLength={32}
@@ -191,12 +195,12 @@ export function LobbyForm() {
 
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium" style={{ color: 'var(--color-text-primary)', fontFamily: 'var(--font-primary)' }}>
-            ID de Room
+            {tf.roomId}
           </label>
           <div className="flex gap-2">
             <input
               className="input-text-md"
-              placeholder="Ex: alpha-421"
+              placeholder={tf.roomIdPlaceholder}
               value={roomId}
               onChange={e => setRoomId(e.target.value.toLowerCase())}
               pattern="[a-z]+-[0-9]{3}"
@@ -206,7 +210,7 @@ export function LobbyForm() {
               onClick={handleGenerate}
               className="btn-secondary-md whitespace-nowrap"
             >
-              Générer
+              {tf.generate}
             </button>
           </div>
         </div>
@@ -225,7 +229,7 @@ export function LobbyForm() {
           disabled={loading || sessionLoading}
           className="w-full mt-2"
         >
-          Rejoindre la room
+          {tf.submit}
         </Button>
       </form>
 
@@ -244,6 +248,9 @@ interface ScalePickerProps {
 }
 
 function ScalePicker({ scaleId, onScaleChange, customRaw, onCustomChange }: ScalePickerProps) {
+  const { dict } = useI18n()
+  const tf = dict.app.form
+  const scaleNames = dict.room.scales
   const preview = getScale(
     scaleId,
     scaleId === 'custom' ? parseCustomValues(customRaw) : null,
@@ -255,7 +262,7 @@ function ScalePicker({ scaleId, onScaleChange, customRaw, onCustomChange }: Scal
         className="text-sm font-medium"
         style={{ color: 'var(--color-text-primary)', fontFamily: 'var(--font-primary)' }}
       >
-        Échelle d&apos;estimation
+        {tf.scale}
       </label>
       <select
         className="input-text-md"
@@ -263,24 +270,24 @@ function ScalePicker({ scaleId, onScaleChange, customRaw, onCustomChange }: Scal
         onChange={e => onScaleChange(e.target.value)}
       >
         {PREDEFINED_SCALE_IDS.map(id => (
-          <option key={id} value={id}>{PREDEFINED_SCALES[id].name}</option>
+          <option key={id} value={id}>{scaleNames[id]}</option>
         ))}
-        <option value="custom">Personnalisée…</option>
+        <option value="custom">{tf.scaleCustom}</option>
       </select>
 
       {scaleId === 'custom' && (
         <input
           className="input-text-md"
-          placeholder="Ex: 1, 2, 4, 8, 16 ou XS, S, M, L"
+          placeholder={tf.scaleCustomPlaceholder}
           value={customRaw}
           onChange={e => onCustomChange(e.target.value)}
           style={{ marginTop: 4 }}
         />
       )}
 
-      <div className="scale-preview" aria-label="Aperçu des cartes">
+      <div className="scale-preview" aria-label={tf.scalePreview}>
         {preview.values.length === 0 ? (
-          <span className="scale-preview__empty">Saisis des valeurs séparées par des virgules.</span>
+          <span className="scale-preview__empty">{tf.scalePreviewEmpty}</span>
         ) : (
           preview.values.map((v, i) => (
             <span key={`${v}-${i}`} className="scale-preview__chip">{String(v)}</span>

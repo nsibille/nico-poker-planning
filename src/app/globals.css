@@ -2645,6 +2645,46 @@ html, body {
   border-color: var(--color-brand-primary);
   color: var(--color-brand-primary);
 }
+button.marketing-lang-switch {
+  background: transparent;
+  cursor: pointer;
+}
+
+/* Header léger du lobby et de la salle, slug `app-header`. */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: saturate(160%) blur(12px);
+  background: rgba(245, 246, 250, 0.78);
+  border-bottom: 1px solid var(--color-border);
+}
+.app-header__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.app-header__lockup {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+.app-header__center {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  flex-wrap: wrap;
+}
+.app-header__actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
 
 .marketing-header__burger {
   display: none;

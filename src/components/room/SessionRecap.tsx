@@ -6,9 +6,17 @@ import { Avatar } from '@/components/ui/Avatar'
 import { createClient } from '@/lib/supabase/client'
 import { useGameStore, useRoomSession } from '@/store/gameStore'
 import { computeSessionStats, formatDuration } from '@/lib/game/session-stats'
-import { formatMean, consensusLabel, consensusIcon } from '@/lib/game/reveal-stats'
+import { formatMean, consensusIcon } from '@/lib/game/reveal-stats'
+import { useI18n } from '@/lib/i18n/I18nProvider'
+import { fmt } from '@/lib/i18n/interpolate'
+import type { Dictionary } from '@/lib/i18n/dict'
 import type { EstimationScale } from '@/lib/game/scales'
 import type { Player, Vote, Story, ConsensusLevel } from '@/types'
+
+/** Libellé de consensus traduit, avec repli sur 'empty'. */
+function consensusText(dict: Dictionary, level: ConsensusLevel | null | undefined): string {
+  return dict.room.consensus[(level ?? 'empty') as ConsensusLevel].label
+}
 
 interface SessionRecapProps {
   roomId: string
@@ -20,6 +28,8 @@ interface SessionRecapProps {
 
 export function SessionRecap({ roomId, players, stories, endedAt, scale }: SessionRecapProps) {
   const router = useRouter()
+  const { dict } = useI18n()
+  const tre = dict.room.recap
   const session = useRoomSession(roomId)
   const myPlayerId = session?.playerId ?? null
   const myRole = session?.role ?? null
@@ -83,7 +93,7 @@ export function SessionRecap({ roomId, players, stories, endedAt, scale }: Sessi
   if (!allVotes) {
     return (
       <div className="session-recap session-recap--loading">
-        <div className="session-recap__loading-pulse">Compilation des résultats…</div>
+        <div className="session-recap__loading-pulse">{tre.compiling}</div>
       </div>
     )
   }
@@ -93,6 +103,7 @@ export function SessionRecap({ roomId, players, stories, endedAt, scale }: Sessi
     divergentCount, mostContested, mostUnanimous, awards,
     totalVotingSeconds, averageVotingSeconds } = stats
   const isScrumMaster = myRole === 'scrum-master'
+  const devCount = players.filter(p => p.role === 'developer').length
 
   // Sort players by alignment (ascending, most aligned first) for the leaderboard.
   const ranked = [...perPlayer]
@@ -106,77 +117,78 @@ export function SessionRecap({ roomId, players, stories, endedAt, scale }: Sessi
   return (
     <div className="session-recap">
       <header className="session-recap__hero">
-        <div className="session-recap__hero-eyebrow">Session #{roomId}</div>
+        <div className="session-recap__hero-eyebrow">{fmt(tre.session, { id: roomId })}</div>
         <h1 className="session-recap__title">
-          <span className="session-recap__title-word session-recap__title-word--1">Session</span>{' '}
-          <span className="session-recap__title-word session-recap__title-word--2">terminée</span>
+          <span className="session-recap__title-word session-recap__title-word--1">{tre.titleWord1}</span>{' '}
+          <span className="session-recap__title-word session-recap__title-word--2">{tre.titleWord2}</span>
           <span className="session-recap__title-emoji">🎉</span>
         </h1>
         <p className="session-recap__subtitle">
-          {storiesCount} stor{storiesCount > 1 ? 'ies' : 'y'} estimée{storiesCount > 1 ? 's' : ''} ·{' '}
-          {players.filter(p => p.role === 'developer').length} dev{players.filter(p => p.role === 'developer').length > 1 ? 's' : ''} ·{' '}
-          terminée par le Scrum Master
+          {fmt(tre.subtitle, {
+            stories: fmt(storiesCount > 1 ? tre.storiesMany : tre.storiesOne, { n: storiesCount }),
+            devs: fmt(devCount > 1 ? tre.devsMany : tre.devsOne, { n: devCount }),
+          })}
         </p>
       </header>
 
       <section className="session-recap__big-stats">
         <BigStat
           delay={0.6}
-          label="Stories"
+          label={tre.statStories}
           value={String(storiesCount)}
           accent="indigo"
-          hint={storiesCount > 1 ? 'rounds joués' : 'round joué'}
+          hint={storiesCount > 1 ? tre.hintRoundsPlayedMany : tre.hintRoundsPlayedOne}
         />
         <BigStat
           delay={0.8}
-          label="Story points"
+          label={tre.statStoryPoints}
           value={totalStoryPoints.toFixed(0)}
           accent="brand"
-          hint="Total estimé"
+          hint={tre.hintTotalEstimated}
         />
         <BigStat
           delay={1.0}
-          label="Complexité moy."
+          label={tre.statComplexity}
           value={globalMean !== null ? formatMean(globalMean) : '-'}
           accent="indigo"
-          hint="par story"
+          hint={tre.hintPerStory}
         />
         <BigStat
           delay={1.2}
-          label="🎯 Consensus parfait"
+          label={tre.statPerfect}
           value={String(perfectConsensusCount)}
           accent="success"
           hint={perfectConsensusCount === storiesCount && storiesCount > 0
-            ? 'sans-faute !'
-            : perfectConsensusCount > 1 ? 'rounds' : 'round'}
+            ? tre.hintFlawless
+            : perfectConsensusCount > 1 ? tre.hintRoundsMany : tre.hintRoundsOne}
         />
         <BigStat
           delay={1.4}
-          label="⚠️ Divergents"
+          label={tre.statDivergent}
           value={String(divergentCount)}
           accent={divergentCount > 0 ? 'danger' : 'muted'}
-          hint={divergentCount > 0 ? 'à débriefer' : 'aucun'}
+          hint={divergentCount > 0 ? tre.hintToDebrief : tre.hintNone}
         />
         {totalVotingSeconds !== null && (
           <BigStat
             delay={1.6}
-            label="⏱ Temps de vote"
+            label={tre.statVotingTime}
             value={formatDuration(totalVotingSeconds)}
             accent="indigo"
             hint={averageVotingSeconds !== null
-              ? `${formatDuration(averageVotingSeconds)} / round`
-              : 'cumulé'}
+              ? fmt(tre.hintPerRound, { time: formatDuration(averageVotingSeconds) })
+              : tre.hintCumulative}
           />
         )}
       </section>
 
       {awards.length > 0 && (
         <section className="session-recap__section">
-          <h2 className="session-recap__section-title">
-            <span aria-hidden>🏆</span> Awards de la session
-          </h2>
+          <h2 className="session-recap__section-title">{tre.awardsTitle}</h2>
           <div className="session-recap__awards">
-            {awards.map((a, i) => (
+            {awards.map((a, i) => {
+              const meta = dict.room.awards[a.id as keyof typeof dict.room.awards]
+              return (
               <article
                 key={a.id}
                 className="award-card"
@@ -185,8 +197,8 @@ export function SessionRecap({ roomId, players, stories, endedAt, scale }: Sessi
               >
                 <div className="award-card__icon">{a.icon}</div>
                 <div className="award-card__body">
-                  <div className="award-card__title">{a.title}</div>
-                  <div className="award-card__subtitle">{a.subtitle}</div>
+                  <div className="award-card__title">{meta?.title ?? a.id}</div>
+                  <div className="award-card__subtitle">{meta?.subtitle ?? ''}</div>
                   <div className="award-card__player">
                     <Avatar name={a.player.name} role={a.player.role} emoji={a.player.emoji} size="sm" />
                     <span className="award-card__player-name" title={a.player.name}>{a.player.name}</span>
@@ -195,18 +207,17 @@ export function SessionRecap({ roomId, players, stories, endedAt, scale }: Sessi
                 </div>
                 <div className="award-card__shine" aria-hidden />
               </article>
-            ))}
+              )
+            })}
           </div>
         </section>
       )}
 
       <section className="session-recap__section">
-        <h2 className="session-recap__section-title">
-          <span aria-hidden>📊</span> Classement par alignement
-        </h2>
+        <h2 className="session-recap__section-title">{tre.leaderboardTitle}</h2>
         <div className="session-recap__leaderboard">
           {ranked.length === 0 ? (
-            <p className="session-recap__empty">Aucun dev n&apos;a voté cette session.</p>
+            <p className="session-recap__empty">{tre.leaderboardEmpty}</p>
           ) : ranked.map((p, i) => {
             const isMe = p.player.id === myPlayerId
             const rank = i + 1
@@ -224,18 +235,18 @@ export function SessionRecap({ roomId, players, stories, endedAt, scale }: Sessi
                   <Avatar name={p.player.name} role={p.player.role} emoji={p.player.emoji} size="lg" />
                 </div>
                 <div className="player-row__identity">
-                  <div className="player-row__name">{p.player.name}{isMe && <span className="player-row__me-tag">toi</span>}</div>
+                  <div className="player-row__name">{p.player.name}{isMe && <span className="player-row__me-tag">{tre.you}</span>}</div>
                   <div className="player-row__sub">
-                    {p.numericVotes} vote{p.numericVotes > 1 ? 's' : ''}
-                    {p.questionVotes > 0 && <> · {p.questionVotes} × «&nbsp;?&nbsp;»</>}
-                    {p.missing > 0 && <> · {p.missing} absent{p.missing > 1 ? 's' : ''}</>}
+                    {fmt(p.numericVotes > 1 ? tre.votesMany : tre.votesOne, { n: p.numericVotes })}
+                    {p.questionVotes > 0 && <> · {fmt(tre.questionVotes, { n: p.questionVotes })}</>}
+                    {p.missing > 0 && <> · {fmt(p.missing > 1 ? tre.missingMany : tre.missingOne, { n: p.missing })}</>}
                   </div>
                 </div>
                 <div className="player-row__metric">
                   <div className="player-row__metric-value">
                     {p.averageGiven !== null ? formatMean(p.averageGiven) : '-'}
                   </div>
-                  <div className="player-row__metric-label">moy. donnée</div>
+                  <div className="player-row__metric-label">{tre.meanGiven}</div>
                 </div>
                 <div className="player-row__metric">
                   <div className="player-row__metric-value">
@@ -243,7 +254,7 @@ export function SessionRecap({ roomId, players, stories, endedAt, scale }: Sessi
                       ? (p.alignmentScore === 0 ? '🎯' : `Δ${p.alignmentScore.toFixed(2)}`)
                       : '-'}
                   </div>
-                  <div className="player-row__metric-label">alignement</div>
+                  <div className="player-row__metric-label">{tre.alignment}</div>
                 </div>
               </div>
             )
@@ -253,15 +264,13 @@ export function SessionRecap({ roomId, players, stories, endedAt, scale }: Sessi
 
       {(mostContested || mostUnanimous) && (
         <section className="session-recap__section">
-          <h2 className="session-recap__section-title">
-            <span aria-hidden>🔥</span> Highlights
-          </h2>
+          <h2 className="session-recap__section-title">{tre.highlightsTitle}</h2>
           <div className="session-recap__highlights">
             {mostUnanimous && (
               <HighlightCard
                 delay={4.0}
                 icon="🤝"
-                label="La plus consensuelle"
+                label={tre.mostConsensual}
                 story={mostUnanimous}
                 tone="success"
               />
@@ -270,7 +279,7 @@ export function SessionRecap({ roomId, players, stories, endedAt, scale }: Sessi
               <HighlightCard
                 delay={4.2}
                 icon="💥"
-                label="La plus chaude"
+                label={tre.mostHeated}
                 story={mostContested}
                 tone="danger"
               />
@@ -280,9 +289,7 @@ export function SessionRecap({ roomId, players, stories, endedAt, scale }: Sessi
       )}
 
       <section className="session-recap__section">
-        <h2 className="session-recap__section-title">
-          <span aria-hidden>🃏</span> Toutes les stories
-        </h2>
+        <h2 className="session-recap__section-title">{tre.allStoriesTitle}</h2>
         <ol className="session-recap__stories">
           {[...stories].sort((a, b) => a.round - b.round).map((s, i) => (
             <li
@@ -292,12 +299,12 @@ export function SessionRecap({ roomId, players, stories, endedAt, scale }: Sessi
               data-consensus={s.consensus ?? 'empty'}
             >
               <span className="recap-story__rank">#{s.round}</span>
-              <span className="recap-story__title">{s.title || <em>(titre perdu)</em>}</span>
+              <span className="recap-story__title">{s.title || <em>{tre.titleLost}</em>}</span>
               <span className="recap-story__consensus">
                 {consensusIcon((s.consensus ?? 'empty') as ConsensusLevel)}{' '}
-                {consensusLabel((s.consensus ?? 'empty') as ConsensusLevel)}
+                {consensusText(dict, s.consensus as ConsensusLevel | null)}
                 {s.voting_seconds !== null && s.voting_seconds !== undefined && (
-                  <span className="recap-story__time" title="Temps de vote du round">
+                  <span className="recap-story__time" title={dict.room.timeline.timeTitle}>
                     {' · ⏱ '}{formatDuration(s.voting_seconds)}
                   </span>
                 )}
@@ -314,10 +321,10 @@ export function SessionRecap({ roomId, players, stories, endedAt, scale }: Sessi
 
       <footer className="session-recap__footer">
         {isScrumMaster && (
-          <ResumeSessionButton roomId={roomId} />
+          <ResumeSessionButton roomId={roomId} label={tre.resume} />
         )}
         <button type="button" onClick={handleLeave} className="btn-primary-md">
-          Quitter la session
+          {tre.leave}
         </button>
       </footer>
     </div>
@@ -335,20 +342,22 @@ function BigStat({ label, value, hint, accent, delay }: { label: string; value: 
 }
 
 function HighlightCard({ icon, label, story, tone, delay }: { icon: string; label: string; story: Story; tone: 'success' | 'danger'; delay: number }) {
+  const { dict } = useI18n()
+  const tre = dict.room.recap
   return (
     <div className="highlight-card" data-tone={tone} style={{ animationDelay: `${delay}s` }}>
       <div className="highlight-card__icon">{icon}</div>
       <div className="highlight-card__label">{label}</div>
-      <div className="highlight-card__title">#{story.round}, {story.title || '(titre perdu)'}</div>
+      <div className="highlight-card__title">#{story.round}, {story.title || tre.titleLost}</div>
       <div className="highlight-card__meta">
-        Consensus : <strong>{consensusLabel((story.consensus ?? 'empty') as ConsensusLevel)}</strong>
-        {story.final_mean !== null && story.final_mean !== undefined && <> · moy. <strong>{formatMean(story.final_mean)}</strong></>}
+        {tre.consensusLabel} <strong>{consensusText(dict, story.consensus as ConsensusLevel | null)}</strong>
+        {story.final_mean !== null && story.final_mean !== undefined && <> · {tre.meanShort} <strong>{formatMean(story.final_mean)}</strong></>}
       </div>
     </div>
   )
 }
 
-function ResumeSessionButton({ roomId }: { roomId: string }) {
+function ResumeSessionButton({ roomId, label }: { roomId: string; label: string }) {
   const [busy, setBusy] = useState(false)
   async function resume() {
     if (busy) return
@@ -359,7 +368,7 @@ function ResumeSessionButton({ roomId }: { roomId: string }) {
   }
   return (
     <button type="button" onClick={resume} disabled={busy} className="btn-secondary-md">
-      {busy ? '…' : '↶ Reprendre la session'}
+      {busy ? '…' : label}
     </button>
   )
 }

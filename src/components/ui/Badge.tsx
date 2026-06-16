@@ -8,12 +8,7 @@ export function BadgeRole({ role }: { role: Role }) {
   return <span className="badge-role-dev">Dev</span>
 }
 
-export function BadgePhase({ phase }: { phase: Phase }) {
-  const labels: Record<Phase, string> = {
-    waiting: 'En attente',
-    voting: 'Vote en cours',
-    revealed: 'Révélés',
-  }
+export function BadgePhase({ phase, labels }: { phase: Phase; labels: Record<Phase, string> }) {
   const cls: Record<Phase, string> = {
     waiting: 'badge-phase-waiting',
     voting: 'badge-phase-voting',
@@ -22,8 +17,8 @@ export function BadgePhase({ phase }: { phase: Phase }) {
   return <span className={cls[phase]}>{labels[phase]}</span>
 }
 
-export function BadgeRound({ round }: { round: number }) {
-  return <span className="badge-round">Round {round}</span>
+export function BadgeRound({ label }: { label: string }) {
+  return <span className="badge-round">{label}</span>
 }
 
 export function BadgeRoomId({ id }: { id: string }) {

@@ -1,11 +1,19 @@
+'use client'
 import { Suspense } from 'react'
 import Image from 'next/image'
+import { AppHeader } from '@/components/app/AppHeader'
 import { LobbyForm } from '@/components/lobby/LobbyForm'
 import { Spinner } from '@/components/ui/Spinner'
+import { useI18n } from '@/lib/i18n/I18nProvider'
 
 export default function HomePage() {
+  const { dict } = useI18n()
+  const t = dict.app
+
   return (
     <div className="layout-lobby">
+      <AppHeader />
+
       <section className="lobby-hero bg-card-pattern" aria-label="Scrumbler">
         <div className="lobby-hero__inner">
           <Image
@@ -16,10 +24,8 @@ export default function HomePage() {
             priority
             style={{ height: 72, width: 'auto' }}
           />
-          <span className="lobby-hero__eyebrow">Planning poker</span>
-          <p className="lobby-hero__tagline">
-            Estime tes user stories en équipe, sans compte, en temps réel.
-          </p>
+          <span className="lobby-hero__eyebrow">{t.hero.eyebrow}</span>
+          <p className="lobby-hero__tagline">{t.hero.tagline}</p>
         </div>
       </section>
 
@@ -34,9 +40,7 @@ export default function HomePage() {
           </Suspense>
         </div>
 
-        <p className="lobby-footnote">
-          Aucun compte requis, connexion anonyme.
-        </p>
+        <p className="lobby-footnote">{t.hero.footnote}</p>
       </div>
     </div>
   )

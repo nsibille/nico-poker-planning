@@ -1,6 +1,8 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { formatClock } from '@/lib/game/session-stats'
+import { useI18n } from '@/lib/i18n/I18nProvider'
+import { fmt } from '@/lib/i18n/interpolate'
 import type { Phase } from '@/types'
 
 interface RoundTimerProps {
@@ -25,6 +27,8 @@ function baseNow(startedAt: string | null): number {
  * durée enregistrée une fois les votes révélés.
  */
 export function RoundTimer({ phase, startedAt, frozenSeconds }: RoundTimerProps) {
+  const { dict } = useI18n()
+  const tt = dict.room.timer
   const live = phase === 'voting' && !!startedAt
 
   const [now, setNow] = useState<number>(() => baseNow(startedAt))
@@ -55,8 +59,8 @@ export function RoundTimer({ phase, startedAt, frozenSeconds }: RoundTimerProps)
   return (
     <span
       className={`badge-timer${live ? ' badge-timer--live' : ''}`}
-      title={live ? 'Temps de vote en cours' : 'Temps de vote du round'}
-      aria-label={`Temps de vote : ${formatClock(seconds)}`}
+      title={live ? tt.live : tt.frozen}
+      aria-label={fmt(tt.aria, { time: formatClock(seconds) })}
     >
       <span className="badge-timer__icon" aria-hidden>⏱</span>
       <span className="badge-timer__value">{formatClock(seconds)}</span>

@@ -20,10 +20,13 @@ import { createClient } from '@/lib/supabase/client'
 import { computeRevealStats } from '@/lib/game/reveal-stats'
 import { useGameStore, useRoomSession } from '@/store/gameStore'
 import { getScale } from '@/lib/game/scales'
+import { useI18n } from '@/lib/i18n/I18nProvider'
+import { fmt } from '@/lib/i18n/interpolate'
 
 export default function RoomPage() {
   const params = useParams()
   const router = useRouter()
+  const { dict } = useI18n()
   const roomId = params.roomId as string
   const { toast, showToast, clearToast } = useToast()
 
@@ -64,10 +67,10 @@ export default function RoomPage() {
 
   useEffect(() => {
     if (!roomLoading && !room) {
-      showToast('Room introuvable')
+      showToast(dict.room.page.roomNotFound)
       setTimeout(() => router.push('/app'), 1500)
     }
-  }, [room, roomLoading, router, showToast])
+  }, [room, roomLoading, router, showToast, dict])
 
   useEffect(() => {
     if (!hydrated) return
@@ -155,7 +158,7 @@ export default function RoomPage() {
   if (!room) {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg-page)' }}>
-        <p style={{ fontFamily: 'var(--font-primary)', color: 'var(--color-text-muted)' }}>Redirection…</p>
+        <p style={{ fontFamily: 'var(--font-primary)', color: 'var(--color-text-muted)' }}>{dict.room.page.redirecting}</p>
         {toast && <Toast message={toast.message} type={toast.type} onClose={clearToast} />}
       </div>
     )
@@ -315,6 +318,8 @@ function HistoryBanner({
   onReopenForAll,
   showToast,
 }: HistoryBannerProps) {
+  const { dict } = useI18n()
+  const tb = dict.room.historyBanner
   const [busy, setBusy] = useState<null | 'exit' | 'reopen'>(null)
 
   async function reopenForAll() {
@@ -326,7 +331,7 @@ function HistoryBanner({
       .update({ phase: 'voting', round: viewingRound, story: storyTitle, timer_started_at: new Date().toISOString() })
       .eq('id', roomId)
     if (roomErr) {
-      showToast(`Échec : ${roomErr.message}`, 'error')
+      showToast(fmt(tb.reopenFailed, { msg: roomErr.message }), 'error')
       setBusy(null)
       return
     }
@@ -339,7 +344,7 @@ function HistoryBanner({
       .eq('room_id', roomId)
       .eq('round', viewingRound)
     if (votesErr) {
-      showToast(`Vote partiellement réouvert : ${votesErr.message}`, 'error')
+      showToast(fmt(tb.reopenPartial, { msg: votesErr.message }), 'error')
     }
     onReopenForAll()
     setBusy(null)
@@ -354,11 +359,8 @@ function HistoryBanner({
     <div className="history-banner">
       <span className="history-banner__icon" aria-hidden>📜</span>
       <div className="history-banner__body">
-        <strong>Vue historique, Round {viewingRound}</strong>
-        <p>
-          Vue locale, les autres participants ne voient rien.
-          Round live actuel : <strong>{liveRound}</strong>.
-        </p>
+        <strong>{fmt(tb.title, { round: viewingRound })}</strong>
+        <p>{fmt(tb.body, { liveRound })}</p>
       </div>
       <div className="history-banner__actions">
         <button
@@ -366,9 +368,9 @@ function HistoryBanner({
           className="history-banner__cta history-banner__cta--primary"
           onClick={reopenForAll}
           disabled={busy !== null}
-          title="Force tous les participants à re-voter ce round"
+          title={tb.reopenForAllTitle}
         >
-          {busy === 'reopen' ? '…' : '↻ Rouvrir pour tout le monde'}
+          {busy === 'reopen' ? '…' : tb.reopenForAll}
         </button>
         <button
           type="button"
@@ -376,7 +378,7 @@ function HistoryBanner({
           onClick={exit}
           disabled={busy !== null}
         >
-          ← Retour au round courant
+          {tb.back}
         </button>
       </div>
     </div>

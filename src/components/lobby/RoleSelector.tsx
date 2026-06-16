@@ -1,4 +1,5 @@
 'use client'
+import { useI18n } from '@/lib/i18n/I18nProvider'
 import type { Role } from '@/types'
 
 interface RoleSelectorProps {
@@ -6,18 +7,20 @@ interface RoleSelectorProps {
   onChange: (role: Role) => void
 }
 
-const ROLES: Array<{ id: Role; icon: string; title: string; sub: string }> = [
-  { id: 'developer',    icon: '🧑‍💻', title: 'Développeur', sub: 'Je vote' },
-  { id: 'scrum-master', icon: '🎯',   title: 'Scrum Master', sub: 'J\'anime' },
-]
-
 export function RoleSelector({ value, onChange }: RoleSelectorProps) {
+  const { dict } = useI18n()
+  const tf = dict.app.form
+  const ROLES: Array<{ id: Role; icon: string; title: string; sub: string }> = [
+    { id: 'developer',    icon: '🧑‍💻', title: tf.roleDev, sub: tf.roleDevSub },
+    { id: 'scrum-master', icon: '🎯',   title: tf.roleSm, sub: tf.roleSmSub },
+  ]
+
   return (
     <div className="flex flex-col gap-2">
       <label className="text-sm font-medium" style={{ color: 'var(--color-text-primary)', fontFamily: 'var(--font-primary)' }}>
-        Rôle
+        {tf.role}
       </label>
-      <div className="role-card-group" role="radiogroup" aria-label="Rôle">
+      <div className="role-card-group" role="radiogroup" aria-label={tf.role}>
         {ROLES.map(r => {
           const selected = value === r.id
           return (

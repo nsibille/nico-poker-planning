@@ -4,6 +4,8 @@ import { VoteCard } from './VoteCard'
 import { createClient } from '@/lib/supabase/client'
 import { useGameStore } from '@/store/gameStore'
 import { Toast, useToast } from '@/components/ui/Toast'
+import { useI18n } from '@/lib/i18n/I18nProvider'
+import { fmt } from '@/lib/i18n/interpolate'
 import type { Phase } from '@/types'
 import type { EstimationScale } from '@/lib/game/scales'
 
@@ -19,6 +21,8 @@ interface VoteGridProps {
 }
 
 export function VoteGrid({ roomId, round, phase, reopened = false, myPlayerId, myRole, currentVote, scale }: VoteGridProps) {
+  const { dict } = useI18n()
+  const tv = dict.room.vote
   const { setSelectedVote } = useGameStore()
   const { toast, showToast, clearToast } = useToast()
   const [confirmedVote, setConfirmedVote] = useState<string | null>(null)
@@ -52,7 +56,7 @@ export function VoteGrid({ roomId, round, phase, reopened = false, myPlayerId, m
         .eq('player_id', myPlayerId)
         .eq('round', round)
       if (error) {
-        showToast(`Annulation échouée : ${error.message}`)
+        showToast(fmt(tv.cancelFailed, { msg: error.message }))
         setSelectedVote(value)
       }
       return
@@ -65,7 +69,7 @@ export function VoteGrid({ roomId, round, phase, reopened = false, myPlayerId, m
       { onConflict: 'room_id,player_id,round' }
     )
     if (error) {
-      showToast(`Vote non enregistré : ${error.message}`)
+      showToast(fmt(tv.voteFailed, { msg: error.message }))
       setSelectedVote(null)
       return
     }
@@ -78,17 +82,17 @@ export function VoteGrid({ roomId, round, phase, reopened = false, myPlayerId, m
   const displayConfirmed = confirmedVote ?? (currentVote && canVote ? currentVote : null)
 
   const title = reopened
-    ? 'Re-vote demandé par le Scrum Master'
+    ? tv.reopenTitle
     : phase === 'voting'
-      ? 'Votre estimation'
-      : 'En attente…'
+      ? tv.yourEstimate
+      : tv.waitingTitle
 
   return (
     <div className={`card-surface flex flex-col gap-4 ${reopened ? 'vote-grid--reopened' : ''}`}>
       {reopened && (
         <div className="vote-grid__reopen-banner">
           <span aria-hidden>↺</span>
-          <span>Le Scrum Master t&apos;a rouvert le vote, choisis ta nouvelle estimation, elle est prise en compte immédiatement.</span>
+          <span>{tv.reopenBanner}</span>
         </div>
       )}
       <h3 style={{ fontSize: 'var(--text-md)', fontWeight: 'var(--fw-bold)', color: 'var(--color-text-primary)', fontFamily: 'var(--font-primary)' }}>
@@ -110,7 +114,7 @@ export function VoteGrid({ roomId, round, phase, reopened = false, myPlayerId, m
       </div>
       {canVote && displayConfirmed && (
         <p style={{ textAlign: 'center', fontSize: 'var(--text-sm)', color: 'var(--color-success)', fontFamily: 'var(--font-primary)', fontWeight: 'var(--fw-medium)' }}>
-          ✓ Vote enregistré : {displayConfirmed} <span style={{ color: 'var(--color-text-muted)' }}>, reclique la carte pour annuler</span>
+          {fmt(tv.recorded, { value: displayConfirmed })} <span style={{ color: 'var(--color-text-muted)' }}>{tv.recordedCancel}</span>
         </p>
       )}
       {toast && <Toast message={toast.message} type={toast.type} onClose={clearToast} />}

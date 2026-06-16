@@ -1,6 +1,8 @@
 'use client'
 import { useState, useRef, useEffect } from 'react'
 import { PLAYER_EMOJIS, randomPlayerEmoji } from '@/lib/game/emojis'
+import { useI18n } from '@/lib/i18n/I18nProvider'
+import { fmt } from '@/lib/i18n/interpolate'
 
 interface EmojiPickerProps {
   value: string
@@ -8,6 +10,8 @@ interface EmojiPickerProps {
 }
 
 export function EmojiPicker({ value, onChange }: EmojiPickerProps) {
+  const { dict } = useI18n()
+  const tf = dict.app.form
   const [open, setOpen] = useState(false)
   const rootRef = useRef<HTMLDivElement>(null)
 
@@ -22,13 +26,13 @@ export function EmojiPicker({ value, onChange }: EmojiPickerProps) {
 
   return (
     <div className="emoji-picker" ref={rootRef}>
-      <label className="emoji-picker__label">Ton avatar</label>
+      <label className="emoji-picker__label">{tf.avatar}</label>
       <div className="emoji-picker__row">
         <button
           type="button"
           className="emoji-picker__preview"
           onClick={() => setOpen(o => !o)}
-          aria-label="Choisir un autre emoji"
+          aria-label={tf.avatarChoose}
         >
           <span aria-hidden>{value}</span>
         </button>
@@ -36,12 +40,12 @@ export function EmojiPicker({ value, onChange }: EmojiPickerProps) {
           type="button"
           className="emoji-picker__dice"
           onClick={() => onChange(randomPlayerEmoji(value))}
-          aria-label="Emoji aléatoire"
-          title="Re-roll"
+          aria-label={tf.avatarRandom}
+          title={tf.avatarReroll}
         >
           🎲
         </button>
-        <span className="emoji-picker__hint">Clique l&apos;avatar pour choisir, ou le dé pour re-roll</span>
+        <span className="emoji-picker__hint">{tf.avatarHint}</span>
       </div>
 
       {open && (
@@ -52,7 +56,7 @@ export function EmojiPicker({ value, onChange }: EmojiPickerProps) {
               type="button"
               className={`emoji-picker__cell${e === value ? ' is-selected' : ''}`}
               onClick={() => { onChange(e); setOpen(false) }}
-              aria-label={`Choisir ${e}`}
+              aria-label={fmt(tf.avatarPick, { emoji: e })}
             >
               {e}
             </button>

@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Textarea } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { createClient } from '@/lib/supabase/client'
+import { useI18n } from '@/lib/i18n/I18nProvider'
 import type { Phase } from '@/types'
 
 interface StoryPanelProps {
@@ -15,6 +16,8 @@ interface StoryPanelProps {
 }
 
 export function StoryPanel({ roomId, story, phase, isScrumMaster, historyRound }: StoryPanelProps) {
+  const { dict } = useI18n()
+  const ts = dict.room.story
   const [draft, setDraft] = useState(story)
   const [lastSyncedStory, setLastSyncedStory] = useState(story)
   const [saving, setSaving] = useState(false)
@@ -33,10 +36,10 @@ export function StoryPanel({ roomId, story, phase, isScrumMaster, historyRound }
     return (
       <div className="card-surface flex flex-col gap-3">
         <h3 style={{ fontSize: 'var(--text-md)', fontWeight: 'var(--fw-bold)', color: 'var(--color-text-primary)', fontFamily: 'var(--font-primary)' }}>
-          User Story
+          {ts.title}
         </h3>
         <div className="story-display">
-          {story || <span style={{ color: 'var(--color-text-muted)' }}>Aucune story définie</span>}
+          {story || <span style={{ color: 'var(--color-text-muted)' }}>{ts.empty}</span>}
         </div>
       </div>
     )
@@ -74,12 +77,12 @@ export function StoryPanel({ roomId, story, phase, isScrumMaster, historyRound }
   }
 
   const buttonLabel = isWaiting
-    ? 'Lancer le vote'
+    ? ts.launchVote
     : saving
-      ? 'Enregistrement…'
+      ? ts.saving
       : hasUnsavedChanges
-        ? 'Enregistrer la modification'
-        : 'À jour'
+        ? ts.saveEdit
+        : ts.upToDate
 
   const buttonDisabled = trimmedEmpty || (!isWaiting && !hasUnsavedChanges) || saving
 
@@ -87,12 +90,12 @@ export function StoryPanel({ roomId, story, phase, isScrumMaster, historyRound }
     <div className="card-surface flex flex-col gap-3">
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <h3 style={{ fontSize: 'var(--text-md)', fontWeight: 'var(--fw-bold)', color: 'var(--color-text-primary)', fontFamily: 'var(--font-primary)' }}>
-          User Story
+          {ts.title}
         </h3>
         {!isWaiting && (
           <span className={`story-status-pill story-status-pill--${phase}`}>
-            {phase === 'voting' ? 'Vote en cours' : 'Révélé'}
-            {hasUnsavedChanges && <span className="story-status-pill__dot" aria-label="modifications non sauvegardées" />}
+            {phase === 'voting' ? ts.statusVoting : ts.statusRevealed}
+            {hasUnsavedChanges && <span className="story-status-pill__dot" aria-label={ts.unsaved} />}
           </span>
         )}
       </div>
@@ -100,13 +103,13 @@ export function StoryPanel({ roomId, story, phase, isScrumMaster, historyRound }
       <Textarea
         value={draft}
         onChange={e => setDraft(e.target.value)}
-        placeholder={isWaiting ? 'Décris la story à estimer…' : 'Édite la story (sera mise à jour pour tout le monde)'}
+        placeholder={isWaiting ? ts.placeholderWaiting : ts.placeholderEdit}
         rows={3}
       />
 
       {isWaiting && trimmedEmpty && (
         <p className="story-helper">
-          Renseigne une story pour lancer le vote du round.
+          {ts.helper}
         </p>
       )}
 

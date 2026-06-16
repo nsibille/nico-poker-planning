@@ -1,6 +1,8 @@
 'use client'
 import { formatMean, consensusIcon } from '@/lib/game/reveal-stats'
 import { formatDuration } from '@/lib/game/session-stats'
+import { useI18n } from '@/lib/i18n/I18nProvider'
+import { fmt } from '@/lib/i18n/interpolate'
 import type { Story, ConsensusLevel } from '@/types'
 
 interface StoryTimelineProps {
@@ -13,15 +15,18 @@ interface StoryTimelineProps {
   onSelect: (round: number | null) => void
 }
 
-const CONSENSUS_TINT: Record<ConsensusLevel, { bar: string; ring: string; label: string }> = {
-  perfect:   { bar: '#3fb88e', ring: 'rgba(63,184,142,0.45)',  label: 'Parfait' },
-  aligned:   { bar: '#4970ff', ring: 'rgba(73,112,255,0.45)',  label: 'Aligné' },
-  discuss:   { bar: '#ffb24d', ring: 'rgba(255,178,77,0.55)',  label: 'À discuter' },
-  divergent: { bar: '#ff5e7e', ring: 'rgba(255,94,126,0.55)',  label: 'Divergent' },
-  empty:     { bar: '#a0a8c0', ring: 'rgba(160,168,192,0.40)', label: 'Aucun vote' },
+const CONSENSUS_TINT: Record<ConsensusLevel, { bar: string; ring: string }> = {
+  perfect:   { bar: '#3fb88e', ring: 'rgba(63,184,142,0.45)' },
+  aligned:   { bar: '#4970ff', ring: 'rgba(73,112,255,0.45)' },
+  discuss:   { bar: '#ffb24d', ring: 'rgba(255,178,77,0.55)' },
+  divergent: { bar: '#ff5e7e', ring: 'rgba(255,94,126,0.55)' },
+  empty:     { bar: '#a0a8c0', ring: 'rgba(160,168,192,0.40)' },
 }
 
 export function StoryTimeline({ stories, liveRound, livePhase, liveStory, viewingRound, onSelect }: StoryTimelineProps) {
+  const { dict } = useI18n()
+  const tt = dict.room.timeline
+  const short = dict.room.consensusShort
   // Build the displayable list: every revealed story, plus a virtual "current"
   // item for the live round when it's not yet revealed (so the SM always sees
   // where they are).
@@ -29,7 +34,7 @@ export function StoryTimeline({ stories, liveRound, livePhase, liveStory, viewin
   const currentVirtual = !liveAlreadySnapshotted
     ? {
         round: liveRound,
-        title: liveStory || 'Round en cours',
+        title: liveStory || tt.roundInProgress,
         final_mean: null as number | null,
         consensus: null as ConsensusLevel | null,
         votingSeconds: null as number | null,
@@ -41,7 +46,7 @@ export function StoryTimeline({ stories, liveRound, livePhase, liveStory, viewin
   const items = [
     ...stories.map(s => ({
       round: s.round,
-      title: s.title || '(titre perdu)',
+      title: s.title || tt.titleLost,
       final_mean: s.final_mean,
       consensus: s.consensus as ConsensusLevel | null,
       votingSeconds: s.voting_seconds,
@@ -58,17 +63,17 @@ export function StoryTimeline({ stories, liveRound, livePhase, liveStory, viewin
   }
 
   return (
-    <aside className="story-timeline" aria-label="Historique des stories">
+    <aside className="story-timeline" aria-label={tt.title}>
       <header className="story-timeline__header">
-        <span className="story-timeline__eyebrow">Scrum Master</span>
-        <h3 className="story-timeline__title">Timeline</h3>
+        <span className="story-timeline__eyebrow">{tt.eyebrow}</span>
+        <h3 className="story-timeline__title">{tt.title}</h3>
         <p className="story-timeline__hint">
-          Navigation locale, clique pour consulter un round passé sans déranger les participants.
+          {tt.hint}
         </p>
       </header>
 
       {items.length === 0 ? (
-        <p className="story-timeline__empty">Aucune story révélée pour l&apos;instant.</p>
+        <p className="story-timeline__empty">{tt.empty}</p>
       ) : (
         <ol className="story-timeline__list">
           {items.map((item, idx) => {
@@ -90,8 +95,8 @@ export function StoryTimeline({ stories, liveRound, livePhase, liveStory, viewin
                   className={`story-timeline__item${isActive ? ' is-active' : ''}${item.isPending ? ' is-pending' : ''}`}
                   onClick={() => openStory(item.round)}
                   title={item.isPending
-                    ? `Round ${item.round} en cours, clique pour revenir au round courant`
-                    : `Round ${item.round}, ${item.title}`}
+                    ? fmt(tt.pendingTitle, { round: item.round })
+                    : fmt(tt.itemTitle, { round: item.round, title: item.title })}
                   data-consensus={item.consensus ?? 'empty'}
                   style={tint ? { ['--timeline-tint' as string]: tint.bar, ['--timeline-ring' as string]: tint.ring } : undefined}
                 >
@@ -102,13 +107,13 @@ export function StoryTimeline({ stories, liveRound, livePhase, liveStory, viewin
                     <span
                       className="story-timeline__dot"
                       aria-hidden
-                      title={tint?.label ?? (item.isPending ? 'En cours' : 'Aucun vote')}
+                      title={item.consensus ? short[item.consensus] : (item.isPending ? tt.pendingDot : tt.emptyDot)}
                     />
                     {item.isLive && !item.isPending && (
-                      <span className="story-timeline__live-pill">live</span>
+                      <span className="story-timeline__live-pill">{tt.live}</span>
                     )}
                     {item.isPending && (
-                      <span className="story-timeline__live-pill story-timeline__live-pill--pending">en cours</span>
+                      <span className="story-timeline__live-pill story-timeline__live-pill--pending">{tt.pending}</span>
                     )}
                   </div>
 
@@ -119,15 +124,15 @@ export function StoryTimeline({ stories, liveRound, livePhase, liveStory, viewin
                   <div className="story-timeline__meta">
                     <span className="story-timeline__mean">
                       <span className="story-timeline__mean-value">{meanText}</span>
-                      <span className="story-timeline__mean-label">moy.</span>
+                      <span className="story-timeline__mean-label">{tt.mean}</span>
                     </span>
                     {item.consensus && (
                       <span className="story-timeline__consensus" data-consensus={item.consensus}>
-                        {consensusIcon(item.consensus)} {tint?.label}
+                        {consensusIcon(item.consensus)} {short[item.consensus]}
                       </span>
                     )}
                     {item.votingSeconds !== null && item.votingSeconds !== undefined && (
-                      <span className="story-timeline__time" title="Temps de vote du round">
+                      <span className="story-timeline__time" title={tt.timeTitle}>
                         ⏱ {formatDuration(item.votingSeconds)}
                       </span>
                     )}
@@ -141,7 +146,7 @@ export function StoryTimeline({ stories, liveRound, livePhase, liveStory, viewin
 
       {viewingRound !== null && (
         <div className="story-timeline__active-hint">
-          Vue active : <strong>round {viewingRound}</strong>
+          {tt.activeView} <strong>{fmt(tt.activeRound, { round: viewingRound })}</strong>
         </div>
       )}
     </aside>

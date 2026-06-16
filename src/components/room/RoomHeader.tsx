@@ -7,6 +7,9 @@ import { BadgeRoomId, BadgeRound, BadgePhase } from '@/components/ui/Badge'
 import { RoundTimer } from '@/components/room/RoundTimer'
 import { useGameStore, useRoomSession } from '@/store/gameStore'
 import { createClient } from '@/lib/supabase/client'
+import { useI18n } from '@/lib/i18n/I18nProvider'
+import { fmt } from '@/lib/i18n/interpolate'
+import type { Locale } from '@/lib/i18n/locales'
 import type { Room } from '@/types'
 
 interface RoomHeaderProps {
@@ -22,6 +25,9 @@ interface RoomHeaderProps {
 
 export function RoomHeader({ room, connected, displayRound, displayPhase, isHistoryMode, votingSeconds }: RoomHeaderProps) {
   const router = useRouter()
+  const { dict, locale, setLocale } = useI18n()
+  const tr = dict.room
+  const otherLocale: Locale = locale === 'fr' ? 'en' : 'fr'
   const session = useRoomSession(room.id)
   const { leaveRoom } = useGameStore()
   const [leaving, setLeaving] = useState(false)
@@ -42,7 +48,7 @@ export function RoomHeader({ room, connected, displayRound, displayPhase, isHist
   return (
     <nav className="nav-room-header">
       <div className="flex items-center gap-2 flex-1">
-        <Link href="/fr" aria-label="Scrumbler" className="nav-room-header__lockup">
+        <Link href={`/${locale}`} aria-label="Scrumbler" className="nav-room-header__lockup">
           <Image
             src="/brand/logo/logo-horizontal.svg"
             alt="Scrumbler"
@@ -53,8 +59,8 @@ export function RoomHeader({ room, connected, displayRound, displayPhase, isHist
           />
         </Link>
         <BadgeRoomId id={room.id} />
-        <BadgeRound round={displayRound ?? room.round} />
-        <BadgePhase phase={displayPhase ?? (room.phase as 'waiting' | 'voting' | 'revealed')} />
+        <BadgeRound label={fmt(tr.round, { n: displayRound ?? room.round })} />
+        <BadgePhase phase={displayPhase ?? (room.phase as 'waiting' | 'voting' | 'revealed')} labels={tr.phase} />
         <RoundTimer
           phase={displayPhase ?? (room.phase as 'waiting' | 'voting' | 'revealed')}
           startedAt={isHistoryMode ? null : room.timer_started_at}
@@ -64,9 +70,9 @@ export function RoomHeader({ room, connected, displayRound, displayPhase, isHist
           <span
             className="badge-phase-waiting"
             style={{ borderColor: 'var(--color-violet)', color: 'var(--color-violet)', background: 'var(--color-violet-50)' }}
-            title="Tu consultes un round déjà révélé"
+            title={tr.header.historyTitle}
           >
-            📜 Historique
+            📜 {tr.header.history}
           </span>
         )}
         {!connected && (
@@ -74,17 +80,27 @@ export function RoomHeader({ room, connected, displayRound, displayPhase, isHist
             className="badge-phase-waiting"
             style={{ borderColor: 'var(--color-warning)', color: 'var(--color-warning-dark)' }}
           >
-            Reconnexion…
+            {tr.header.reconnecting}
           </span>
         )}
       </div>
-      <button
-        onClick={handleLeave}
-        disabled={leaving}
-        className="btn-ghost-sm"
-      >
-        {leaving ? 'Déconnexion…' : 'Quitter'}
-      </button>
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          className="marketing-lang-switch"
+          onClick={() => setLocale(otherLocale)}
+          aria-label={`Switch to ${otherLocale.toUpperCase()}`}
+        >
+          {otherLocale.toUpperCase()}
+        </button>
+        <button
+          onClick={handleLeave}
+          disabled={leaving}
+          className="btn-ghost-sm"
+        >
+          {leaving ? tr.header.leaving : tr.header.leave}
+        </button>
+      </div>
     </nav>
   )
 }

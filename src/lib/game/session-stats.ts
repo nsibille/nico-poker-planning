@@ -25,10 +25,10 @@ export interface PlayerStats {
 }
 
 export interface Award {
+  /** Identifiant stable, sert à récupérer titre/sous-titre traduits dans le
+   *  dictionnaire (dict.room.awards[id]). */
   id: string
   icon: string
-  title: string
-  subtitle: string
   player: Player
   value?: string
 }
@@ -237,8 +237,6 @@ export function computeSessionStats(
     awards.push({
       id: 'optimist',
       icon: '🌞',
-      title: 'L\'Optimiste',
-      subtitle: 'A vu la vie en petites complexités',
       player: optimist.player,
       value: (optimist.averageGiven as number).toFixed(1),
     })
@@ -252,8 +250,6 @@ export function computeSessionStats(
     awards.push({
       id: 'pessimist',
       icon: '🌧️',
-      title: 'Le Pessimiste',
-      subtitle: 'A toujours pensé au pire des cas',
       player: pessimist.player,
       value: (pessimist.averageGiven as number).toFixed(1),
     })
@@ -267,11 +263,9 @@ export function computeSessionStats(
     awards.push({
       id: 'chameleon',
       icon: '🎯',
-      title: 'Le Caméléon',
-      subtitle: 'Toujours raccord avec l\'équipe',
       player: chameleon.player,
       value: (chameleon.alignmentScore as number) === 0
-        ? 'Pile-poil'
+        ? '🎯'
         : `Δ ${(chameleon.alignmentScore as number).toFixed(2)}`,
     })
   }
@@ -284,8 +278,6 @@ export function computeSessionStats(
     awards.push({
       id: 'rebel',
       icon: '🦄',
-      title: 'Le Franc-Tireur',
-      subtitle: 'Sa propre vision des choses',
       player: rebel.player,
       value: `Δ ${(rebel.alignmentScore as number).toFixed(2)}`,
     })
@@ -299,8 +291,6 @@ export function computeSessionStats(
     awards.push({
       id: 'indecisive',
       icon: '🌀',
-      title: 'L\'Indécis',
-      subtitle: 'A préféré ne pas se prononcer',
       player: indecisive.player,
       value: `${indecisive.questionVotes} × ?`,
     })
@@ -314,8 +304,6 @@ export function computeSessionStats(
     awards.push({
       id: 'machine',
       icon: '🚀',
-      title: 'La Machine',
-      subtitle: 'A chiffré le plus vite en moyenne',
       player: machine.player,
       value: formatDuration(machine.averageResponseSec as number),
     })

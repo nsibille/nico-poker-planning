@@ -5,6 +5,8 @@ import { Toast, useToast } from '@/components/ui/Toast'
 import { createClient } from '@/lib/supabase/client'
 import { useGameStore } from '@/store/gameStore'
 import { computeRevealStats } from '@/lib/game/reveal-stats'
+import { useI18n } from '@/lib/i18n/I18nProvider'
+import { fmt } from '@/lib/i18n/interpolate'
 import type { EstimationScale } from '@/lib/game/scales'
 import type { Player, Vote, Phase } from '@/types'
 
@@ -27,6 +29,8 @@ interface StatusBarProps {
 }
 
 export function StatusBar({ roomId, phase, round, liveRound, isHistoryMode, story, players, votes, isScrumMaster, scale, timerStartedAt }: StatusBarProps) {
+  const { dict } = useI18n()
+  const ts = dict.room.status
   const { setSelectedVote } = useGameStore()
   const [loading, setLoading] = useState(false)
   const [endConfirm, setEndConfirm] = useState(false)
@@ -40,7 +44,7 @@ export function StatusBar({ roomId, phase, round, liveRound, isHistoryMode, stor
       .update({ ended_at: new Date().toISOString() })
       .eq('id', roomId)
     if (error) {
-      showToast(`Fin de session échouée : ${error.message}`)
+      showToast(fmt(ts.endFailed, { msg: error.message }))
     }
     setLoading(false)
     setEndConfirm(false)
@@ -75,12 +79,12 @@ export function StatusBar({ roomId, phase, round, liveRound, isHistoryMode, stor
       voting_seconds: votingSeconds,
     }, { onConflict: 'room_id,round' })
     if (storyError) {
-      showToast(`Snapshot story échoué : ${storyError.message}. La migration timeline a-t-elle été appliquée ?`)
+      showToast(fmt(ts.snapshotFailed, { msg: storyError.message }))
       setLoading(false)
       return
     }
     const { error: roomError } = await supabase.from('rooms').update({ phase: 'revealed' }).eq('id', roomId)
-    if (roomError) showToast(`Reveal échoué : ${roomError.message}`)
+    if (roomError) showToast(fmt(ts.revealFailed, { msg: roomError.message }))
     setLoading(false)
   }
 
@@ -92,7 +96,7 @@ export function StatusBar({ roomId, phase, round, liveRound, isHistoryMode, stor
       .update({ phase: 'waiting', story: '', round: liveRound + 1, timer_started_at: null })
       .eq('id', roomId)
     if (error) {
-      showToast(`Prochain round échoué : ${error.message}`)
+      showToast(fmt(ts.nextRoundFailed, { msg: error.message }))
       setLoading(false)
       return
     }
@@ -108,7 +112,7 @@ export function StatusBar({ roomId, phase, round, liveRound, isHistoryMode, stor
     return (
       <div className="card-surface flex flex-col gap-2">
         <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)', fontFamily: 'var(--font-primary)' }}>
-          Tu consultes le round {round}, vue locale. Clique « Re-voter » sous un participant pour rouvrir son vote, ou « Rouvrir pour tout le monde » dans le bandeau pour forcer un nouveau vote sur ce round. Round live actuel : {liveRound}.
+          {fmt(ts.historyHint, { round, liveRound })}
         </span>
         {toast && <Toast message={toast.message} type={toast.type} onClose={clearToast} />}
       </div>
@@ -125,16 +129,16 @@ export function StatusBar({ roomId, phase, round, liveRound, isHistoryMode, stor
             {phase === 'voting' && (
               <div className="flex items-center gap-3">
                 <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)', fontFamily: 'var(--font-primary)' }}>
-                  {voted.length}/{devs.length} vote{devs.length !== 1 ? 's' : ''}
+                  {fmt(devs.length === 1 ? ts.votesOne : ts.votesMany, { voted: voted.length, total: devs.length })}
                 </span>
                 <Button
                   variant="reveal"
                   onClick={handleReveal}
                   disabled={!hasDevs}
                   loading={loading}
-                  title={allVoted ? undefined : 'Tous les devs n\'ont pas voté, révéler quand même ?'}
+                  title={allVoted ? undefined : ts.revealTitle}
                 >
-                  Révéler les votes
+                  {ts.reveal}
                 </Button>
               </div>
             )}
@@ -145,19 +149,19 @@ export function StatusBar({ roomId, phase, round, liveRound, isHistoryMode, stor
                   className="btn-ghost-sm status-bar__end-session"
                   onClick={() => setEndConfirm(true)}
                   disabled={loading}
-                  title="Affiche l'écran final à tous les participants"
+                  title={ts.endSessionTitle}
                 >
-                  🏁 Terminer la session
+                  {ts.endSession}
                 </button>
                 <Button variant="primary" onClick={handleNextRound} loading={loading}>
-                  Prochain round →
+                  {ts.nextRound}
                 </Button>
               </div>
             )}
             {phase === 'revealed' && endConfirm && (
               <div className="flex items-center gap-2 flex-wrap">
                 <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)', fontFamily: 'var(--font-primary)' }}>
-                  Tout le monde verra le récap final.
+                  {ts.endConfirm}
                 </span>
                 <button
                   type="button"
@@ -165,16 +169,16 @@ export function StatusBar({ roomId, phase, round, liveRound, isHistoryMode, stor
                   onClick={() => setEndConfirm(false)}
                   disabled={loading}
                 >
-                  Annuler
+                  {ts.cancel}
                 </button>
                 <Button variant="danger" onClick={handleEndSession} loading={loading}>
-                  Oui, terminer
+                  {ts.confirmEnd}
                 </Button>
               </div>
             )}
             {phase === 'waiting' && (
               <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)', fontFamily: 'var(--font-primary)' }}>
-                Définissez une story pour lancer le vote
+                {ts.waitingHint}
               </span>
             )}
           </>
@@ -185,7 +189,7 @@ export function StatusBar({ roomId, phase, round, liveRound, isHistoryMode, stor
         <div className="flex flex-col gap-1" style={{ fontFamily: 'var(--font-primary)', fontSize: 'var(--text-sm)' }}>
           {voted.length > 0 && (
             <div className="flex flex-wrap items-center gap-2">
-              <span style={{ color: 'var(--color-success, #1aa37a)', fontWeight: 'var(--fw-medium)' }}>✓ A voté :</span>
+              <span style={{ color: 'var(--color-success, #1aa37a)', fontWeight: 'var(--fw-medium)' }}>{ts.voted}</span>
               <span style={{ color: 'var(--color-text-primary)' }}>
                 {voted.map(d => d.name).join(', ')}
               </span>
@@ -193,7 +197,7 @@ export function StatusBar({ roomId, phase, round, liveRound, isHistoryMode, stor
           )}
           {pending.length > 0 && (
             <div className="flex flex-wrap items-center gap-2">
-              <span style={{ color: 'var(--color-text-muted)', fontWeight: 'var(--fw-medium)' }}>… En attente :</span>
+              <span style={{ color: 'var(--color-text-muted)', fontWeight: 'var(--fw-medium)' }}>{ts.pending}</span>
               <span style={{ color: 'var(--color-text-primary)' }}>
                 {pending.map(d => d.name).join(', ')}
               </span>
