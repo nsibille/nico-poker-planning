@@ -47,6 +47,11 @@ export interface SessionStats {
   mostContested: Story | null
   mostUnanimous: Story | null
   awards: Award[]
+  /** Temps de vote cumulé (secondes) sur les rounds chronométrés. Null si aucun
+   *  round n'a de mesure (sessions d'avant le chrono). */
+  totalVotingSeconds: number | null
+  /** Temps de vote moyen par round chronométré (secondes). Null si aucune mesure. */
+  averageVotingSeconds: number | null
 }
 
 function nearestScaleIndex(scaleNums: number[], value: number): number {
@@ -192,6 +197,17 @@ export function computeSessionStats(
   const perfectConsensusCount = stories.filter(s => s.consensus === 'perfect').length
   const divergentCount = stories.filter(s => s.consensus === 'divergent').length
 
+  // Temps de vote : agrégé sur les rounds qui ont une mesure (voting_seconds).
+  const votingTimes = stories
+    .map(s => s.voting_seconds)
+    .filter((v): v is number => v !== null && v !== undefined && isFinite(v) && v >= 0)
+  const totalVotingSeconds = votingTimes.length > 0
+    ? votingTimes.reduce((a, b) => a + b, 0)
+    : null
+  const averageVotingSeconds = votingTimes.length > 0
+    ? (totalVotingSeconds as number) / votingTimes.length
+    : null
+
   // Most contested / most unanimous (by spread among numeric votes for that round)
   let mostContested: Story | null = null
   let maxSpread = -1
@@ -316,6 +332,8 @@ export function computeSessionStats(
     mostContested,
     mostUnanimous,
     awards,
+    totalVotingSeconds,
+    averageVotingSeconds,
   }
 }
 
@@ -328,6 +346,14 @@ export function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60)
   const s = Math.round(seconds - m * 60)
   return s === 0 ? `${m}min` : `${m}min ${s.toString().padStart(2, '0')}`
+}
+
+/** Format horloge M:SS pour un chrono qui tourne, ex: 0:07 / 1:23 / 12:05. */
+export function formatClock(seconds: number): string {
+  const total = Math.max(0, Math.floor(seconds))
+  const m = Math.floor(total / 60)
+  const s = total % 60
+  return `${m}:${s.toString().padStart(2, '0')}`
 }
 
 export function consensusEmoji(c: ConsensusLevel | string | null): string {

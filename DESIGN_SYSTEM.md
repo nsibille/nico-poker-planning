@@ -446,6 +446,37 @@ Variantes  : sm, md, lg | success, warning, danger, info, neutral
 
 ---
 
+### `badge-timer`
+**Chrono de round** (temps de vote). Croissant et indicatif : démarre au lancement
+du vote, ticke pendant la phase de vote (variante `--live`, pastille qui pulse,
+teinte chaude alignée sur `badge-phase-voting`), puis se fige sur la durée
+enregistrée une fois les votes révélés. Composant : `RoundTimer`.
+
+```css
+.badge-timer {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--color-bg-page);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  padding: 3px 10px;
+  font-size: var(--text-xs);
+  font-family: var(--font-mono);
+  font-weight: var(--fw-medium);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+.badge-timer--live {
+  background: var(--color-warning-light);
+  color: var(--color-warning-dark);
+  border-color: transparent;
+}
+```
+
+---
+
 ### `avatar-sm`
 **Avatar rôle Scrum Master**
 
@@ -1073,6 +1104,7 @@ en overlay, contenu blanc, bouton pill blanc/brand inversé.
 | `badge-phase-voting` | Badge | Phase vote en cours |
 | `badge-phase-revealed` | Badge | Phase votes révélés |
 | `badge-phase-waiting` | Badge | Phase en attente |
+| `badge-timer` | Badge | Chrono de round — temps de vote (variante `--live`) |
 | `avatar-sm` | Avatar | Avatar Scrum Master |
 | `avatar-dev` | Avatar | Avatar Développeur |
 | `card-surface` | Card | Conteneur générique — ombre bleue |

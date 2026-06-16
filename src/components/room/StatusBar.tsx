@@ -21,9 +21,12 @@ interface StatusBarProps {
   votes: Vote[]
   isScrumMaster: boolean
   scale: EstimationScale
+  /** Départ du chrono du round live (rooms.timer_started_at). Sert à figer la
+   *  durée de vote au moment du reveal. */
+  timerStartedAt: string | null
 }
 
-export function StatusBar({ roomId, phase, round, liveRound, isHistoryMode, story, players, votes, isScrumMaster, scale }: StatusBarProps) {
+export function StatusBar({ roomId, phase, round, liveRound, isHistoryMode, story, players, votes, isScrumMaster, scale, timerStartedAt }: StatusBarProps) {
   const { setSelectedVote } = useGameStore()
   const [loading, setLoading] = useState(false)
   const [endConfirm, setEndConfirm] = useState(false)
@@ -55,6 +58,12 @@ export function StatusBar({ roomId, phase, round, liveRound, isHistoryMode, stor
     setLoading(true)
     const supabase = createClient()
     const stats = computeRevealStats(scale, players, votes)
+    // Durée de vote figée : temps écoulé depuis le départ du chrono. Null si le
+    // timer n'a pas été posé (rounds d'avant la feature). Indicatif, alimente
+    // le suivi de perf dans la timeline et le récap.
+    const votingSeconds = timerStartedAt
+      ? Math.max(0, (Date.now() - new Date(timerStartedAt).getTime()) / 1000)
+      : null
     // Snapshot the round → stories before flipping the phase. Upsert lets us
     // re-reveal an already-revealed round (e.g. after the SM re-opens votes).
     const { error: storyError } = await supabase.from('stories').upsert({
@@ -63,6 +72,7 @@ export function StatusBar({ roomId, phase, round, liveRound, isHistoryMode, stor
       title: story,
       final_mean: stats.mean,
       consensus: stats.consensus,
+      voting_seconds: votingSeconds,
     }, { onConflict: 'room_id,round' })
     if (storyError) {
       showToast(`Snapshot story échoué : ${storyError.message}. La migration timeline a-t-elle été appliquée ?`)
@@ -79,7 +89,7 @@ export function StatusBar({ roomId, phase, round, liveRound, isHistoryMode, stor
     const supabase = createClient()
     const { error } = await supabase
       .from('rooms')
-      .update({ phase: 'waiting', story: '', round: liveRound + 1 })
+      .update({ phase: 'waiting', story: '', round: liveRound + 1, timer_started_at: null })
       .eq('id', roomId)
     if (error) {
       showToast(`Prochain round échoué : ${error.message}`)

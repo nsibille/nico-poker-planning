@@ -1,6 +1,6 @@
 'use client'
 import { useState, useCallback, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Spinner } from '@/components/ui/Spinner'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
@@ -23,44 +23,54 @@ import type { Role } from '@/types'
 
 export function LobbyForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  // Room ciblée par l'URL (ex: /app?room=alpha-421, posé par RoomPage quand on
+  // arrive sur une room sans session). Quand elle est présente, elle prime :
+  // on pré-remplit le formulaire et on ne reprend JAMAIS une autre room.
+  const targetRoom = searchParams.get('room')
   const { userId, loading: sessionLoading } = useSession()
   const { toast, showToast, clearToast } = useToast()
-  const { myPlayerId, myRoomId, setMyName, setMyRole, setMyPlayerId, setMyRoomId, setMyEmoji, reset } = useGameStore()
+  const { sessions, lastRoomId, joinRoom, leaveRoom } = useGameStore()
 
   const [name, setName] = useState('')
   const [role, setRole] = useState<Role | null>(null)
-  const [roomId, setRoomId] = useState('')
+  const [roomId, setRoomId] = useState((targetRoom ?? '').toLowerCase())
   const [emoji, setEmoji] = useState<string>(() => randomPlayerEmoji())
   const [scaleId, setScaleId] = useState<string>('fibonacci')
   const [customRaw, setCustomRaw] = useState<string>('')
   const [loading, setLoading] = useState(false)
-  // Tant qu'on a une session persistée non vérifiée, on masque le formulaire.
-  // État dérivé du store : si la vérif DB échoue, le reset() ci-dessous remet
-  // myPlayerId à null et restoring repasse à false automatiquement.
-  const restoring = !!(myPlayerId && myRoomId)
 
-  // Si on a une session persistée, on vérifie que le player existe encore en
-  // DB et on reprend. S'il a été supprimé (autre onglet, données stale), on
-  // reset et le formulaire réapparaît.
+  // Reprise automatique : uniquement sur /app nu (aucune room ciblée). On
+  // reprend la dernière room rejointe si sa session existe encore. Si une room
+  // est ciblée par l'URL, on ne reprend rien, l'utilisateur veut rejoindre
+  // cette room précise.
+  const resumeRoomId = !targetRoom && lastRoomId && sessions[lastRoomId] ? lastRoomId : null
+  const restoring = !!resumeRoomId
+
+  // On vérifie que le player de la session à reprendre existe encore en DB.
+  // S'il a été supprimé (autre onglet, données stale), on purge la session et
+  // le formulaire réapparaît.
   useEffect(() => {
-    if (!myPlayerId || !myRoomId) return
+    if (!resumeRoomId) return
+    const resumeSession = sessions[resumeRoomId]
+    if (!resumeSession) return
     let cancelled = false
     const supabase = createClient()
     ;(async () => {
       const { data } = await supabase
         .from('players')
         .select('id, room_id')
-        .eq('id', myPlayerId)
+        .eq('id', resumeSession.playerId)
         .maybeSingle()
       if (cancelled) return
-      if (data && data.room_id === myRoomId) {
-        router.replace(`/room/${myRoomId}`)
+      if (data && data.room_id === resumeRoomId) {
+        router.replace(`/room/${resumeRoomId}`)
       } else {
-        reset()
+        leaveRoom(resumeRoomId)
       }
     })()
     return () => { cancelled = true }
-  }, [myPlayerId, myRoomId, reset, router])
+  }, [resumeRoomId, sessions, leaveRoom, router])
 
   const handleGenerate = useCallback(() => {
     setRoomId(generateRoomId())
@@ -144,11 +154,7 @@ export function LobbyForm() {
         return
       }
 
-      setMyName(name.trim())
-      setMyRole(role)
-      setMyPlayerId(player.id)
-      setMyRoomId(roomId)
-      setMyEmoji(emoji)
+      joinRoom(roomId, { playerId: player.id, name: name.trim(), role, emoji })
       router.push(`/room/${roomId}`)
     } catch {
       showToast('Une erreur est survenue')

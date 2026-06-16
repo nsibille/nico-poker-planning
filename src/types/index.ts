@@ -9,6 +9,9 @@ export interface Room {
   scale_id: string
   scale_values: (number | string)[] | null
   ended_at: string | null
+  /** Posé quand le SM lance le vote. Base du chrono de round (temps écoulé
+   *  calculé côté client). Null hors phase de vote. */
+  timer_started_at: string | null
   created_at: string
   updated_at: string
 }
@@ -21,6 +24,9 @@ export interface Story {
   title: string
   final_mean: number | null
   consensus: ConsensusLevel | null
+  /** Durée du vote (secondes) figée au reveal. Null si non mesurée (round
+   *  révélé avant l'ajout du chrono, ou backfill). */
+  voting_seconds: number | null
   revealed_at: string
   updated_at: string
 }

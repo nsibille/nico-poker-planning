@@ -12,6 +12,9 @@ function normalize(row: Record<string, unknown>): Story {
       ? null
       : Number(row.final_mean),
     consensus: (row.consensus as ConsensusLevel | null) ?? null,
+    voting_seconds: row.voting_seconds === null || row.voting_seconds === undefined
+      ? null
+      : Number(row.voting_seconds),
     revealed_at: row.revealed_at as string,
     updated_at: row.updated_at as string,
   }

@@ -61,6 +61,7 @@ export type Database = {
           story: string
           updated_at: string
           ended_at: string | null
+          timer_started_at: string | null
         }
         Insert: {
           created_at?: string
@@ -72,6 +73,7 @@ export type Database = {
           story?: string
           updated_at?: string
           ended_at?: string | null
+          timer_started_at?: string | null
         }
         Update: {
           created_at?: string
@@ -83,6 +85,7 @@ export type Database = {
           story?: string
           updated_at?: string
           ended_at?: string | null
+          timer_started_at?: string | null
         }
         Relationships: []
       }
@@ -95,6 +98,7 @@ export type Database = {
           consensus: string | null
           revealed_at: string
           updated_at: string
+          voting_seconds: number | null
         }
         Insert: {
           room_id: string
@@ -104,6 +108,7 @@ export type Database = {
           consensus?: string | null
           revealed_at?: string
           updated_at?: string
+          voting_seconds?: number | null
         }
         Update: {
           room_id?: string
@@ -113,6 +118,7 @@ export type Database = {
           consensus?: string | null
           revealed_at?: string
           updated_at?: string
+          voting_seconds?: number | null
         }
         Relationships: [
           {

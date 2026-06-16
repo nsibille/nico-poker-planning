@@ -1,5 +1,6 @@
 'use client'
 import { formatMean, consensusIcon } from '@/lib/game/reveal-stats'
+import { formatDuration } from '@/lib/game/session-stats'
 import type { Story, ConsensusLevel } from '@/types'
 
 interface StoryTimelineProps {
@@ -31,6 +32,7 @@ export function StoryTimeline({ stories, liveRound, livePhase, liveStory, viewin
         title: liveStory || 'Round en cours',
         final_mean: null as number | null,
         consensus: null as ConsensusLevel | null,
+        votingSeconds: null as number | null,
         isLive: true,
         isPending: livePhase !== 'revealed',
       }
@@ -42,6 +44,7 @@ export function StoryTimeline({ stories, liveRound, livePhase, liveStory, viewin
       title: s.title || '(titre perdu)',
       final_mean: s.final_mean,
       consensus: s.consensus as ConsensusLevel | null,
+      votingSeconds: s.voting_seconds,
       isLive: s.round === liveRound,
       isPending: false,
     })),
@@ -121,6 +124,11 @@ export function StoryTimeline({ stories, liveRound, livePhase, liveStory, viewin
                     {item.consensus && (
                       <span className="story-timeline__consensus" data-consensus={item.consensus}>
                         {consensusIcon(item.consensus)} {tint?.label}
+                      </span>
+                    )}
+                    {item.votingSeconds !== null && item.votingSeconds !== undefined && (
+                      <span className="story-timeline__time" title="Temps de vote du round">
+                        ⏱ {formatDuration(item.votingSeconds)}
                       </span>
                     )}
                   </div>

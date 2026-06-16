@@ -418,6 +418,54 @@ html, body {
   font-weight: var(--fw-medium);
 }
 
+/* ── Chrono de round (slug badge-timer) ── */
+.badge-timer {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--color-bg-page);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  padding: 3px 10px;
+  font-size: var(--text-xs);
+  font-family: var(--font-mono);
+  font-weight: var(--fw-medium);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.badge-timer__icon {
+  font-size: 0.95em;
+  line-height: 1;
+}
+
+.badge-timer__value {
+  min-width: 2.6em;
+  text-align: center;
+}
+
+/* Pendant le vote : teinte chaude + pastille qui pulse, même langage que la
+   phase "Vote en cours". */
+.badge-timer--live {
+  background: var(--color-warning-light);
+  color: var(--color-warning-dark);
+  border-color: transparent;
+}
+
+.badge-timer--live .badge-timer__icon {
+  animation: timerTick 1s steps(2, end) infinite;
+}
+
+@keyframes timerTick {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .badge-timer--live .badge-timer__icon { animation: none; }
+}
+
 /* ── Avatars ── */
 .avatar-sm {
   width: 36px; height: 36px;
@@ -961,8 +1009,15 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  flex-wrap: wrap;
+  gap: 4px 8px;
   margin-top: 2px;
+}
+.story-timeline__time {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 .story-timeline__mean {
   display: inline-flex;
@@ -2412,6 +2467,11 @@ html, body {
   font-size: var(--text-xs);
   color: var(--color-text-secondary);
   white-space: nowrap;
+}
+
+.recap-story__time {
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
 }
 .recap-story__mean {
   text-align: right;
